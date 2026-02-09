@@ -1,31 +1,24 @@
 package appli;
 
+import appli.util.Router;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import java.io.IOException;
-
 public class StartApplication extends Application {
-    private static Stage mainStage;
 
-    public void start(Stage stage) throws IOException {
-        mainStage = stage;
-        FXMLLoader fxmlLoader = new
-                FXMLLoader(StartApplication.class.getResource("accueil/loginView.fxml"));
-        Scene scene = new Scene(fxmlLoader.load());
-        mainStage.setTitle("Hello!");
-        mainStage.setScene(scene);
-        mainStage.show();
-
+    @Override
+    public void start(Stage stage) {
+        Router.setPrimaryStage(stage);
+        Router.setTitle("HSP - Connexion");
+        Router.navigateTo("login");
     }
 
-    public static void changeScene(String nomDuFichierFxml) throws IOException {
-        FXMLLoader fxmlLoader = new
-                FXMLLoader(StartApplication.class.getResource(nomDuFichierFxml + "View.fxml"));
-        Scene scene = new Scene(fxmlLoader.load());
-        mainStage.setScene(scene);
+    @Override
+    public void stop() {
+        appli.util.DBConnection.getInstance().closeConnection();
     }
 
+    public static void main(String[] args) {
+        launch(args);
+    }
 }

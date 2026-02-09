@@ -1,4 +1,4 @@
-package model;
+package appli.model;
 
 import java.time.LocalDateTime;
 
@@ -6,8 +6,8 @@ public class User {
 
     public enum Role {
         ADMIN("Administrateur"),
-        SECRETAIRE("Secrétaire"),
-        MEDECIN("Médecin"),
+        SECRETAIRE("Secretaire"),
+        MEDECIN("Medecin"),
         GESTIONNAIRE("Gestionnaire de stock");
 
         private final String libelle;
@@ -42,7 +42,6 @@ public class User {
         this.actif = true;
     }
 
-    // Getters and Setters
     public int getId() {
         return id;
     }

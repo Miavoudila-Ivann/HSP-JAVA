@@ -1,4 +1,4 @@
-package model;
+package appli.model;
 
 import java.time.LocalDateTime;
 
@@ -6,9 +6,9 @@ public class DemandeProduit {
 
     public enum Statut {
         EN_ATTENTE("En attente"),
-        VALIDEE("Validée"),
-        REFUSEE("Refusée"),
-        LIVREE("Livrée");
+        VALIDEE("Validee"),
+        REFUSEE("Refusee"),
+        LIVREE("Livree");
 
         private final String libelle;
 
@@ -51,7 +51,6 @@ public class DemandeProduit {
         this.medecinId = medecinId;
     }
 
-    // Getters and Setters
     public int getId() {
         return id;
     }

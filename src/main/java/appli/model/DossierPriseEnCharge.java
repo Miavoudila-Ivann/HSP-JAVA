@@ -1,4 +1,4 @@
-package model;
+package appli.model;
 
 import java.time.LocalDateTime;
 
@@ -6,8 +6,8 @@ public class DossierPriseEnCharge {
 
     public enum NiveauGravite {
         NIVEAU_1("1", "Mineur", "#4CAF50"),
-        NIVEAU_2("2", "Modéré", "#8BC34A"),
-        NIVEAU_3("3", "Sérieux", "#FFC107"),
+        NIVEAU_2("2", "Modere", "#8BC34A"),
+        NIVEAU_3("3", "Serieux", "#FFC107"),
         NIVEAU_4("4", "Grave", "#FF9800"),
         NIVEAU_5("5", "Critique", "#F44336");
 
@@ -46,8 +46,8 @@ public class DossierPriseEnCharge {
     public enum Statut {
         EN_ATTENTE("En attente"),
         EN_COURS("En cours"),
-        TERMINE("Terminé"),
-        ANNULE("Annulé");
+        TERMINE("Termine"),
+        ANNULE("Annule");
 
         private final String libelle;
 
@@ -88,7 +88,6 @@ public class DossierPriseEnCharge {
         this.niveauGravite = niveauGravite;
     }
 
-    // Getters and Setters
     public int getId() {
         return id;
     }

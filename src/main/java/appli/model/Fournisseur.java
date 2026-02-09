@@ -1,4 +1,4 @@
-package model;
+package appli.model;
 
 import java.time.LocalDateTime;
 
@@ -22,7 +22,6 @@ public class Fournisseur {
         this.nom = nom;
     }
 
-    // Getters and Setters
     public int getId() {
         return id;
     }

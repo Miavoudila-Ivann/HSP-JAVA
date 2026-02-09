@@ -1,4 +1,4 @@
-package model;
+package appli.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -8,7 +8,7 @@ public class Patient {
 
     public enum Sexe {
         M("Masculin"),
-        F("Féminin");
+        F("Feminin");
 
         private final String libelle;
 
@@ -46,7 +46,6 @@ public class Patient {
         this.sexe = sexe;
     }
 
-    // Getters and Setters
     public int getId() {
         return id;
     }

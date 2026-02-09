@@ -1,4 +1,4 @@
-package model;
+package appli.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,7 +21,6 @@ public class Stock {
         this.quantite = quantite;
     }
 
-    // Getters and Setters
     public int getId() {
         return id;
     }

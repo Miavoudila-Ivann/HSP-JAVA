@@ -1,4 +1,4 @@
-package model;
+package appli.model;
 
 import java.time.LocalDateTime;
 
@@ -7,8 +7,8 @@ public class Produit {
     public enum NiveauDangerosite {
         FAIBLE("Faible", "#4CAF50"),
         MOYEN("Moyen", "#FFC107"),
-        ELEVE("Élevé", "#FF9800"),
-        TRES_ELEVE("Très élevé", "#F44336");
+        ELEVE("Eleve", "#FF9800"),
+        TRES_ELEVE("Tres eleve", "#F44336");
 
         private final String libelle;
         private final String couleur;
@@ -54,7 +54,6 @@ public class Produit {
         this.uniteMesure = uniteMesure;
     }
 
-    // Getters and Setters
     public int getId() {
         return id;
     }

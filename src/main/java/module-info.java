@@ -3,9 +3,16 @@ module appli.bibliotheque {
     requires javafx.fxml;
     requires java.sql;
 
-
     opens appli to javafx.fxml;
+    opens appli.ui.controller to javafx.fxml;
+    opens appli.model to javafx.fxml;
+
     exports appli;
-    exports appli.auteur;
-    opens appli.auteur to javafx.fxml;
+    exports appli.model;
+    exports appli.ui.controller;
+    exports appli.service;
+    exports appli.repository;
+    exports appli.dao;
+    exports appli.security;
+    exports appli.util;
 }

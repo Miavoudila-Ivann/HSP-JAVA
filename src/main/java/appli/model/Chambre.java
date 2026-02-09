@@ -1,4 +1,4 @@
-package model;
+package appli.model;
 
 public class Chambre {
 
@@ -36,7 +36,6 @@ public class Chambre {
         this.occupee = false;
     }
 
-    // Getters and Setters
     public int getId() {
         return id;
     }
@@ -86,7 +85,7 @@ public class Chambre {
     }
 
     public String getDescription() {
-        return numero + " - " + typeChambre.getLibelle() + " (Étage " + etage + ")";
+        return numero + " - " + typeChambre.getLibelle() + " (Etage " + etage + ")";
     }
 
     @Override
