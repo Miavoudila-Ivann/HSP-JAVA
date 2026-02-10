@@ -7,7 +7,11 @@
       "Bash(mvn compile:*)",
       "Bash(xargs:*)",
       "Bash(./mvnw compile:*)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(wc:*)",
+      "Bash(./mvnw.cmd:*)",
+      "Bash(\"/c/Program Files/JetBrains/IntelliJ IDEA 2025.1.1.1/jbr/bin/javac\" -version)",
+      "Bash(JAVA_HOME=\"/c/Program Files/JetBrains/IntelliJ IDEA 2025.1.1.1/jbr\" PATH=\"$JAVA_HOME/bin:$PATH\" ./mvnw.cmd:*)"
     ]
   }
 }

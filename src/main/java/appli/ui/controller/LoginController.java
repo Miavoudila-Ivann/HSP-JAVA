@@ -2,12 +2,15 @@ package appli.ui.controller;
 
 import appli.model.User;
 import appli.service.AuthService;
+import appli.util.Route;
 import appli.util.Router;
 import appli.util.ValidationUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 import java.util.Optional;
 
@@ -59,13 +62,7 @@ public class LoginController {
             return;
         }
 
-        User user = userOpt.get();
-        navigateToDashboard(user);
-    }
-
-    private void navigateToDashboard(User user) {
-        Router.setTitle("HSP - " + user.getRole().getLibelle());
-        Router.navigateTo("dashboard", user);
+        Router.goTo(Route.DASHBOARD);
     }
 
     private void showError(String message) {
@@ -74,8 +71,8 @@ public class LoginController {
     }
 
     @FXML
-    private void handleKeyPressed(javafx.scene.input.KeyEvent event) {
-        if (event.getCode() == javafx.scene.input.KeyCode.ENTER) {
+    private void handleKeyPressed(KeyEvent event) {
+        if (event.getCode() == KeyCode.ENTER) {
             handleLogin();
         }
     }
