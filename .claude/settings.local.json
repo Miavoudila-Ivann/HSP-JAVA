@@ -3,7 +3,8 @@
     "allow": [
       "Bash(tree:*)",
       "Bash(mvn clean:*)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(mvn compile:*)"
     ]
   }
 }
