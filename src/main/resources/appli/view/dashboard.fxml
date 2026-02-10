@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="appli.ui.controller.DashboardController"
+            prefHeight="600.0" prefWidth="900.0"
+            style="-fx-background-color: #f5f5f5;">
+
+    <!-- Barre du haut : info utilisateur + deconnexion -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="15"
+              style="-fx-background-color: #2196F3; -fx-padding: 15 25 15 25;">
+            <Label text="HSP" style="-fx-text-fill: white; -fx-font-weight: bold;">
+                <font><Font size="20.0"/></font>
+            </Label>
+            <Separator orientation="VERTICAL" prefHeight="30" style="-fx-opacity: 0.3;"/>
+            <Label text="Tableau de bord" style="-fx-text-fill: white;">
+                <font><Font size="16.0"/></font>
+            </Label>
+            <!-- Spacer -->
+            <HBox HBox.hgrow="ALWAYS"/>
+            <Label fx:id="welcomeLabel" text="Bienvenue" style="-fx-text-fill: white;">
+                <font><Font size="13.0"/></font>
+            </Label>
+            <Label text="|" style="-fx-text-fill: rgba(255,255,255,0.5);"/>
+            <Label fx:id="roleLabel" text="Role"
+                   style="-fx-text-fill: white; -fx-background-color: rgba(255,255,255,0.2); -fx-padding: 4 10 4 10; -fx-background-radius: 12;">
+                <font><Font size="12.0"/></font>
+            </Label>
+            <Button text="Deconnexion" onAction="#handleLogout"
+                    style="-fx-background-color: rgba(255,255,255,0.15); -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand; -fx-border-color: rgba(255,255,255,0.3); -fx-border-radius: 5;">
+            </Button>
+        </HBox>
+    </top>
+
+    <!-- Contenu central : grille de navigation -->
+    <center>
+        <VBox alignment="TOP_CENTER" spacing="30">
+            <padding>
+                <Insets top="40" right="50" bottom="40" left="50"/>
+            </padding>
+
+            <Label text="Menu Principal" style="-fx-text-fill: #333333;">
+                <font><Font name="System Bold" size="22.0"/></font>
+            </Label>
+
+            <Label text="Selectionnez un module pour commencer" style="-fx-text-fill: #888888;">
+                <font><Font size="13.0"/></font>
+            </Label>
+
+            <!-- Ligne 1 : Patients, Hospitalisations, Stock -->
+            <HBox alignment="CENTER" spacing="20">
+                <Button fx:id="btnPatients" text="Patients" onAction="#goToPatients"
+                        prefWidth="220" prefHeight="100"
+                        style="-fx-background-color: white; -fx-text-fill: #2196F3; -fx-font-size: 16; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2); -fx-border-color: #e0e0e0; -fx-border-radius: 10;">
+                </Button>
+
+                <Button fx:id="btnHospitalisations" text="Hospitalisations" onAction="#goToHospitalisations"
+                        prefWidth="220" prefHeight="100"
+                        style="-fx-background-color: white; -fx-text-fill: #FF9800; -fx-font-size: 16; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2); -fx-border-color: #e0e0e0; -fx-border-radius: 10;">
+                </Button>
+
+                <Button fx:id="btnStock" text="Stock" onAction="#goToStock"
+                        prefWidth="220" prefHeight="100"
+                        style="-fx-background-color: white; -fx-text-fill: #4CAF50; -fx-font-size: 16; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2); -fx-border-color: #e0e0e0; -fx-border-radius: 10;">
+                </Button>
+            </HBox>
+
+            <!-- Ligne 2 : Demandes, Utilisateurs, Journal -->
+            <HBox alignment="CENTER" spacing="20">
+                <Button fx:id="btnDemandes" text="Demandes" onAction="#goToDemandes"
+                        prefWidth="220" prefHeight="100"
+                        style="-fx-background-color: white; -fx-text-fill: #9C27B0; -fx-font-size: 16; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2); -fx-border-color: #e0e0e0; -fx-border-radius: 10;">
+                </Button>
+
+                <Button fx:id="btnUtilisateurs" text="Utilisateurs" onAction="#goToUtilisateurs"
+                        prefWidth="220" prefHeight="100"
+                        style="-fx-background-color: white; -fx-text-fill: #F44336; -fx-font-size: 16; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2); -fx-border-color: #e0e0e0; -fx-border-radius: 10;">
+                </Button>
+
+                <Button fx:id="btnJournal" text="Journal" onAction="#goToJournal"
+                        prefWidth="220" prefHeight="100"
+                        style="-fx-background-color: white; -fx-text-fill: #607D8B; -fx-font-size: 16; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2); -fx-border-color: #e0e0e0; -fx-border-radius: 10;">
+                </Button>
+            </HBox>
+        </VBox>
+    </center>
+
+    <!-- Barre du bas -->
+    <bottom>
+        <HBox alignment="CENTER" style="-fx-background-color: #eeeeee; -fx-padding: 10;">
+            <Label text="HSP - Systeme de Gestion Hospitaliere" style="-fx-text-fill: #999999;">
+                <font><Font size="11.0"/></font>
+            </Label>
+        </HBox>
+    </bottom>
+
+</BorderPane>

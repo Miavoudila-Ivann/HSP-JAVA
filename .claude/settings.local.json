@@ -11,7 +11,9 @@
       "Bash(wc:*)",
       "Bash(./mvnw.cmd:*)",
       "Bash(\"/c/Program Files/JetBrains/IntelliJ IDEA 2025.1.1.1/jbr/bin/javac\" -version)",
-      "Bash(JAVA_HOME=\"/c/Program Files/JetBrains/IntelliJ IDEA 2025.1.1.1/jbr\" PATH=\"$JAVA_HOME/bin:$PATH\" ./mvnw.cmd:*)"
+      "Bash(JAVA_HOME=\"/c/Program Files/JetBrains/IntelliJ IDEA 2025.1.1.1/jbr\" PATH=\"$JAVA_HOME/bin:$PATH\" ./mvnw.cmd:*)",
+      "Bash(JAVA_HOME=\"/c/Program Files/JetBrains/IntelliJ IDEA 2025.1.1.1/jbr\" PATH=\"$JAVA_HOME/bin:$PATH\" java:*)",
+      "Bash(JAVA_HOME=\"/c/Program Files/JetBrains/IntelliJ IDEA 2025.1.1.1/jbr\" PATH=\"$JAVA_HOME/bin:$PATH\" MAVEN_OPTS=\"\" ./mvnw.cmd:*)"
     ]
   }
 }

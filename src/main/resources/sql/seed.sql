@@ -8,26 +8,26 @@ USE hsp_java;
 -- ============================================================
 -- 1. UTILISATEURS DE TEST
 -- Mot de passe par defaut: "password123" pour tous
--- Hash genere avec PasswordHasher (salt:hash en base64)
+-- Hash genere avec BCrypt (cost factor 12)
 -- ============================================================
 
 INSERT INTO users (email, password_hash, nom, prenom, role, specialite, telephone, actif) VALUES
 -- Administrateur
-('admin@hsp.fr', 'c2FsdDEyMzQ1Njc4OTAxMjM0NTY=:JDJhJDEwJGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3', 'Dupont', 'Jean', 'ADMIN', NULL, '0601020304', TRUE),
+('admin@hsp.fr', '$2a$12$.PQOxGpNjutdE8Vc8ejIpObzQ15q93w2YEhg6w7O7yQ2UKYBUsiQe', 'Dupont', 'Jean', 'ADMIN', NULL, '0601020304', TRUE),
 
 -- Secretaires
-('secretaire1@hsp.fr', 'c2FsdDEyMzQ1Njc4OTAxMjM0NTY=:JDJhJDEwJGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3', 'Martin', 'Marie', 'SECRETAIRE', NULL, '0601020305', TRUE),
-('secretaire2@hsp.fr', 'c2FsdDEyMzQ1Njc4OTAxMjM0NTY=:JDJhJDEwJGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3', 'Bernard', 'Sophie', 'SECRETAIRE', NULL, '0601020306', TRUE),
+('secretaire1@hsp.fr', '$2a$12$.PQOxGpNjutdE8Vc8ejIpObzQ15q93w2YEhg6w7O7yQ2UKYBUsiQe', 'Martin', 'Marie', 'SECRETAIRE', NULL, '0601020305', TRUE),
+('secretaire2@hsp.fr', '$2a$12$.PQOxGpNjutdE8Vc8ejIpObzQ15q93w2YEhg6w7O7yQ2UKYBUsiQe', 'Bernard', 'Sophie', 'SECRETAIRE', NULL, '0601020306', TRUE),
 
 -- Medecins
-('medecin1@hsp.fr', 'c2FsdDEyMzQ1Njc4OTAxMjM0NTY=:JDJhJDEwJGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3', 'Leroy', 'Pierre', 'MEDECIN', 'Medecine generale', '0601020307', TRUE),
-('medecin2@hsp.fr', 'c2FsdDEyMzQ1Njc4OTAxMjM0NTY=:JDJhJDEwJGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3', 'Moreau', 'Claire', 'MEDECIN', 'Urgences', '0601020308', TRUE),
-('medecin3@hsp.fr', 'c2FsdDEyMzQ1Njc4OTAxMjM0NTY=:JDJhJDEwJGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3', 'Petit', 'François', 'MEDECIN', 'Cardiologie', '0601020309', TRUE),
-('medecin4@hsp.fr', 'c2FsdDEyMzQ1Njc4OTAxMjM0NTY=:JDJhJDEwJGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3', 'Roux', 'Isabelle', 'MEDECIN', 'Pediatrie', '0601020310', TRUE),
+('medecin1@hsp.fr', '$2a$12$.PQOxGpNjutdE8Vc8ejIpObzQ15q93w2YEhg6w7O7yQ2UKYBUsiQe', 'Leroy', 'Pierre', 'MEDECIN', 'Medecine generale', '0601020307', TRUE),
+('medecin2@hsp.fr', '$2a$12$.PQOxGpNjutdE8Vc8ejIpObzQ15q93w2YEhg6w7O7yQ2UKYBUsiQe', 'Moreau', 'Claire', 'MEDECIN', 'Urgences', '0601020308', TRUE),
+('medecin3@hsp.fr', '$2a$12$.PQOxGpNjutdE8Vc8ejIpObzQ15q93w2YEhg6w7O7yQ2UKYBUsiQe', 'Petit', 'Francois', 'MEDECIN', 'Cardiologie', '0601020309', TRUE),
+('medecin4@hsp.fr', '$2a$12$.PQOxGpNjutdE8Vc8ejIpObzQ15q93w2YEhg6w7O7yQ2UKYBUsiQe', 'Roux', 'Isabelle', 'MEDECIN', 'Pediatrie', '0601020310', TRUE),
 
 -- Gestionnaires de stock
-('gestionnaire1@hsp.fr', 'c2FsdDEyMzQ1Njc4OTAxMjM0NTY=:JDJhJDEwJGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3', 'Fournier', 'Michel', 'GESTIONNAIRE', NULL, '0601020311', TRUE),
-('gestionnaire2@hsp.fr', 'c2FsdDEyMzQ1Njc4OTAxMjM0NTY=:JDJhJDEwJGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3', 'Girard', 'Anne', 'GESTIONNAIRE', NULL, '0601020312', TRUE);
+('gestionnaire1@hsp.fr', '$2a$12$.PQOxGpNjutdE8Vc8ejIpObzQ15q93w2YEhg6w7O7yQ2UKYBUsiQe', 'Fournier', 'Michel', 'GESTIONNAIRE', NULL, '0601020311', TRUE),
+('gestionnaire2@hsp.fr', '$2a$12$.PQOxGpNjutdE8Vc8ejIpObzQ15q93w2YEhg6w7O7yQ2UKYBUsiQe', 'Girard', 'Anne', 'GESTIONNAIRE', NULL, '0601020312', TRUE);
 
 -- ============================================================
 -- 2. CHAMBRES

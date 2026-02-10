@@ -2,6 +2,7 @@ module appli.bibliotheque {
     requires javafx.controls;
     requires javafx.fxml;
     requires java.sql;
+    requires jbcrypt;
 
     opens appli to javafx.fxml;
     opens appli.ui.controller to javafx.fxml;

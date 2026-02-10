@@ -3,6 +3,7 @@ package appli.util;
 import appli.model.User;
 import appli.security.RoleGuard;
 import appli.security.SessionManager;
+import appli.service.AuthService;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -101,10 +102,10 @@ public class Router {
     }
 
     /**
-     * Deconnecte l'utilisateur et redirige vers la page de login.
+     * Deconnecte l'utilisateur (avec journalisation) et redirige vers la page de login.
      */
     public static void logout() {
-        SessionManager.getInstance().logout();
+        new AuthService().logout();
         navigationData.clear();
         goTo(Route.LOGIN);
     }
