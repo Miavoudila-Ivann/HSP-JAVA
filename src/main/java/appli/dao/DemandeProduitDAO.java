@@ -272,6 +272,32 @@ public class DemandeProduitDAO {
         return false;
     }
 
+    public boolean updateStatut(int id, DemandeProduit.Statut statut, Integer gestionnaireId,
+                                String commentaire, LocalDateTime dateTraitement) {
+        String sql = "UPDATE demandes_produits SET statut = ?, gestionnaire_id = ?, " +
+                "commentaire_traitement = ?, date_traitement = ? WHERE id = ?";
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, statut.name());
+            if (gestionnaireId != null) {
+                stmt.setInt(2, gestionnaireId);
+            } else {
+                stmt.setNull(2, Types.INTEGER);
+            }
+            stmt.setString(3, commentaire);
+            if (dateTraitement != null) {
+                stmt.setTimestamp(4, Timestamp.valueOf(dateTraitement));
+            } else {
+                stmt.setNull(4, Types.TIMESTAMP);
+            }
+            stmt.setInt(5, id);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la mise a jour du statut de la demande : " + e.getMessage());
+        }
+        return false;
+    }
+
     public boolean delete(int id) {
         String sql = "DELETE FROM demandes_produits WHERE id = ?";
         try (Connection conn = DBConnection.getInstance().getConnection();

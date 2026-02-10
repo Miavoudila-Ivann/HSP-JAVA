@@ -1,50 +1,17 @@
 package appli.repository;
 
-import appli.dao.ChambreDAO;
 import appli.model.Chambre;
 
 import java.util.List;
 import java.util.Optional;
 
-public class ChambreRepository {
+public interface ChambreRepository {
 
-    private final ChambreDAO chambreDAO = new ChambreDAO();
+    Optional<Chambre> findById(int id);
 
-    public Optional<Chambre> getById(int id) {
-        return Optional.ofNullable(chambreDAO.findById(id));
-    }
+    List<Chambre> findAvailableRooms();
 
-    public Optional<Chambre> getByNumero(String numero) {
-        return Optional.ofNullable(chambreDAO.findByNumero(numero));
-    }
+    Optional<Chambre> findAvailableRoomForUpdate();
 
-    public List<Chambre> getAll() {
-        return chambreDAO.findAll();
-    }
-
-    public List<Chambre> getDisponibles() {
-        return chambreDAO.findDisponibles();
-    }
-
-    public List<Chambre> getByType(Chambre.TypeChambre type) {
-        return chambreDAO.findByType(type);
-    }
-
-    public Chambre save(Chambre chambre) {
-        if (chambre.getId() == 0) {
-            int id = chambreDAO.insert(chambre);
-            chambre.setId(id);
-        } else {
-            chambreDAO.update(chambre);
-        }
-        return chambre;
-    }
-
-    public void updateOccupation(int chambreId, boolean occupee) {
-        chambreDAO.updateOccupation(chambreId, occupee);
-    }
-
-    public void delete(int id) {
-        chambreDAO.delete(id);
-    }
+    void setAvailable(int chambreId, boolean available);
 }

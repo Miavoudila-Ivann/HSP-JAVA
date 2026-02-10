@@ -4,6 +4,7 @@ import appli.model.JournalAction;
 import appli.model.Patient;
 import appli.model.User;
 import appli.repository.PatientRepository;
+import appli.repository.jdbc.PatientRepositoryJdbc;
 import appli.security.SessionManager;
 
 import java.util.List;
@@ -15,35 +16,35 @@ import java.util.Optional;
  */
 public class PatientService {
 
-    private final PatientRepository patientRepository = new PatientRepository();
+    private final PatientRepository patientRepository = new PatientRepositoryJdbc();
     private final JournalService journalService = new JournalService();
 
     /**
      * Recupere un patient par son identifiant.
      */
     public Optional<Patient> getById(int id) {
-        return patientRepository.getById(id);
+        return patientRepository.findById(id);
     }
 
     /**
      * Recupere un patient par son numero de securite sociale.
      */
     public Optional<Patient> getByNumeroSecuriteSociale(String numeroSecu) {
-        return patientRepository.getByNumeroSecuriteSociale(numeroSecu);
+        return patientRepository.findBySsn(numeroSecu);
     }
 
     /**
      * Recupere la liste de tous les patients.
      */
     public List<Patient> getAll() {
-        return patientRepository.getAll();
+        return patientRepository.findAll();
     }
 
     /**
      * Recherche des patients par nom, prenom ou numero de securite sociale.
      */
     public List<Patient> search(String searchTerm) {
-        return patientRepository.search(searchTerm);
+        return patientRepository.searchByName(searchTerm);
     }
 
     /**
@@ -63,8 +64,7 @@ public class PatientService {
 
         // Verification que le numero de securite sociale n'existe pas deja
         if (patient.getNumeroSecuriteSociale() != null) {
-            Optional<Patient> existant = patientRepository.getByNumeroSecuriteSociale(patient.getNumeroSecuriteSociale());
-            if (existant.isPresent()) {
+            if (patientRepository.existsBySsn(patient.getNumeroSecuriteSociale())) {
                 throw new IllegalArgumentException("Un patient avec ce numero de securite sociale existe deja");
             }
         }
@@ -99,14 +99,14 @@ public class PatientService {
         }
 
         // Verification que le patient existe
-        Optional<Patient> existant = patientRepository.getById(patient.getId());
+        Optional<Patient> existant = patientRepository.findById(patient.getId());
         if (existant.isEmpty()) {
             throw new IllegalArgumentException("Patient non trouve");
         }
 
         // Verification unicite numero secu si modifie
         if (patient.getNumeroSecuriteSociale() != null) {
-            Optional<Patient> patientAvecMemeSecu = patientRepository.getByNumeroSecuriteSociale(patient.getNumeroSecuriteSociale());
+            Optional<Patient> patientAvecMemeSecu = patientRepository.findBySsn(patient.getNumeroSecuriteSociale());
             if (patientAvecMemeSecu.isPresent() && patientAvecMemeSecu.get().getId() != patient.getId()) {
                 throw new IllegalArgumentException("Un autre patient avec ce numero de securite sociale existe deja");
             }
@@ -141,7 +141,7 @@ public class PatientService {
             throw new SecurityException("Seul l'administrateur peut supprimer un patient");
         }
 
-        Optional<Patient> patient = patientRepository.getById(patientId);
+        Optional<Patient> patient = patientRepository.findById(patientId);
         if (patient.isEmpty()) {
             throw new IllegalArgumentException("Patient non trouve");
         }
@@ -163,7 +163,7 @@ public class PatientService {
      */
     public Optional<Patient> consulterPatient(int patientId) {
         User currentUser = SessionManager.getInstance().getCurrentUser();
-        Optional<Patient> patient = patientRepository.getById(patientId);
+        Optional<Patient> patient = patientRepository.findById(patientId);
 
         if (patient.isPresent() && currentUser != null) {
             journalService.logAction(

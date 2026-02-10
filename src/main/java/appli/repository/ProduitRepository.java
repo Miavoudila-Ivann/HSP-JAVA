@@ -1,42 +1,25 @@
 package appli.repository;
 
-import appli.dao.ProduitDAO;
 import appli.model.Produit;
 
 import java.util.List;
 import java.util.Optional;
 
-public class ProduitRepository {
+public interface ProduitRepository {
 
-    private final ProduitDAO produitDAO = new ProduitDAO();
+    Produit save(Produit produit);
 
-    public Optional<Produit> getById(int id) {
-        return Optional.ofNullable(produitDAO.findById(id));
-    }
+    Produit update(Produit produit);
 
-    public Optional<Produit> getByCode(String code) {
-        return Optional.ofNullable(produitDAO.findByCode(code));
-    }
+    Optional<Produit> findById(int id);
 
-    public List<Produit> getAll() {
-        return produitDAO.findAll();
-    }
+    Optional<Produit> findByCode(String code);
 
-    public List<Produit> getByCategorie(String categorie) {
-        return produitDAO.findByCategorie(categorie);
-    }
+    List<Produit> findAll();
 
-    public Produit save(Produit produit) {
-        if (produit.getId() == 0) {
-            int id = produitDAO.insert(produit);
-            produit.setId(id);
-        } else {
-            produitDAO.update(produit);
-        }
-        return produit;
-    }
+    List<Produit> findByCategorieId(int categorieId);
 
-    public void delete(int id) {
-        produitDAO.delete(id);
-    }
+    List<Produit> findAllWithStock();
+
+    List<Produit> findLowStock();
 }

@@ -195,6 +195,25 @@ public class HospitalisationDAO {
         return false;
     }
 
+    public boolean endHospitalisation(int id, java.time.LocalDateTime dateSortie,
+                                      String diagnosticSortie, Hospitalisation.TypeSortie typeSortie,
+                                      int medecinSortieId) {
+        String sql = "UPDATE hospitalisations SET date_sortie_effective = ?, diagnostic_sortie = ?, " +
+                "statut = 'TERMINEE', type_sortie = ?, medecin_sortie_id = ? WHERE id = ?";
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setTimestamp(1, Timestamp.valueOf(dateSortie));
+            stmt.setString(2, diagnosticSortie);
+            stmt.setString(3, typeSortie.name());
+            stmt.setInt(4, medecinSortieId);
+            stmt.setInt(5, id);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la fin de l'hospitalisation : " + e.getMessage());
+        }
+        return false;
+    }
+
     public boolean delete(int id) {
         String sql = "DELETE FROM hospitalisations WHERE id = ?";
         try (Connection conn = DBConnection.getInstance().getConnection();

@@ -244,6 +244,41 @@ public class ProduitDAO {
         return false;
     }
 
+    public List<Produit> findAllWithStock() {
+        List<Produit> produits = new ArrayList<>();
+        String sql = "SELECT DISTINCT p.* FROM produits p " +
+                "INNER JOIN stocks s ON p.id = s.produit_id " +
+                "WHERE p.actif = true AND s.quantite > 0 ORDER BY p.nom";
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                produits.add(mapResultSetToProduit(rs));
+            }
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la recuperation des produits avec stock : " + e.getMessage());
+        }
+        return produits;
+    }
+
+    public List<Produit> findLowStock() {
+        List<Produit> produits = new ArrayList<>();
+        String sql = "SELECT p.* FROM produits p " +
+                "WHERE p.actif = true AND p.seuil_alerte_stock > " +
+                "(SELECT COALESCE(SUM(s.quantite), 0) FROM stocks s WHERE s.produit_id = p.id) " +
+                "ORDER BY p.nom";
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                produits.add(mapResultSetToProduit(rs));
+            }
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la recuperation des produits en stock bas : " + e.getMessage());
+        }
+        return produits;
+    }
+
     public boolean delete(int id) {
         String sql = "UPDATE produits SET actif = false WHERE id = ?";
         try (Connection conn = DBConnection.getInstance().getConnection();

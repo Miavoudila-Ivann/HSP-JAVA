@@ -4,7 +4,10 @@
       "Bash(tree:*)",
       "Bash(mvn clean:*)",
       "Bash(dir:*)",
-      "Bash(mvn compile:*)"
+      "Bash(mvn compile:*)",
+      "Bash(xargs:*)",
+      "Bash(./mvnw compile:*)",
+      "mcp__ide__getDiagnostics"
     ]
   }
 }

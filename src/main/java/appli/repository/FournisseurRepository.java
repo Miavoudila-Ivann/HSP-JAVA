@@ -1,38 +1,17 @@
 package appli.repository;
 
-import appli.dao.FournisseurDAO;
 import appli.model.Fournisseur;
 
 import java.util.List;
 import java.util.Optional;
 
-public class FournisseurRepository {
+public interface FournisseurRepository {
 
-    private final FournisseurDAO fournisseurDAO = new FournisseurDAO();
+    Fournisseur save(Fournisseur fournisseur);
 
-    public Optional<Fournisseur> getById(int id) {
-        return Optional.ofNullable(fournisseurDAO.findById(id));
-    }
+    Fournisseur update(Fournisseur fournisseur);
 
-    public List<Fournisseur> getAll() {
-        return fournisseurDAO.findAll();
-    }
+    Optional<Fournisseur> findById(int id);
 
-    public List<Fournisseur> search(String searchTerm) {
-        return fournisseurDAO.search(searchTerm);
-    }
-
-    public Fournisseur save(Fournisseur fournisseur) {
-        if (fournisseur.getId() == 0) {
-            int id = fournisseurDAO.insert(fournisseur);
-            fournisseur.setId(id);
-        } else {
-            fournisseurDAO.update(fournisseur);
-        }
-        return fournisseur;
-    }
-
-    public void delete(int id) {
-        fournisseurDAO.delete(id);
-    }
+    List<Fournisseur> findAll();
 }

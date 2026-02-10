@@ -199,6 +199,36 @@ public class DossierPriseEnChargeDAO {
         return false;
     }
 
+    public boolean updateStatut(int id, DossierPriseEnCharge.Statut statut) {
+        String sql = "UPDATE dossiers_prise_en_charge SET statut = ? WHERE id = ?";
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, statut.name());
+            stmt.setInt(2, id);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la mise a jour du statut du dossier : " + e.getMessage());
+        }
+        return false;
+    }
+
+    public List<DossierPriseEnCharge> findOpenCasesSorted() {
+        List<DossierPriseEnCharge> dossiers = new ArrayList<>();
+        String sql = "SELECT * FROM dossiers_prise_en_charge " +
+                "WHERE statut IN ('EN_ATTENTE', 'EN_COURS', 'EN_OBSERVATION') " +
+                "ORDER BY niveau_gravite DESC, priorite_triage ASC, date_creation ASC";
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                dossiers.add(mapResultSetToDossier(rs));
+            }
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la recuperation des dossiers ouverts : " + e.getMessage());
+        }
+        return dossiers;
+    }
+
     public boolean delete(int id) {
         String sql = "DELETE FROM dossiers_prise_en_charge WHERE id = ?";
         try (Connection conn = DBConnection.getInstance().getConnection();

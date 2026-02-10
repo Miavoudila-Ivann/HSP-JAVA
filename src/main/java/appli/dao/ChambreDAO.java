@@ -149,6 +149,33 @@ public class ChambreDAO {
         return false;
     }
 
+    public Chambre findFirstAvailable() {
+        String sql = "SELECT * FROM chambres WHERE actif = true AND nb_lits_occupes < capacite AND en_maintenance = false ORDER BY etage, numero LIMIT 1";
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) {
+                return mapResultSetToChambre(rs);
+            }
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la recherche de la premiere chambre disponible : " + e.getMessage());
+        }
+        return null;
+    }
+
+    public boolean setAvailable(int chambreId, boolean available) {
+        String sql = "UPDATE chambres SET en_maintenance = ? WHERE id = ?";
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setBoolean(1, !available);
+            stmt.setInt(2, chambreId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la mise a jour de la disponibilite de la chambre : " + e.getMessage());
+        }
+        return false;
+    }
+
     public boolean delete(int id) {
         String sql = "DELETE FROM chambres WHERE id = ?";
         try (Connection conn = DBConnection.getInstance().getConnection();

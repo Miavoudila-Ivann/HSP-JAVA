@@ -1,42 +1,25 @@
 package appli.repository;
 
-import appli.dao.PatientDAO;
 import appli.model.Patient;
 
 import java.util.List;
 import java.util.Optional;
 
-public class PatientRepository {
+public interface PatientRepository {
 
-    private final PatientDAO patientDAO = new PatientDAO();
+    Patient save(Patient patient);
 
-    public Optional<Patient> getById(int id) {
-        return Optional.ofNullable(patientDAO.findById(id));
-    }
+    Patient update(Patient patient);
 
-    public Optional<Patient> getByNumeroSecuriteSociale(String numeroSecu) {
-        return Optional.ofNullable(patientDAO.findByNumeroSecuriteSociale(numeroSecu));
-    }
+    Optional<Patient> findById(int id);
 
-    public List<Patient> getAll() {
-        return patientDAO.findAll();
-    }
+    Optional<Patient> findBySsn(String numeroSecuriteSociale);
 
-    public List<Patient> search(String searchTerm) {
-        return patientDAO.search(searchTerm);
-    }
+    List<Patient> findAll();
 
-    public Patient save(Patient patient) {
-        if (patient.getId() == 0) {
-            int id = patientDAO.insert(patient);
-            patient.setId(id);
-        } else {
-            patientDAO.update(patient);
-        }
-        return patient;
-    }
+    List<Patient> searchByName(String searchTerm);
 
-    public void delete(int id) {
-        patientDAO.delete(id);
-    }
+    boolean existsBySsn(String numeroSecuriteSociale);
+
+    void delete(int id);
 }

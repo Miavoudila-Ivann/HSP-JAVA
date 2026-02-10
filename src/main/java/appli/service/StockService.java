@@ -5,6 +5,9 @@ import appli.model.*;
 import appli.repository.FournisseurRepository;
 import appli.repository.ProduitRepository;
 import appli.repository.StockRepository;
+import appli.repository.jdbc.FournisseurRepositoryJdbc;
+import appli.repository.jdbc.ProduitRepositoryJdbc;
+import appli.repository.jdbc.StockRepositoryJdbc;
 import appli.security.SessionManager;
 import appli.util.DBConnection;
 
@@ -26,12 +29,12 @@ import java.util.Optional;
  */
 public class StockService {
 
-    private final ProduitRepository produitRepository = new ProduitRepository();
+    private final ProduitRepository produitRepository = new ProduitRepositoryJdbc();
     private final ProduitDAO produitDAO = new ProduitDAO();
-    private final FournisseurRepository fournisseurRepository = new FournisseurRepository();
+    private final FournisseurRepository fournisseurRepository = new FournisseurRepositoryJdbc();
     private final FournisseurDAO fournisseurDAO = new FournisseurDAO();
     private final ProduitFournisseurDAO produitFournisseurDAO = new ProduitFournisseurDAO();
-    private final StockRepository stockRepository = new StockRepository();
+    private final StockRepository stockRepository = new StockRepositoryJdbc();
     private final StockDAO stockDAO = new StockDAO();
     private final DemandeProduitDAO demandeProduitDAO = new DemandeProduitDAO();
     private final MouvementStockDAO mouvementStockDAO = new MouvementStockDAO();
@@ -43,28 +46,28 @@ public class StockService {
      * Recupere un produit par son identifiant.
      */
     public Optional<Produit> getProduitById(int id) {
-        return produitRepository.getById(id);
+        return produitRepository.findById(id);
     }
 
     /**
      * Recupere un produit par son code.
      */
     public Optional<Produit> getProduitByCode(String code) {
-        return produitRepository.getByCode(code);
+        return produitRepository.findByCode(code);
     }
 
     /**
      * Recupere tous les produits.
      */
     public List<Produit> getAllProduits() {
-        return produitRepository.getAll();
+        return produitRepository.findAll();
     }
 
     /**
      * Recupere les produits d'une categorie.
      */
     public List<Produit> getProduitsByCategorie(int categorieId) {
-        return produitRepository.getByCategorie(categorieId);
+        return produitRepository.findByCategorieId(categorieId);
     }
 
     /**
@@ -127,14 +130,14 @@ public class StockService {
      * Recupere un fournisseur par son identifiant.
      */
     public Optional<Fournisseur> getFournisseurById(int id) {
-        return fournisseurRepository.getById(id);
+        return fournisseurRepository.findById(id);
     }
 
     /**
      * Recupere tous les fournisseurs.
      */
     public List<Fournisseur> getAllFournisseurs() {
-        return fournisseurRepository.getAll();
+        return fournisseurRepository.findAll();
     }
 
     /**
@@ -628,7 +631,7 @@ public class StockService {
      * Recupere tous les stocks.
      */
     public List<Stock> getAllStocks() {
-        return stockRepository.getAll();
+        return stockRepository.findAllStocks();
     }
 
     /**
@@ -656,7 +659,7 @@ public class StockService {
      * Recupere les produits en rupture ou stock bas.
      */
     public List<Produit> getProduitsStockBas() {
-        List<Produit> produits = produitRepository.getAll();
+        List<Produit> produits = produitRepository.findAll();
         return produits.stream()
             .filter(p -> {
                 int quantite = stockDAO.getTotalQuantiteByProduit(p.getId());

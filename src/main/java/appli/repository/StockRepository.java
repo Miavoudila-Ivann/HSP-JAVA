@@ -1,50 +1,31 @@
 package appli.repository;
 
-import appli.dao.StockDAO;
+import appli.model.DemandeProduit;
+import appli.model.MouvementStock;
 import appli.model.Stock;
 
 import java.util.List;
 import java.util.Optional;
 
-public class StockRepository {
+public interface StockRepository {
 
-    private final StockDAO stockDAO = new StockDAO();
+    DemandeProduit createRequest(DemandeProduit demande);
 
-    public Optional<Stock> getById(int id) {
-        return Optional.ofNullable(stockDAO.findById(id));
-    }
+    List<DemandeProduit> listPendingRequests();
 
-    public List<Stock> getByProduitId(int produitId) {
-        return stockDAO.findByProduitId(produitId);
-    }
+    void approveRequest(int demandeId, int gestionnaireId, String commentaire);
 
-    public List<Stock> getAll() {
-        return stockDAO.findAll();
-    }
+    void refuseRequest(int demandeId, int gestionnaireId, String commentaire);
 
-    public List<Stock> getExpiringBefore(int days) {
-        return stockDAO.findExpiringBefore(days);
-    }
+    Stock replenishStock(Stock stock);
 
-    public int getTotalQuantiteByProduit(int produitId) {
-        return stockDAO.getTotalQuantiteByProduit(produitId);
-    }
+    MouvementStock insertMovement(MouvementStock mouvement);
 
-    public Stock save(Stock stock) {
-        if (stock.getId() == 0) {
-            int id = stockDAO.insert(stock);
-            stock.setId(id);
-        } else {
-            stockDAO.update(stock);
-        }
-        return stock;
-    }
+    List<Stock> findAllStocks();
 
-    public void updateQuantite(int stockId, int quantite) {
-        stockDAO.updateQuantite(stockId, quantite);
-    }
+    Optional<Stock> findStockById(int id);
 
-    public void delete(int id) {
-        stockDAO.delete(id);
-    }
+    List<Stock> findStocksByProduit(int produitId);
+
+    int getTotalQuantiteByProduit(int produitId);
 }

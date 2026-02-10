@@ -5,8 +5,10 @@ import appli.model.DossierPriseEnCharge;
 import appli.model.JournalAction;
 import appli.model.Patient;
 import appli.model.User;
-import appli.repository.DossierPriseEnChargeRepository;
 import appli.repository.PatientRepository;
+import appli.repository.TriageRepository;
+import appli.repository.jdbc.PatientRepositoryJdbc;
+import appli.repository.jdbc.TriageRepositoryJdbc;
 import appli.security.SessionManager;
 
 import java.time.LocalDateTime;
@@ -20,9 +22,9 @@ import java.util.Optional;
  */
 public class TriageService {
 
-    private final DossierPriseEnChargeRepository dossierRepository = new DossierPriseEnChargeRepository();
+    private final TriageRepository triageRepository = new TriageRepositoryJdbc();
     private final DossierPriseEnChargeDAO dossierDAO = new DossierPriseEnChargeDAO();
-    private final PatientRepository patientRepository = new PatientRepository();
+    private final PatientRepository patientRepository = new PatientRepositoryJdbc();
     private final JournalService journalService = new JournalService();
 
     /**
@@ -40,7 +42,7 @@ public class TriageService {
         }
 
         // Verifier que le patient existe
-        Optional<Patient> patient = patientRepository.getById(patientId);
+        Optional<Patient> patient = patientRepository.findById(patientId);
         if (patient.isEmpty()) {
             throw new IllegalArgumentException("Patient non trouve");
         }
@@ -62,7 +64,7 @@ public class TriageService {
         dossier.setAntecedents(patient.get().getAntecedentsMedicaux());
         dossier.setAllergies(patient.get().getAllergiesConnues());
 
-        DossierPriseEnCharge savedDossier = dossierRepository.save(dossier);
+        DossierPriseEnCharge savedDossier = triageRepository.save(dossier);
 
         journalService.logAction(
             currentUser,
@@ -106,7 +108,7 @@ public class TriageService {
      * Recupere un dossier par son identifiant.
      */
     public Optional<DossierPriseEnCharge> getById(int id) {
-        return dossierRepository.getById(id);
+        return triageRepository.findById(id);
     }
 
     /**
@@ -144,7 +146,7 @@ public class TriageService {
             throw new SecurityException("Seul un medecin peut prendre en charge un dossier");
         }
 
-        Optional<DossierPriseEnCharge> dossierOpt = dossierRepository.getById(dossierId);
+        Optional<DossierPriseEnCharge> dossierOpt = triageRepository.findById(dossierId);
         if (dossierOpt.isEmpty()) {
             throw new IllegalArgumentException("Dossier non trouve");
         }
@@ -159,7 +161,7 @@ public class TriageService {
         dossier.setMedecinResponsableId(medecinId);
         dossier.setDatePriseEnCharge(LocalDateTime.now());
 
-        DossierPriseEnCharge savedDossier = dossierRepository.save(dossier);
+        DossierPriseEnCharge savedDossier = triageRepository.save(dossier);
 
         journalService.logAction(
             currentUser,
@@ -182,7 +184,7 @@ public class TriageService {
             throw new IllegalStateException("Aucun utilisateur connecte");
         }
 
-        Optional<DossierPriseEnCharge> dossierOpt = dossierRepository.getById(dossierId);
+        Optional<DossierPriseEnCharge> dossierOpt = triageRepository.findById(dossierId);
         if (dossierOpt.isEmpty()) {
             throw new IllegalArgumentException("Dossier non trouve");
         }
@@ -192,7 +194,7 @@ public class TriageService {
 
         dossier.setStatut(nouveauStatut);
 
-        DossierPriseEnCharge savedDossier = dossierRepository.save(dossier);
+        DossierPriseEnCharge savedDossier = triageRepository.save(dossier);
 
         journalService.logAction(
             currentUser,
@@ -216,7 +218,7 @@ public class TriageService {
             throw new IllegalStateException("Aucun utilisateur connecte");
         }
 
-        Optional<DossierPriseEnCharge> dossierOpt = dossierRepository.getById(dossierId);
+        Optional<DossierPriseEnCharge> dossierOpt = triageRepository.findById(dossierId);
         if (dossierOpt.isEmpty()) {
             throw new IllegalArgumentException("Dossier non trouve");
         }
@@ -227,7 +229,7 @@ public class TriageService {
         dossier.setNiveauGravite(nouveauNiveau);
         dossier.setPrioriteTriage(calculerPriorite(nouveauNiveau));
 
-        DossierPriseEnCharge savedDossier = dossierRepository.save(dossier);
+        DossierPriseEnCharge savedDossier = triageRepository.save(dossier);
 
         journalService.logAction(
             currentUser,
@@ -251,7 +253,7 @@ public class TriageService {
             throw new IllegalStateException("Aucun utilisateur connecte");
         }
 
-        Optional<DossierPriseEnCharge> dossierOpt = dossierRepository.getById(dossierId);
+        Optional<DossierPriseEnCharge> dossierOpt = triageRepository.findById(dossierId);
         if (dossierOpt.isEmpty()) {
             throw new IllegalArgumentException("Dossier non trouve");
         }
@@ -259,7 +261,7 @@ public class TriageService {
         DossierPriseEnCharge dossier = dossierOpt.get();
         dossier.setConstantesVitales(constantesVitales);
 
-        return dossierRepository.save(dossier);
+        return triageRepository.save(dossier);
     }
 
     /**
