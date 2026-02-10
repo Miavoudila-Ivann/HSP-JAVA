@@ -3,6 +3,7 @@ package appli.dao;
 import appli.model.Chambre;
 import appli.util.DBConnection;
 
+import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +57,7 @@ public class ChambreDAO {
 
     public List<Chambre> findDisponibles() {
         List<Chambre> chambres = new ArrayList<>();
-        String sql = "SELECT * FROM chambres WHERE occupee = false ORDER BY etage, numero";
+        String sql = "SELECT * FROM chambres WHERE actif = true AND nb_lits_occupes < capacite AND en_maintenance = false ORDER BY etage, numero";
         try (Connection conn = DBConnection.getInstance().getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -86,14 +87,20 @@ public class ChambreDAO {
     }
 
     public int insert(Chambre chambre) {
-        String sql = "INSERT INTO chambres (numero, etage, type_chambre, capacite, occupee) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO chambres (numero, etage, batiment, type_chambre, capacite, nb_lits_occupes, equipements, tarif_journalier, actif, en_maintenance, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, chambre.getNumero());
             stmt.setInt(2, chambre.getEtage());
-            stmt.setString(3, chambre.getTypeChambre().name());
-            stmt.setInt(4, chambre.getCapacite());
-            stmt.setBoolean(5, chambre.isOccupee());
+            stmt.setString(3, chambre.getBatiment());
+            stmt.setString(4, chambre.getTypeChambre().name());
+            stmt.setInt(5, chambre.getCapacite());
+            stmt.setInt(6, chambre.getNbLitsOccupes());
+            stmt.setString(7, chambre.getEquipements());
+            stmt.setBigDecimal(8, chambre.getTarifJournalier());
+            stmt.setBoolean(9, chambre.isActif());
+            stmt.setBoolean(10, chambre.isEnMaintenance());
+            stmt.setString(11, chambre.getNotes());
             stmt.executeUpdate();
 
             ResultSet generatedKeys = stmt.getGeneratedKeys();
@@ -107,15 +114,21 @@ public class ChambreDAO {
     }
 
     public boolean update(Chambre chambre) {
-        String sql = "UPDATE chambres SET numero = ?, etage = ?, type_chambre = ?, capacite = ?, occupee = ? WHERE id = ?";
+        String sql = "UPDATE chambres SET numero = ?, etage = ?, batiment = ?, type_chambre = ?, capacite = ?, nb_lits_occupes = ?, equipements = ?, tarif_journalier = ?, actif = ?, en_maintenance = ?, notes = ? WHERE id = ?";
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, chambre.getNumero());
             stmt.setInt(2, chambre.getEtage());
-            stmt.setString(3, chambre.getTypeChambre().name());
-            stmt.setInt(4, chambre.getCapacite());
-            stmt.setBoolean(5, chambre.isOccupee());
-            stmt.setInt(6, chambre.getId());
+            stmt.setString(3, chambre.getBatiment());
+            stmt.setString(4, chambre.getTypeChambre().name());
+            stmt.setInt(5, chambre.getCapacite());
+            stmt.setInt(6, chambre.getNbLitsOccupes());
+            stmt.setString(7, chambre.getEquipements());
+            stmt.setBigDecimal(8, chambre.getTarifJournalier());
+            stmt.setBoolean(9, chambre.isActif());
+            stmt.setBoolean(10, chambre.isEnMaintenance());
+            stmt.setString(11, chambre.getNotes());
+            stmt.setInt(12, chambre.getId());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Erreur lors de la mise a jour de la chambre : " + e.getMessage());
@@ -123,15 +136,15 @@ public class ChambreDAO {
         return false;
     }
 
-    public boolean updateOccupation(int chambreId, boolean occupee) {
-        String sql = "UPDATE chambres SET occupee = ? WHERE id = ?";
+    public boolean updateNbLitsOccupes(int chambreId, int nbLitsOccupes) {
+        String sql = "UPDATE chambres SET nb_lits_occupes = ? WHERE id = ?";
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setBoolean(1, occupee);
+            stmt.setInt(1, nbLitsOccupes);
             stmt.setInt(2, chambreId);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Erreur lors de la mise a jour de l'occupation : " + e.getMessage());
+            System.err.println("Erreur lors de la mise a jour du nombre de lits occupes : " + e.getMessage());
         }
         return false;
     }
@@ -153,9 +166,18 @@ public class ChambreDAO {
         chambre.setId(rs.getInt("id"));
         chambre.setNumero(rs.getString("numero"));
         chambre.setEtage(rs.getInt("etage"));
+        chambre.setBatiment(rs.getString("batiment"));
         chambre.setTypeChambre(Chambre.TypeChambre.valueOf(rs.getString("type_chambre")));
         chambre.setCapacite(rs.getInt("capacite"));
-        chambre.setOccupee(rs.getBoolean("occupee"));
+        chambre.setNbLitsOccupes(rs.getInt("nb_lits_occupes"));
+        chambre.setEquipements(rs.getString("equipements"));
+        BigDecimal tarif = rs.getBigDecimal("tarif_journalier");
+        if (tarif != null) {
+            chambre.setTarifJournalier(tarif);
+        }
+        chambre.setActif(rs.getBoolean("actif"));
+        chambre.setEnMaintenance(rs.getBoolean("en_maintenance"));
+        chambre.setNotes(rs.getString("notes"));
         return chambre;
     }
 }

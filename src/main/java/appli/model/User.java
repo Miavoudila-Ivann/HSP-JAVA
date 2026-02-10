@@ -27,9 +27,14 @@ public class User {
     private String nom;
     private String prenom;
     private Role role;
+    private String specialite;
+    private String telephone;
     private boolean actif;
     private LocalDateTime dateCreation;
     private LocalDateTime derniereConnexion;
+    private int tentativesConnexion;
+    private boolean compteVerrouille;
+    private LocalDateTime dateVerrouillage;
 
     public User() {}
 
@@ -90,6 +95,22 @@ public class User {
         this.role = role;
     }
 
+    public String getSpecialite() {
+        return specialite;
+    }
+
+    public void setSpecialite(String specialite) {
+        this.specialite = specialite;
+    }
+
+    public String getTelephone() {
+        return telephone;
+    }
+
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
+    }
+
     public boolean isActif() {
         return actif;
     }
@@ -112,6 +133,30 @@ public class User {
 
     public void setDerniereConnexion(LocalDateTime derniereConnexion) {
         this.derniereConnexion = derniereConnexion;
+    }
+
+    public int getTentativesConnexion() {
+        return tentativesConnexion;
+    }
+
+    public void setTentativesConnexion(int tentativesConnexion) {
+        this.tentativesConnexion = tentativesConnexion;
+    }
+
+    public boolean isCompteVerrouille() {
+        return compteVerrouille;
+    }
+
+    public void setCompteVerrouille(boolean compteVerrouille) {
+        this.compteVerrouille = compteVerrouille;
+    }
+
+    public LocalDateTime getDateVerrouillage() {
+        return dateVerrouillage;
+    }
+
+    public void setDateVerrouillage(LocalDateTime dateVerrouillage) {
+        this.dateVerrouillage = dateVerrouillage;
     }
 
     public String getNomComplet() {

@@ -21,19 +21,64 @@ public class Patient {
         }
     }
 
+    public enum GroupeSanguin {
+        A_POSITIF("A+"),
+        A_NEGATIF("A-"),
+        B_POSITIF("B+"),
+        B_NEGATIF("B-"),
+        AB_POSITIF("AB+"),
+        AB_NEGATIF("AB-"),
+        O_POSITIF("O+"),
+        O_NEGATIF("O-");
+
+        private final String libelle;
+
+        GroupeSanguin(String libelle) {
+            this.libelle = libelle;
+        }
+
+        public String getLibelle() {
+            return libelle;
+        }
+
+        public String getDbValue() {
+            return libelle;
+        }
+
+        public static GroupeSanguin fromDbValue(String value) {
+            for (GroupeSanguin gs : values()) {
+                if (gs.libelle.equals(value)) {
+                    return gs;
+                }
+            }
+            return null;
+        }
+    }
+
     private int id;
     private String numeroSecuriteSociale;
     private String nom;
     private String prenom;
     private LocalDate dateNaissance;
     private Sexe sexe;
+    private GroupeSanguin groupeSanguin;
     private String adresse;
+    private String codePostal;
+    private String ville;
     private String telephone;
+    private String telephoneMobile;
     private String email;
     private String personneContactNom;
     private String personneContactTelephone;
+    private String personneContactLien;
+    private String medecinTraitant;
+    private String notesMedicales;
+    private String allergiesConnues;
+    private String antecedentsMedicaux;
     private LocalDateTime dateCreation;
+    private LocalDateTime dateModification;
     private Integer creePar;
+    private Integer modifiePar;
 
     public Patient() {}
 
@@ -94,6 +139,14 @@ public class Patient {
         this.sexe = sexe;
     }
 
+    public GroupeSanguin getGroupeSanguin() {
+        return groupeSanguin;
+    }
+
+    public void setGroupeSanguin(GroupeSanguin groupeSanguin) {
+        this.groupeSanguin = groupeSanguin;
+    }
+
     public String getAdresse() {
         return adresse;
     }
@@ -102,12 +155,36 @@ public class Patient {
         this.adresse = adresse;
     }
 
+    public String getCodePostal() {
+        return codePostal;
+    }
+
+    public void setCodePostal(String codePostal) {
+        this.codePostal = codePostal;
+    }
+
+    public String getVille() {
+        return ville;
+    }
+
+    public void setVille(String ville) {
+        this.ville = ville;
+    }
+
     public String getTelephone() {
         return telephone;
     }
 
     public void setTelephone(String telephone) {
         this.telephone = telephone;
+    }
+
+    public String getTelephoneMobile() {
+        return telephoneMobile;
+    }
+
+    public void setTelephoneMobile(String telephoneMobile) {
+        this.telephoneMobile = telephoneMobile;
     }
 
     public String getEmail() {
@@ -134,6 +211,46 @@ public class Patient {
         this.personneContactTelephone = personneContactTelephone;
     }
 
+    public String getPersonneContactLien() {
+        return personneContactLien;
+    }
+
+    public void setPersonneContactLien(String personneContactLien) {
+        this.personneContactLien = personneContactLien;
+    }
+
+    public String getMedecinTraitant() {
+        return medecinTraitant;
+    }
+
+    public void setMedecinTraitant(String medecinTraitant) {
+        this.medecinTraitant = medecinTraitant;
+    }
+
+    public String getNotesMedicales() {
+        return notesMedicales;
+    }
+
+    public void setNotesMedicales(String notesMedicales) {
+        this.notesMedicales = notesMedicales;
+    }
+
+    public String getAllergiesConnues() {
+        return allergiesConnues;
+    }
+
+    public void setAllergiesConnues(String allergiesConnues) {
+        this.allergiesConnues = allergiesConnues;
+    }
+
+    public String getAntecedentsMedicaux() {
+        return antecedentsMedicaux;
+    }
+
+    public void setAntecedentsMedicaux(String antecedentsMedicaux) {
+        this.antecedentsMedicaux = antecedentsMedicaux;
+    }
+
     public LocalDateTime getDateCreation() {
         return dateCreation;
     }
@@ -142,12 +259,28 @@ public class Patient {
         this.dateCreation = dateCreation;
     }
 
+    public LocalDateTime getDateModification() {
+        return dateModification;
+    }
+
+    public void setDateModification(LocalDateTime dateModification) {
+        this.dateModification = dateModification;
+    }
+
     public Integer getCreePar() {
         return creePar;
     }
 
     public void setCreePar(Integer creePar) {
         this.creePar = creePar;
+    }
+
+    public Integer getModifiePar() {
+        return modifiePar;
+    }
+
+    public void setModifiePar(Integer modifiePar) {
+        this.modifiePar = modifiePar;
     }
 
     public String getNomComplet() {

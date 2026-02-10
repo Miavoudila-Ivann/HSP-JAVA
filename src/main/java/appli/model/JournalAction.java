@@ -11,7 +11,8 @@ public class JournalAction {
         MODIFICATION("Modification"),
         SUPPRESSION("Suppression"),
         CONSULTATION("Consultation"),
-        EXPORT("Export");
+        EXPORT("Export"),
+        ECHEC_CONNEXION("Echec de connexion");
 
         private final String libelle;
 
@@ -31,8 +32,11 @@ public class JournalAction {
     private String description;
     private LocalDateTime dateAction;
     private String adresseIP;
+    private String userAgent;
     private String entite;
     private Integer entiteId;
+    private String donneesAvant;
+    private String donneesApres;
 
     public JournalAction() {
         this.dateAction = LocalDateTime.now();
@@ -101,6 +105,14 @@ public class JournalAction {
         this.adresseIP = adresseIP;
     }
 
+    public String getUserAgent() {
+        return userAgent;
+    }
+
+    public void setUserAgent(String userAgent) {
+        this.userAgent = userAgent;
+    }
+
     public String getEntite() {
         return entite;
     }
@@ -115,6 +127,22 @@ public class JournalAction {
 
     public void setEntiteId(Integer entiteId) {
         this.entiteId = entiteId;
+    }
+
+    public String getDonneesAvant() {
+        return donneesAvant;
+    }
+
+    public void setDonneesAvant(String donneesAvant) {
+        this.donneesAvant = donneesAvant;
+    }
+
+    public String getDonneesApres() {
+        return donneesApres;
+    }
+
+    public void setDonneesApres(String donneesApres) {
+        this.donneesApres = donneesApres;
     }
 
     @Override

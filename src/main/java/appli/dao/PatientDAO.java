@@ -75,7 +75,7 @@ public class PatientDAO {
     }
 
     public int insert(Patient patient) {
-        String sql = "INSERT INTO patients (numero_securite_sociale, nom, prenom, date_naissance, sexe, adresse, telephone, email, personne_contact_nom, personne_contact_telephone, date_creation, cree_par) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO patients (numero_securite_sociale, nom, prenom, date_naissance, sexe, groupe_sanguin, adresse, code_postal, ville, telephone, telephone_mobile, email, personne_contact_nom, personne_contact_telephone, personne_contact_lien, medecin_traitant, notes_medicales, allergies_connues, antecedents_medicaux, date_creation, cree_par) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, patient.getNumeroSecuriteSociale());
@@ -83,16 +83,25 @@ public class PatientDAO {
             stmt.setString(3, patient.getPrenom());
             stmt.setDate(4, patient.getDateNaissance() != null ? Date.valueOf(patient.getDateNaissance()) : null);
             stmt.setString(5, patient.getSexe() != null ? patient.getSexe().name() : null);
-            stmt.setString(6, patient.getAdresse());
-            stmt.setString(7, patient.getTelephone());
-            stmt.setString(8, patient.getEmail());
-            stmt.setString(9, patient.getPersonneContactNom());
-            stmt.setString(10, patient.getPersonneContactTelephone());
-            stmt.setTimestamp(11, Timestamp.valueOf(LocalDateTime.now()));
+            stmt.setString(6, patient.getGroupeSanguin() != null ? patient.getGroupeSanguin().getDbValue() : null);
+            stmt.setString(7, patient.getAdresse());
+            stmt.setString(8, patient.getCodePostal());
+            stmt.setString(9, patient.getVille());
+            stmt.setString(10, patient.getTelephone());
+            stmt.setString(11, patient.getTelephoneMobile());
+            stmt.setString(12, patient.getEmail());
+            stmt.setString(13, patient.getPersonneContactNom());
+            stmt.setString(14, patient.getPersonneContactTelephone());
+            stmt.setString(15, patient.getPersonneContactLien());
+            stmt.setString(16, patient.getMedecinTraitant());
+            stmt.setString(17, patient.getNotesMedicales());
+            stmt.setString(18, patient.getAllergiesConnues());
+            stmt.setString(19, patient.getAntecedentsMedicaux());
+            stmt.setTimestamp(20, Timestamp.valueOf(LocalDateTime.now()));
             if (patient.getCreePar() != null) {
-                stmt.setInt(12, patient.getCreePar());
+                stmt.setInt(21, patient.getCreePar());
             } else {
-                stmt.setNull(12, Types.INTEGER);
+                stmt.setNull(21, Types.INTEGER);
             }
             stmt.executeUpdate();
 
@@ -107,7 +116,7 @@ public class PatientDAO {
     }
 
     public boolean update(Patient patient) {
-        String sql = "UPDATE patients SET numero_securite_sociale = ?, nom = ?, prenom = ?, date_naissance = ?, sexe = ?, adresse = ?, telephone = ?, email = ?, personne_contact_nom = ?, personne_contact_telephone = ? WHERE id = ?";
+        String sql = "UPDATE patients SET numero_securite_sociale = ?, nom = ?, prenom = ?, date_naissance = ?, sexe = ?, groupe_sanguin = ?, adresse = ?, code_postal = ?, ville = ?, telephone = ?, telephone_mobile = ?, email = ?, personne_contact_nom = ?, personne_contact_telephone = ?, personne_contact_lien = ?, medecin_traitant = ?, notes_medicales = ?, allergies_connues = ?, antecedents_medicaux = ?, date_modification = ?, modifie_par = ? WHERE id = ?";
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, patient.getNumeroSecuriteSociale());
@@ -115,12 +124,27 @@ public class PatientDAO {
             stmt.setString(3, patient.getPrenom());
             stmt.setDate(4, patient.getDateNaissance() != null ? Date.valueOf(patient.getDateNaissance()) : null);
             stmt.setString(5, patient.getSexe() != null ? patient.getSexe().name() : null);
-            stmt.setString(6, patient.getAdresse());
-            stmt.setString(7, patient.getTelephone());
-            stmt.setString(8, patient.getEmail());
-            stmt.setString(9, patient.getPersonneContactNom());
-            stmt.setString(10, patient.getPersonneContactTelephone());
-            stmt.setInt(11, patient.getId());
+            stmt.setString(6, patient.getGroupeSanguin() != null ? patient.getGroupeSanguin().getDbValue() : null);
+            stmt.setString(7, patient.getAdresse());
+            stmt.setString(8, patient.getCodePostal());
+            stmt.setString(9, patient.getVille());
+            stmt.setString(10, patient.getTelephone());
+            stmt.setString(11, patient.getTelephoneMobile());
+            stmt.setString(12, patient.getEmail());
+            stmt.setString(13, patient.getPersonneContactNom());
+            stmt.setString(14, patient.getPersonneContactTelephone());
+            stmt.setString(15, patient.getPersonneContactLien());
+            stmt.setString(16, patient.getMedecinTraitant());
+            stmt.setString(17, patient.getNotesMedicales());
+            stmt.setString(18, patient.getAllergiesConnues());
+            stmt.setString(19, patient.getAntecedentsMedicaux());
+            stmt.setTimestamp(20, Timestamp.valueOf(LocalDateTime.now()));
+            if (patient.getModifiePar() != null) {
+                stmt.setInt(21, patient.getModifiePar());
+            } else {
+                stmt.setNull(21, Types.INTEGER);
+            }
+            stmt.setInt(22, patient.getId());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Erreur lors de la mise a jour du patient : " + e.getMessage());
@@ -154,18 +178,38 @@ public class PatientDAO {
         if (sexe != null) {
             patient.setSexe(Patient.Sexe.valueOf(sexe));
         }
+        String groupeSanguin = rs.getString("groupe_sanguin");
+        if (groupeSanguin != null) {
+            patient.setGroupeSanguin(Patient.GroupeSanguin.fromDbValue(groupeSanguin));
+        }
         patient.setAdresse(rs.getString("adresse"));
+        patient.setCodePostal(rs.getString("code_postal"));
+        patient.setVille(rs.getString("ville"));
         patient.setTelephone(rs.getString("telephone"));
+        patient.setTelephoneMobile(rs.getString("telephone_mobile"));
         patient.setEmail(rs.getString("email"));
         patient.setPersonneContactNom(rs.getString("personne_contact_nom"));
         patient.setPersonneContactTelephone(rs.getString("personne_contact_telephone"));
+        patient.setPersonneContactLien(rs.getString("personne_contact_lien"));
+        patient.setMedecinTraitant(rs.getString("medecin_traitant"));
+        patient.setNotesMedicales(rs.getString("notes_medicales"));
+        patient.setAllergiesConnues(rs.getString("allergies_connues"));
+        patient.setAntecedentsMedicaux(rs.getString("antecedents_medicaux"));
         Timestamp dateCreation = rs.getTimestamp("date_creation");
         if (dateCreation != null) {
             patient.setDateCreation(dateCreation.toLocalDateTime());
         }
+        Timestamp dateModification = rs.getTimestamp("date_modification");
+        if (dateModification != null) {
+            patient.setDateModification(dateModification.toLocalDateTime());
+        }
         int creePar = rs.getInt("cree_par");
         if (!rs.wasNull()) {
             patient.setCreePar(creePar);
+        }
+        int modifiePar = rs.getInt("modifie_par");
+        if (!rs.wasNull()) {
+            patient.setModifiePar(modifiePar);
         }
         return patient;
     }

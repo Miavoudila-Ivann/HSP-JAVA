@@ -8,7 +8,8 @@ public class Hospitalisation {
     public enum Statut {
         EN_COURS("En cours"),
         TERMINEE("Terminee"),
-        TRANSFEREE("Transferee");
+        TRANSFEREE("Transferee"),
+        DECES("Deces");
 
         private final String libelle;
 
@@ -21,21 +22,47 @@ public class Hospitalisation {
         }
     }
 
+    public enum TypeSortie {
+        GUERISON("Guerison"),
+        AMELIORATION("Amelioration"),
+        TRANSFERT("Transfert"),
+        CONTRE_AVIS("Contre avis medical"),
+        DECES("Deces"),
+        AUTRE("Autre");
+
+        private final String libelle;
+
+        TypeSortie(String libelle) {
+            this.libelle = libelle;
+        }
+
+        public String getLibelle() {
+            return libelle;
+        }
+    }
+
     private int id;
+    private String numeroSejour;
     private int dossierId;
     private DossierPriseEnCharge dossier;
     private int chambreId;
     private Chambre chambre;
+    private Integer litNumero;
     private LocalDateTime dateEntree;
     private LocalDate dateSortiePrevue;
     private LocalDateTime dateSortieEffective;
     private String motifHospitalisation;
-    private String diagnostic;
+    private String diagnosticEntree;
+    private String diagnosticSortie;
     private String traitement;
     private String observations;
+    private String evolution;
     private Statut statut;
+    private TypeSortie typeSortie;
     private int medecinId;
     private User medecin;
+    private Integer medecinSortieId;
+    private User medecinSortie;
 
     public Hospitalisation() {
         this.statut = Statut.EN_COURS;
@@ -56,6 +83,14 @@ public class Hospitalisation {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getNumeroSejour() {
+        return numeroSejour;
+    }
+
+    public void setNumeroSejour(String numeroSejour) {
+        this.numeroSejour = numeroSejour;
     }
 
     public int getDossierId() {
@@ -90,6 +125,14 @@ public class Hospitalisation {
         this.chambre = chambre;
     }
 
+    public Integer getLitNumero() {
+        return litNumero;
+    }
+
+    public void setLitNumero(Integer litNumero) {
+        this.litNumero = litNumero;
+    }
+
     public LocalDateTime getDateEntree() {
         return dateEntree;
     }
@@ -122,12 +165,20 @@ public class Hospitalisation {
         this.motifHospitalisation = motifHospitalisation;
     }
 
-    public String getDiagnostic() {
-        return diagnostic;
+    public String getDiagnosticEntree() {
+        return diagnosticEntree;
     }
 
-    public void setDiagnostic(String diagnostic) {
-        this.diagnostic = diagnostic;
+    public void setDiagnosticEntree(String diagnosticEntree) {
+        this.diagnosticEntree = diagnosticEntree;
+    }
+
+    public String getDiagnosticSortie() {
+        return diagnosticSortie;
+    }
+
+    public void setDiagnosticSortie(String diagnosticSortie) {
+        this.diagnosticSortie = diagnosticSortie;
     }
 
     public String getTraitement() {
@@ -146,12 +197,28 @@ public class Hospitalisation {
         this.observations = observations;
     }
 
+    public String getEvolution() {
+        return evolution;
+    }
+
+    public void setEvolution(String evolution) {
+        this.evolution = evolution;
+    }
+
     public Statut getStatut() {
         return statut;
     }
 
     public void setStatut(Statut statut) {
         this.statut = statut;
+    }
+
+    public TypeSortie getTypeSortie() {
+        return typeSortie;
+    }
+
+    public void setTypeSortie(TypeSortie typeSortie) {
+        this.typeSortie = typeSortie;
     }
 
     public int getMedecinId() {
@@ -170,10 +237,27 @@ public class Hospitalisation {
         this.medecin = medecin;
     }
 
+    public Integer getMedecinSortieId() {
+        return medecinSortieId;
+    }
+
+    public void setMedecinSortieId(Integer medecinSortieId) {
+        this.medecinSortieId = medecinSortieId;
+    }
+
+    public User getMedecinSortie() {
+        return medecinSortie;
+    }
+
+    public void setMedecinSortie(User medecinSortie) {
+        this.medecinSortie = medecinSortie;
+    }
+
     @Override
     public String toString() {
         return "Hospitalisation{" +
                 "id=" + id +
+                ", numeroSejour='" + numeroSejour + '\'' +
                 ", dossierId=" + dossierId +
                 ", chambreId=" + chambreId +
                 ", dateEntree=" + dateEntree +

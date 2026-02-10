@@ -71,8 +71,23 @@ public class UserDAO {
         return users;
     }
 
+    public List<User> findActifs() {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM users WHERE actif = true ORDER BY nom, prenom";
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                users.add(mapResultSetToUser(rs));
+            }
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la recuperation des utilisateurs actifs : " + e.getMessage());
+        }
+        return users;
+    }
+
     public int insert(User user) {
-        String sql = "INSERT INTO users (email, password_hash, nom, prenom, role, actif, date_creation) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO users (email, password_hash, nom, prenom, role, specialite, telephone, actif, date_creation, tentatives_connexion, compte_verrouille) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, user.getEmail());
@@ -80,8 +95,12 @@ public class UserDAO {
             stmt.setString(3, user.getNom());
             stmt.setString(4, user.getPrenom());
             stmt.setString(5, user.getRole().name());
-            stmt.setBoolean(6, user.isActif());
-            stmt.setTimestamp(7, Timestamp.valueOf(LocalDateTime.now()));
+            stmt.setString(6, user.getSpecialite());
+            stmt.setString(7, user.getTelephone());
+            stmt.setBoolean(8, user.isActif());
+            stmt.setTimestamp(9, Timestamp.valueOf(LocalDateTime.now()));
+            stmt.setInt(10, user.getTentativesConnexion());
+            stmt.setBoolean(11, user.isCompteVerrouille());
             stmt.executeUpdate();
 
             ResultSet generatedKeys = stmt.getGeneratedKeys();
@@ -95,7 +114,7 @@ public class UserDAO {
     }
 
     public boolean update(User user) {
-        String sql = "UPDATE users SET email = ?, password_hash = ?, nom = ?, prenom = ?, role = ?, actif = ? WHERE id = ?";
+        String sql = "UPDATE users SET email = ?, password_hash = ?, nom = ?, prenom = ?, role = ?, specialite = ?, telephone = ?, actif = ?, tentatives_connexion = ?, compte_verrouille = ?, date_verrouillage = ? WHERE id = ?";
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, user.getEmail());
@@ -103,8 +122,13 @@ public class UserDAO {
             stmt.setString(3, user.getNom());
             stmt.setString(4, user.getPrenom());
             stmt.setString(5, user.getRole().name());
-            stmt.setBoolean(6, user.isActif());
-            stmt.setInt(7, user.getId());
+            stmt.setString(6, user.getSpecialite());
+            stmt.setString(7, user.getTelephone());
+            stmt.setBoolean(8, user.isActif());
+            stmt.setInt(9, user.getTentativesConnexion());
+            stmt.setBoolean(10, user.isCompteVerrouille());
+            stmt.setTimestamp(11, user.getDateVerrouillage() != null ? Timestamp.valueOf(user.getDateVerrouillage()) : null);
+            stmt.setInt(12, user.getId());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Erreur lors de la mise a jour de l'utilisateur : " + e.getMessage());
@@ -121,6 +145,21 @@ public class UserDAO {
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Erreur lors de la mise a jour de la derniere connexion : " + e.getMessage());
+        }
+        return false;
+    }
+
+    public boolean updateTentativesConnexion(int userId, int tentatives, boolean verrouille, LocalDateTime dateVerrouillage) {
+        String sql = "UPDATE users SET tentatives_connexion = ?, compte_verrouille = ?, date_verrouillage = ? WHERE id = ?";
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, tentatives);
+            stmt.setBoolean(2, verrouille);
+            stmt.setTimestamp(3, dateVerrouillage != null ? Timestamp.valueOf(dateVerrouillage) : null);
+            stmt.setInt(4, userId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Erreur lors de la mise a jour des tentatives de connexion : " + e.getMessage());
         }
         return false;
     }
@@ -145,6 +184,8 @@ public class UserDAO {
         user.setNom(rs.getString("nom"));
         user.setPrenom(rs.getString("prenom"));
         user.setRole(User.Role.valueOf(rs.getString("role")));
+        user.setSpecialite(rs.getString("specialite"));
+        user.setTelephone(rs.getString("telephone"));
         user.setActif(rs.getBoolean("actif"));
         Timestamp dateCreation = rs.getTimestamp("date_creation");
         if (dateCreation != null) {
@@ -153,6 +194,12 @@ public class UserDAO {
         Timestamp derniereConnexion = rs.getTimestamp("derniere_connexion");
         if (derniereConnexion != null) {
             user.setDerniereConnexion(derniereConnexion.toLocalDateTime());
+        }
+        user.setTentativesConnexion(rs.getInt("tentatives_connexion"));
+        user.setCompteVerrouille(rs.getBoolean("compte_verrouille"));
+        Timestamp dateVerrouillage = rs.getTimestamp("date_verrouillage");
+        if (dateVerrouillage != null) {
+            user.setDateVerrouillage(dateVerrouillage.toLocalDateTime());
         }
         return user;
     }
