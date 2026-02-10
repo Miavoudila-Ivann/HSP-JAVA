@@ -271,15 +271,103 @@ INSERT INTO dossiers_prise_en_charge (numero_dossier, patient_id, date_creation,
 ('DPC-20240115-0004', 6, '2024-01-15 11:30:00', NULL, 'Entorse cheville', 'NIVEAU_1', 'PERSONNEL', 'Douleur cheville droite apres chute, oedeme', '{"tension": "118/72", "pouls": 75, "temperature": 36.9, "saturation": 99}', 'RAS', NULL, NULL, 'EN_ATTENTE', 10, NULL, 2);
 
 -- ============================================================
--- 11. LOGS INITIAUX
+-- 11. HOSPITALISATIONS DE DEMO
+-- Scenario : le patient Dubois (dossier 1, douleur thoracique)
+-- est hospitalise en soins intensifs chambre 301
 -- ============================================================
 
-INSERT INTO journal_actions (user_id, type_action, description, adresse_ip, entite) VALUES
-(1, 'CREATION', 'Initialisation de la base de donnees', '127.0.0.1', 'SYSTEME'),
-(1, 'CREATION', 'Creation des utilisateurs de test', '127.0.0.1', 'users'),
-(1, 'CREATION', 'Creation des chambres', '127.0.0.1', 'chambres'),
-(1, 'CREATION', 'Creation du catalogue produits', '127.0.0.1', 'produits'),
-(1, 'CREATION', 'Initialisation des stocks', '127.0.0.1', 'stocks');
+INSERT INTO hospitalisations (numero_sejour, dossier_id, chambre_id, lit_numero, date_entree, date_sortie_prevue, motif_hospitalisation, diagnostic_entree, traitement, observations, statut, medecin_id) VALUES
+('SEJ-20240115-0001', 1, 13, 1, '2024-01-15 09:30:00', '2024-01-20', 'Surveillance cardiologique post-douleur thoracique', 'Suspicion SCA - troponine en cours', 'Aspirine 300mg IV, Heparine IVSE, Monitoring continu', 'Patient stable, ECG: sus-decalage V1-V4', 'EN_COURS', 4);
+
+-- Mettre a jour la chambre 301 (1 lit occupe) et le dossier 1 (HOSPITALISE)
+UPDATE chambres SET nb_lits_occupes = 1 WHERE id = 13;
+UPDATE dossiers_prise_en_charge SET statut = 'HOSPITALISE' WHERE id = 1;
+
+-- ============================================================
+-- 12. ORDONNANCES DE DEMO
+-- Le Dr Leroy prescrit pour le patient Dubois (dossier 1)
+-- ============================================================
+
+INSERT INTO ordonnances (numero_ordonnance, dossier_id, hospitalisation_id, medecin_id, date_prescription, date_debut, date_fin, statut, notes) VALUES
+('ORD-20240115-0001', 1, 1, 4, '2024-01-15 10:00:00', '2024-01-15', '2024-01-22', 'ACTIVE', 'Traitement cardio initial - surveillance troponine H6');
+
+INSERT INTO lignes_ordonnance (ordonnance_id, produit_id, posologie, quantite, duree_jours, frequence, voie_administration, instructions) VALUES
+(1, 10, '300mg dose de charge puis 100mg/j', 7, 7, 'Une fois par jour', 'ORALE', 'A prendre le matin au petit dejeuner'),
+(1, 11, '1mg en urgence si besoin', 2, 1, 'Si necessaire', 'IV', 'Reserve medecin - surveillance scope');
+
+-- Ordonnance pour le patient Martin (dossier 2, hypoglycemie)
+INSERT INTO ordonnances (numero_ordonnance, dossier_id, medecin_id, date_prescription, date_debut, date_fin, statut, notes) VALUES
+('ORD-20240115-0002', 2, 4, '2024-01-15 10:30:00', '2024-01-15', '2024-01-18', 'ACTIVE', 'Resucrage puis ajustement traitement diabete');
+
+INSERT INTO lignes_ordonnance (ordonnance_id, produit_id, posologie, quantite, duree_jours, frequence, voie_administration, instructions) VALUES
+(2, 1, '1g si douleur', 6, 3, 'Toutes les 6h si besoin', 'ORALE', 'Ne pas depasser 4g/jour');
+
+-- ============================================================
+-- 13. DEMANDES DE PRODUITS DE DEMO
+-- Le Dr Leroy demande des seringues pour le service urgences
+-- Le Dr Moreau demande de la morphine (urgente)
+-- ============================================================
+
+INSERT INTO demandes_produits (numero_demande, produit_id, quantite_demandee, quantite_livree, medecin_id, dossier_id, hospitalisation_id, date_demande, date_besoin, urgence, priorite, motif, statut) VALUES
+-- Demande validee : seringues 5ml pour urgences
+('DEM-20240115-0001', 17, 50, 50, 4, 1, 1, '2024-01-15 11:00:00', '2024-01-15', FALSE, 5, 'Reapprovisionnement chariot urgences', 'VALIDEE'),
+-- Demande en attente : morphine urgente
+('DEM-20240115-0002', 5, 5, 0, 5, 1, 1, '2024-01-15 11:30:00', '2024-01-15', TRUE, 1, 'Douleur thoracique severe - analgesie morphinique', 'EN_ATTENTE'),
+-- Demande refusee : gants en rupture
+('DEM-20240115-0003', 22, 10, 0, 4, NULL, NULL, '2024-01-15 12:00:00', '2024-01-16', FALSE, 5, 'Stock service urgences insuffisant', 'REFUSEE');
+
+-- Mettre a jour la demande validee avec les infos gestionnaire
+UPDATE demandes_produits SET gestionnaire_id = 8, date_traitement = '2024-01-15 11:30:00',
+    commentaire_traitement = 'Livre depuis Reserve A', date_livraison = '2024-01-15 11:45:00'
+WHERE id = 1;
+
+-- Mettre a jour la demande refusee
+UPDATE demandes_produits SET gestionnaire_id = 8, date_traitement = '2024-01-15 12:30:00',
+    commentaire_traitement = 'Rupture de stock gants latex M - commande fournisseur en cours'
+WHERE id = 3;
+
+-- ============================================================
+-- 14. MOUVEMENTS DE STOCK DE DEMO
+-- Mouvement de sortie pour la demande validee (seringues)
+-- ============================================================
+
+INSERT INTO mouvements_stock (stock_id, produit_id, type_mouvement, quantite, quantite_avant, quantite_apres, motif, reference_document, emplacement_source_id, dossier_id, user_id, date_mouvement, valide, date_validation, validateur_id) VALUES
+(17, 17, 'SORTIE', 50, 1000, 950, 'Demande DEM-20240115-0001', 'DEM-20240115-0001', 4, 1, 8, '2024-01-15 11:30:00', TRUE, '2024-01-15 11:30:00', 8);
+
+-- Mettre a jour le stock des seringues 5ml (Reserve A)
+UPDATE stocks SET quantite = 950 WHERE id = 17;
+
+-- ============================================================
+-- 15. LOGS INITIAUX + SCENARIO DEMO
+-- ============================================================
+
+INSERT INTO journal_actions (user_id, type_action, description, adresse_ip, user_agent, entite, entite_id) VALUES
+-- Logs systeme
+(1, 'CREATION', 'Initialisation de la base de donnees', '127.0.0.1', 'HSP-JavaFX/1.0', 'SYSTEME', NULL),
+(1, 'CREATION', 'Creation des utilisateurs de test', '127.0.0.1', 'HSP-JavaFX/1.0', 'users', NULL),
+(1, 'CREATION', 'Creation des chambres', '127.0.0.1', 'HSP-JavaFX/1.0', 'chambres', NULL),
+(1, 'CREATION', 'Creation du catalogue produits', '127.0.0.1', 'HSP-JavaFX/1.0', 'produits', NULL),
+(1, 'CREATION', 'Initialisation des stocks', '127.0.0.1', 'HSP-JavaFX/1.0', 'stocks', NULL),
+
+-- Scenario demo : connexions
+(2, 'CONNEXION', 'Connexion reussie - Marie Martin (Secretaire)', '127.0.0.1', 'HSP-JavaFX/1.0', 'User', 2),
+(2, 'CREATION', 'Creation dossier triage: DPC-20240115-0001 - Patient: Jean-Pierre Dubois - Gravite: Grave', '127.0.0.1', 'HSP-JavaFX/1.0', 'DossierPriseEnCharge', 1),
+(2, 'CREATION', 'Creation dossier triage: DPC-20240115-0002 - Patient: Philippe Martin - Gravite: Serieux', '127.0.0.1', 'HSP-JavaFX/1.0', 'DossierPriseEnCharge', 2),
+(2, 'DECONNEXION', 'Deconnexion de Marie Martin', '127.0.0.1', 'HSP-JavaFX/1.0', 'User', 2),
+
+(4, 'CONNEXION', 'Connexion reussie - Pierre Leroy (Medecin)', '127.0.0.1', 'HSP-JavaFX/1.0', 'User', 4),
+(4, 'MODIFICATION', 'Prise en charge dossier: DPC-20240115-0001', '127.0.0.1', 'HSP-JavaFX/1.0', 'DossierPriseEnCharge', 1),
+(4, 'CREATION', 'Hospitalisation patient - Sejour: SEJ-20240115-0001 - Chambre: 301', '127.0.0.1', 'HSP-JavaFX/1.0', 'Hospitalisation', 1),
+(4, 'CREATION', 'Creation ordonnance: ORD-20240115-0001 pour dossier DPC-20240115-0001', '127.0.0.1', 'HSP-JavaFX/1.0', 'Ordonnance', 1),
+(4, 'CREATION', 'Demande produit: DEM-20240115-0001 - Seringue 5ml x50', '127.0.0.1', 'HSP-JavaFX/1.0', 'DemandeProduit', 1),
+
+(8, 'CONNEXION', 'Connexion reussie - Michel Fournier (Gestionnaire de stock)', '127.0.0.1', 'HSP-JavaFX/1.0', 'User', 8),
+(8, 'MODIFICATION', 'Validation demande: DEM-20240115-0001 - Livre: 50/50', '127.0.0.1', 'HSP-JavaFX/1.0', 'DemandeProduit', 1),
+(8, 'MODIFICATION', 'Refus demande: DEM-20240115-0003 - Motif: Rupture de stock', '127.0.0.1', 'HSP-JavaFX/1.0', 'DemandeProduit', 3),
+
+-- Tentative de connexion echouee (demo securite)
+(NULL, 'ECHEC_CONNEXION', 'Echec connexion - Email inconnu: pirate@evil.com', '192.168.1.50', 'HSP-JavaFX/1.0', NULL, NULL),
+(4, 'ECHEC_CONNEXION', 'Echec connexion - Mot de passe incorrect (tentative 1/5)', '192.168.1.50', 'HSP-JavaFX/1.0', 'User', 4);
 
 -- ============================================================
 -- VERIFICATION DES DONNEES
@@ -289,15 +377,23 @@ SELECT '=== RESUME DES DONNEES INSEREES ===' AS info;
 SELECT CONCAT('Utilisateurs: ', COUNT(*)) AS compteur FROM users;
 SELECT CONCAT('Chambres: ', COUNT(*)) AS compteur FROM chambres;
 SELECT CONCAT('Fournisseurs: ', COUNT(*)) AS compteur FROM fournisseurs;
-SELECT CONCAT('Categories: ', COUNT(*)) AS compteur FROM categories_produits;
 SELECT CONCAT('Produits: ', COUNT(*)) AS compteur FROM produits;
-SELECT CONCAT('Emplacements stock: ', COUNT(*)) AS compteur FROM emplacements_stock;
-SELECT CONCAT('Lignes de stock: ', COUNT(*)) AS compteur FROM stocks;
 SELECT CONCAT('Patients: ', COUNT(*)) AS compteur FROM patients;
 SELECT CONCAT('Dossiers: ', COUNT(*)) AS compteur FROM dossiers_prise_en_charge;
+SELECT CONCAT('Hospitalisations: ', COUNT(*)) AS compteur FROM hospitalisations;
+SELECT CONCAT('Ordonnances: ', COUNT(*)) AS compteur FROM ordonnances;
+SELECT CONCAT('Demandes produits: ', COUNT(*)) AS compteur FROM demandes_produits;
+SELECT CONCAT('Mouvements stock: ', COUNT(*)) AS compteur FROM mouvements_stock;
+SELECT CONCAT('Logs journal: ', COUNT(*)) AS compteur FROM journal_actions;
 
-SELECT '=== UTILISATEURS ===' AS info;
+SELECT '=== SCENARIO DEMO ===' AS info;
+SELECT 'Dossier 1: Dubois - Douleur thoracique -> Hospitalise chambre 301 (soins intensifs)' AS scenario
+UNION ALL SELECT 'Dossier 2: Martin - Hypoglycemie -> En cours de traitement'
+UNION ALL SELECT 'Dossier 3: Petit - Crise asthme -> En attente de prise en charge'
+UNION ALL SELECT 'Dossier 4: Garcia - Entorse cheville -> En attente (mineur)'
+UNION ALL SELECT 'Demande 1: Seringues -> VALIDEE et livree'
+UNION ALL SELECT 'Demande 2: Morphine -> EN ATTENTE (urgente)'
+UNION ALL SELECT 'Demande 3: Gants -> REFUSEE (rupture stock)';
+
+SELECT '=== UTILISATEURS (login: email / password123) ===' AS info;
 SELECT email, CONCAT(prenom, ' ', nom) AS nom_complet, role FROM users ORDER BY role, nom;
-
-SELECT '=== STOCKS ALERTES ===' AS info;
-SELECT * FROM v_stocks_details WHERE statut_stock != 'OK';
