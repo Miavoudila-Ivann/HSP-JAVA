@@ -17,19 +17,30 @@ public class AuthService {
     private final UserRepository userRepository = new UserRepository();
     private final JournalService journalService = new JournalService();
 
+    public enum LoginStatus {
+        SUCCESS,
+        IDENTIFIANTS_INVALIDES,
+        COMPTE_VERROUILLE,
+        COMPTE_DESACTIVE
+    }
+
+    public record LoginResult(LoginStatus status, User user) {
+        public boolean isSuccess() {
+            return status == LoginStatus.SUCCESS;
+        }
+    }
+
     /**
      * Tente de connecter un utilisateur.
-     * - Journalise chaque tentative (succes ou echec) dans login_log / audit_log
-     * - Verrouille le compte apres MAX_TENTATIVES echecs consecutifs
-     * - Reset le compteur sur connexion reussie
+     * Retourne un LoginResult indiquant le statut precis (succes, compte verrouille, etc.)
      */
-    public Optional<User> login(String email, String password) {
+    public LoginResult login(String email, String password) {
         Optional<User> userOpt = userRepository.getByEmail(email);
 
         // Email inconnu
         if (userOpt.isEmpty()) {
             journalService.logConnexionEchec(null, "Email inconnu: " + email);
-            return Optional.empty();
+            return new LoginResult(LoginStatus.IDENTIFIANTS_INVALIDES, null);
         }
 
         User user = userOpt.get();
@@ -37,7 +48,7 @@ public class AuthService {
         // Compte desactive
         if (!user.isActif()) {
             journalService.logConnexionEchec(user, "Compte desactive");
-            return Optional.empty();
+            return new LoginResult(LoginStatus.COMPTE_DESACTIVE, null);
         }
 
         // Compte verrouille : verifier si le delai est ecoule
@@ -45,7 +56,7 @@ public class AuthService {
             if (user.getDateVerrouillage() != null
                     && user.getDateVerrouillage().plusMinutes(VERROUILLAGE_MINUTES).isAfter(LocalDateTime.now())) {
                 journalService.logConnexionEchec(user, "Compte verrouille (tentatives excessives)");
-                return Optional.empty();
+                return new LoginResult(LoginStatus.COMPTE_VERROUILLE, null);
             }
             // Delai ecoule : deverrouiller
             user.setCompteVerrouille(false);
@@ -57,7 +68,10 @@ public class AuthService {
         // Verification du mot de passe
         if (!PasswordHasher.verify(password, user.getPasswordHash())) {
             gererEchecConnexion(user);
-            return Optional.empty();
+            if (user.isCompteVerrouille()) {
+                return new LoginResult(LoginStatus.COMPTE_VERROUILLE, null);
+            }
+            return new LoginResult(LoginStatus.IDENTIFIANTS_INVALIDES, null);
         }
 
         // Connexion reussie : reset tentatives et maj derniere connexion
@@ -71,7 +85,7 @@ public class AuthService {
 
         journalService.logConnexionReussie(user);
 
-        return Optional.of(user);
+        return new LoginResult(LoginStatus.SUCCESS, user);
     }
 
     /**
