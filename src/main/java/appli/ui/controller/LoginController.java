@@ -1,7 +1,7 @@
 package appli.ui.controller;
 
-import appli.model.User;
 import appli.service.AuthService;
+import appli.service.AuthService.LoginResult;
 import appli.util.Route;
 import appli.util.Router;
 import appli.util.ValidationUtils;
@@ -11,8 +11,6 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-
-import java.util.Optional;
 
 public class LoginController {
 
@@ -54,15 +52,17 @@ public class LoginController {
             return;
         }
 
-        Optional<User> userOpt = authService.login(email, password);
+        LoginResult result = authService.login(email, password);
 
-        if (userOpt.isEmpty()) {
-            showError("Email ou mot de passe incorrect");
-            passwordField.clear();
-            return;
+        switch (result.status()) {
+            case SUCCESS -> Router.goTo(Route.DASHBOARD);
+            case COMPTE_VERROUILLE -> showError("Compte verrouille - Reessayez dans 30 minutes");
+            case COMPTE_DESACTIVE -> showError("Compte desactive - Contactez l'administrateur");
+            case IDENTIFIANTS_INVALIDES -> {
+                showError("Email ou mot de passe incorrect");
+                passwordField.clear();
+            }
         }
-
-        Router.goTo(Route.DASHBOARD);
     }
 
     private void showError(String message) {
