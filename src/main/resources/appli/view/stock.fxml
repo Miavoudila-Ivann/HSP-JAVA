@@ -2,50 +2,465 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="appli.ui.controller.StockController"
-            prefHeight="600.0" prefWidth="900.0"
+            prefHeight="700.0" prefWidth="1100.0"
             style="-fx-background-color: #f5f5f5;">
 
+    <!-- BARRE DE NAVIGATION -->
     <top>
-        <HBox alignment="CENTER_LEFT" spacing="15"
-              style="-fx-background-color: #4CAF50; -fx-padding: 15 25 15 25;">
-            <Button text="Dashboard" onAction="#goToDashboard"
-                    style="-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-weight: bold;"/>
-            <Separator orientation="VERTICAL" prefHeight="30" style="-fx-opacity: 0.3;"/>
-            <Label text="Gestion du Stock" style="-fx-text-fill: white;">
-                <font><Font name="System Bold" size="16.0"/></font>
+        <HBox alignment="CENTER_LEFT" spacing="12"
+              style="-fx-background-color: #4CAF50; -fx-padding: 12 20 12 20;">
+            <Button text="&lt; Dashboard" onAction="#goToDashboard"
+                    style="-fx-background-color: rgba(255,255,255,0.15); -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand; -fx-border-color: rgba(255,255,255,0.3); -fx-border-radius: 5;"/>
+            <Separator orientation="VERTICAL" prefHeight="28" style="-fx-opacity: 0.4;"/>
+            <Label text="Gestion du Stock" style="-fx-text-fill: white; -fx-font-weight: bold;">
+                <font><Font size="16.0"/></font>
             </Label>
             <HBox HBox.hgrow="ALWAYS"/>
             <Label fx:id="welcomeLabel" text="" style="-fx-text-fill: white;">
-                <font><Font size="13.0"/></font>
-            </Label>
-            <Label fx:id="roleLabel" text=""
-                   style="-fx-text-fill: white; -fx-background-color: rgba(255,255,255,0.2); -fx-padding: 4 10 4 10; -fx-background-radius: 12;">
                 <font><Font size="12.0"/></font>
+            </Label>
+            <Label text="|" style="-fx-text-fill: rgba(255,255,255,0.5);"/>
+            <Label fx:id="roleLabel" text=""
+                   style="-fx-text-fill: white; -fx-background-color: rgba(255,255,255,0.2); -fx-padding: 3 8 3 8; -fx-background-radius: 10;">
+                <font><Font size="11.0"/></font>
             </Label>
             <Button text="Deconnexion" onAction="#handleLogout"
                     style="-fx-background-color: rgba(255,255,255,0.15); -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand; -fx-border-color: rgba(255,255,255,0.3); -fx-border-radius: 5;"/>
         </HBox>
     </top>
 
+    <!-- CONTENU CENTRAL : TabPane -->
     <center>
-        <VBox alignment="CENTER" spacing="15">
-            <padding><Insets top="40" right="50" bottom="40" left="50"/></padding>
-            <Label text="Module Stock" style="-fx-text-fill: #4CAF50;">
-                <font><Font name="System Bold" size="24.0"/></font>
-            </Label>
-            <Label text="Contenu a implementer" style="-fx-text-fill: #999999;">
-                <font><Font size="14.0"/></font>
-            </Label>
-        </VBox>
+        <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE"
+                 style="-fx-background-color: #f5f5f5;">
+
+            <!-- ============================================================ -->
+            <!-- TAB 1 : PRODUITS                                             -->
+            <!-- ============================================================ -->
+            <Tab text="Produits">
+                <VBox spacing="0">
+
+                    <!-- Toolbar -->
+                    <HBox alignment="CENTER_LEFT" spacing="8"
+                          style="-fx-background-color: #f9f9f9; -fx-padding: 10 15 10 15; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+                        <TextField fx:id="tfSearchProduit" promptText="Rechercher un produit..."
+                                   prefWidth="220"/>
+                        <Button text="Rechercher" onAction="#handleSearchProduit"
+                                style="-fx-background-color: #e0e0e0; -fx-cursor: hand; -fx-background-radius: 4;"/>
+                        <Button text="Tout afficher" onAction="#handleAfficherTousProduits"
+                                style="-fx-background-color: #e0e0e0; -fx-cursor: hand; -fx-background-radius: 4;"/>
+                        <HBox HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="btnNouveauProduit" text="+ Nouveau" onAction="#handleNouveauProduit"
+                                style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand;"/>
+                        <Button fx:id="btnModifierProduit" text="Modifier" onAction="#handleModifierProduit"
+                                disable="true"
+                                style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand;"/>
+                        <Button fx:id="btnToggleActifProduit" text="Desactiver" onAction="#handleToggleActifProduit"
+                                disable="true"
+                                style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand;"/>
+                    </HBox>
+
+                    <!-- Table + Form -->
+                    <HBox VBox.vgrow="ALWAYS" spacing="0">
+
+                        <TableView fx:id="tableProduits" HBox.hgrow="ALWAYS"
+                                   maxHeight="Infinity" maxWidth="Infinity">
+                            <columns>
+                                <TableColumn fx:id="colProduitCode"    text="Code"       prefWidth="90"/>
+                                <TableColumn fx:id="colProduitNom"     text="Nom"        prefWidth="180"/>
+                                <TableColumn fx:id="colProduitForme"   text="Forme"      prefWidth="90"/>
+                                <TableColumn fx:id="colProduitStock"   text="Stock"      prefWidth="70"/>
+                                <TableColumn fx:id="colProduitSeuil"   text="Seuil"      prefWidth="60"/>
+                                <TableColumn fx:id="colProduitPrix"    text="Prix (€)"   prefWidth="80"/>
+                                <TableColumn fx:id="colProduitDanger"  text="Danger"     prefWidth="80"/>
+                                <TableColumn fx:id="colProduitActif"   text="Actif"      prefWidth="55"/>
+                            </columns>
+                            <placeholder>
+                                <Label text="Aucun produit" style="-fx-text-fill: #aaa;"/>
+                            </placeholder>
+                        </TableView>
+
+                        <!-- Formulaire produit (panneau droit) -->
+                        <ScrollPane fx:id="scrollProduitForm" visible="false" managed="false"
+                                    prefWidth="380" minWidth="340" fitToWidth="true"
+                                    hbarPolicy="NEVER"
+                                    style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 0 1;">
+                            <VBox spacing="10" style="-fx-padding: 16; -fx-background-color: white;">
+                                <Label fx:id="labelProduitFormTitre" text="Nouveau produit"
+                                       style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #4CAF50;"/>
+                                <Separator/>
+                                <GridPane hgap="10" vgap="8">
+                                    <columnConstraints>
+                                        <ColumnConstraints minWidth="110" prefWidth="110"/>
+                                        <ColumnConstraints hgrow="ALWAYS" fillWidth="true"/>
+                                    </columnConstraints>
+                                    <Label text="Code *"          GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                    <TextField fx:id="tfProduitCode"   GridPane.rowIndex="0" GridPane.columnIndex="1" maxWidth="Infinity" promptText="EX: MED001"/>
+                                    <Label text="Nom *"           GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                    <TextField fx:id="tfProduitNom"    GridPane.rowIndex="1" GridPane.columnIndex="1" maxWidth="Infinity"/>
+                                    <Label text="Nom commercial"  GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                    <TextField fx:id="tfProduitNomComm" GridPane.rowIndex="2" GridPane.columnIndex="1" maxWidth="Infinity"/>
+                                    <Label text="Forme"           GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                    <ComboBox fx:id="cbProduitForme"   GridPane.rowIndex="3" GridPane.columnIndex="1" maxWidth="Infinity"/>
+                                    <Label text="Dosage"          GridPane.rowIndex="4" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                    <TextField fx:id="tfProduitDosage"  GridPane.rowIndex="4" GridPane.columnIndex="1" maxWidth="Infinity" promptText="Ex : 500mg"/>
+                                    <Label text="Unite mesure *"  GridPane.rowIndex="5" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                    <TextField fx:id="tfProduitUnite"   GridPane.rowIndex="5" GridPane.columnIndex="1" maxWidth="Infinity" promptText="Ex : comprimes"/>
+                                    <Label text="Prix unitaire"   GridPane.rowIndex="6" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                    <TextField fx:id="tfProduitPrix"    GridPane.rowIndex="6" GridPane.columnIndex="1" maxWidth="Infinity" promptText="0.00"/>
+                                    <Label text="Seuil alerte *"  GridPane.rowIndex="7" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                    <TextField fx:id="tfProduitSeuil"   GridPane.rowIndex="7" GridPane.columnIndex="1" maxWidth="120" promptText="10"/>
+                                    <Label text="Dangerosite"     GridPane.rowIndex="8" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                    <ComboBox fx:id="cbProduitDanger"   GridPane.rowIndex="8" GridPane.columnIndex="1" maxWidth="Infinity"/>
+                                    <Label text="Ordonnance"      GridPane.rowIndex="9" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                    <CheckBox fx:id="cbProduitOrdonnance" GridPane.rowIndex="9" GridPane.columnIndex="1" text="Necessite ordonnance"/>
+                                    <Label text="Stupefiant"      GridPane.rowIndex="10" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                    <CheckBox fx:id="cbProduitStupefiant" GridPane.rowIndex="10" GridPane.columnIndex="1" text="Medicament stupefiants"/>
+                                </GridPane>
+                                <Label fx:id="labelProduitFormErreur" text=""
+                                       style="-fx-text-fill: #F44336; -fx-font-size: 11;" wrapText="true"/>
+                                <HBox spacing="8">
+                                    <Button text="Enregistrer" onAction="#handleSauvegarderProduit"
+                                            style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand;" prefHeight="34"/>
+                                    <Button text="Annuler" onAction="#handleAnnulerProduitForm"
+                                            style="-fx-background-color: #e0e0e0; -fx-background-radius: 5; -fx-cursor: hand;" prefHeight="34"/>
+                                </HBox>
+                            </VBox>
+                        </ScrollPane>
+
+                    </HBox>
+                </VBox>
+            </Tab>
+
+            <!-- ============================================================ -->
+            <!-- TAB 2 : FOURNISSEURS                                         -->
+            <!-- ============================================================ -->
+            <Tab text="Fournisseurs">
+                <VBox spacing="0">
+
+                    <!-- Toolbar -->
+                    <HBox alignment="CENTER_LEFT" spacing="8"
+                          style="-fx-background-color: #f9f9f9; -fx-padding: 10 15 10 15; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+                        <Label text="Liste des fournisseurs"
+                               style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #555;"/>
+                        <HBox HBox.hgrow="ALWAYS"/>
+                        <Button fx:id="btnNouveauFournisseur" text="+ Nouveau" onAction="#handleNouveauFournisseur"
+                                style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand;"/>
+                        <Button fx:id="btnModifierFournisseur" text="Modifier" onAction="#handleModifierFournisseur"
+                                disable="true"
+                                style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand;"/>
+                        <Button fx:id="btnAssocierFournisseur" text="Associer produit" onAction="#handleAssocierProduit"
+                                disable="true"
+                                style="-fx-background-color: #9C27B0; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand;"/>
+                    </HBox>
+
+                    <!-- Table + Form -->
+                    <HBox VBox.vgrow="ALWAYS" spacing="0">
+
+                        <TableView fx:id="tableFournisseurs" HBox.hgrow="ALWAYS"
+                                   maxHeight="Infinity" maxWidth="Infinity">
+                            <columns>
+                                <TableColumn fx:id="colFournisseurCode"   text="Code"        prefWidth="90"/>
+                                <TableColumn fx:id="colFournisseurNom"    text="Nom"         prefWidth="180"/>
+                                <TableColumn fx:id="colFournisseurTel"    text="Telephone"   prefWidth="120"/>
+                                <TableColumn fx:id="colFournisseurEmail"  text="Email"       prefWidth="180"/>
+                                <TableColumn fx:id="colFournisseurDelai"  text="Delai (j)"   prefWidth="75"/>
+                                <TableColumn fx:id="colFournisseurActif"  text="Actif"       prefWidth="55"/>
+                            </columns>
+                            <placeholder>
+                                <Label text="Aucun fournisseur" style="-fx-text-fill: #aaa;"/>
+                            </placeholder>
+                        </TableView>
+
+                        <!-- Panneau droit fournisseur -->
+                        <ScrollPane fx:id="scrollFournisseurForm" visible="false" managed="false"
+                                    prefWidth="380" minWidth="340" fitToWidth="true"
+                                    hbarPolicy="NEVER"
+                                    style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 0 1;">
+                            <VBox spacing="10" style="-fx-padding: 16; -fx-background-color: white;">
+
+                                <!-- Section info fournisseur -->
+                                <Label fx:id="labelFournisseurFormTitre" text="Nouveau fournisseur"
+                                       style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #4CAF50;"/>
+                                <Separator/>
+                                <GridPane hgap="10" vgap="8">
+                                    <columnConstraints>
+                                        <ColumnConstraints minWidth="110" prefWidth="110"/>
+                                        <ColumnConstraints hgrow="ALWAYS" fillWidth="true"/>
+                                    </columnConstraints>
+                                    <Label text="Code *"        GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                    <TextField fx:id="tfFournisseurCode"   GridPane.rowIndex="0" GridPane.columnIndex="1" maxWidth="Infinity" promptText="EX: FOUR001"/>
+                                    <Label text="Nom *"         GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                    <TextField fx:id="tfFournisseurNom"    GridPane.rowIndex="1" GridPane.columnIndex="1" maxWidth="Infinity"/>
+                                    <Label text="Raison sociale" GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                    <TextField fx:id="tfFournisseurRS"     GridPane.rowIndex="2" GridPane.columnIndex="1" maxWidth="Infinity"/>
+                                    <Label text="Telephone"     GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                    <TextField fx:id="tfFournisseurTel"    GridPane.rowIndex="3" GridPane.columnIndex="1" maxWidth="Infinity"/>
+                                    <Label text="Email"         GridPane.rowIndex="4" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                    <TextField fx:id="tfFournisseurEmail"  GridPane.rowIndex="4" GridPane.columnIndex="1" maxWidth="Infinity"/>
+                                    <Label text="Contact nom"   GridPane.rowIndex="5" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                    <TextField fx:id="tfFournisseurContact" GridPane.rowIndex="5" GridPane.columnIndex="1" maxWidth="Infinity"/>
+                                    <Label text="Delai livraison" GridPane.rowIndex="6" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                    <TextField fx:id="tfFournisseurDelai"  GridPane.rowIndex="6" GridPane.columnIndex="1" maxWidth="120" promptText="jours"/>
+                                </GridPane>
+                                <Label fx:id="labelFournisseurFormErreur" text=""
+                                       style="-fx-text-fill: #F44336; -fx-font-size: 11;" wrapText="true"/>
+                                <HBox spacing="8">
+                                    <Button text="Enregistrer" onAction="#handleSauvegarderFournisseur"
+                                            style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand;" prefHeight="34"/>
+                                    <Button text="Annuler" onAction="#handleAnnulerFournisseurForm"
+                                            style="-fx-background-color: #e0e0e0; -fx-background-radius: 5; -fx-cursor: hand;" prefHeight="34"/>
+                                </HBox>
+
+                                <!-- Section association produit/fournisseur -->
+                                <Separator/>
+                                <Label text="Associer un produit"
+                                       style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #9C27B0;"/>
+                                <GridPane hgap="10" vgap="8">
+                                    <columnConstraints>
+                                        <ColumnConstraints minWidth="110" prefWidth="110"/>
+                                        <ColumnConstraints hgrow="ALWAYS" fillWidth="true"/>
+                                    </columnConstraints>
+                                    <Label text="Produit *"     GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                    <ComboBox fx:id="cbAssoProduit" GridPane.rowIndex="0" GridPane.columnIndex="1" maxWidth="Infinity" promptText="Choisir..."/>
+                                    <Label text="Reference"     GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                    <TextField fx:id="tfAssoRef"     GridPane.rowIndex="1" GridPane.columnIndex="1" maxWidth="Infinity"/>
+                                    <Label text="Prix achat *"  GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                    <TextField fx:id="tfAssoPrix"    GridPane.rowIndex="2" GridPane.columnIndex="1" maxWidth="Infinity" promptText="0.00"/>
+                                    <Label text="Delai (jours)" GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                    <TextField fx:id="tfAssoDelai"   GridPane.rowIndex="3" GridPane.columnIndex="1" maxWidth="120" promptText="0"/>
+                                    <Label text="Qte minimum"   GridPane.rowIndex="4" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                    <TextField fx:id="tfAssoQteMin"  GridPane.rowIndex="4" GridPane.columnIndex="1" maxWidth="120" promptText="1"/>
+                                    <Label text="Principal"     GridPane.rowIndex="5" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                    <CheckBox fx:id="cbAssoEstPrincipal" GridPane.rowIndex="5" GridPane.columnIndex="1" text="Fournisseur principal"/>
+                                </GridPane>
+                                <Label fx:id="labelAssoErreur" text=""
+                                       style="-fx-text-fill: #F44336; -fx-font-size: 11;" wrapText="true"/>
+                                <Label fx:id="labelAssoConfirm" text=""
+                                       style="-fx-text-fill: #388E3C; -fx-font-size: 11;" wrapText="true"/>
+                                <Button text="Enregistrer l'association" onAction="#handleSauvegarderAssociation"
+                                        style="-fx-background-color: #9C27B0; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand;" prefHeight="34"/>
+
+                            </VBox>
+                        </ScrollPane>
+                    </HBox>
+                </VBox>
+            </Tab>
+
+            <!-- ============================================================ -->
+            <!-- TAB 3 : DEMANDES EN ATTENTE                                  -->
+            <!-- ============================================================ -->
+            <Tab text="Demandes en attente">
+                <VBox spacing="0">
+
+                    <!-- Toolbar -->
+                    <HBox alignment="CENTER_LEFT" spacing="8"
+                          style="-fx-background-color: #f9f9f9; -fx-padding: 10 15 10 15; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+                        <Label fx:id="labelDemandesCompteur" text="Demandes en attente : 0"
+                               style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #555;"/>
+                        <HBox HBox.hgrow="ALWAYS"/>
+                        <Button text="Actualiser" onAction="#handleRafraichirDemandes"
+                                style="-fx-background-color: #e0e0e0; -fx-cursor: hand; -fx-background-radius: 4;"/>
+                    </HBox>
+
+                    <!-- Table -->
+                    <TableView fx:id="tableDemandes" VBox.vgrow="ALWAYS"
+                               maxHeight="Infinity" maxWidth="Infinity">
+                        <columns>
+                            <TableColumn fx:id="colDemandeNum"      text="N° Demande"   prefWidth="150"/>
+                            <TableColumn fx:id="colDemandeProduit"  text="Produit"       prefWidth="160"/>
+                            <TableColumn fx:id="colDemandeQte"      text="Qte"          prefWidth="50"/>
+                            <TableColumn fx:id="colDemandeMedecin"  text="Medecin"      prefWidth="100"/>
+                            <TableColumn fx:id="colDemandeDate"     text="Date"         prefWidth="120"/>
+                            <TableColumn fx:id="colDemandeUrgence"  text="Urgence"      prefWidth="70"/>
+                            <TableColumn fx:id="colDemandeMotif"    text="Motif"        prefWidth="200"/>
+                        </columns>
+                        <placeholder>
+                            <Label text="Aucune demande en attente" style="-fx-text-fill: #aaa;"/>
+                        </placeholder>
+                    </TableView>
+
+                    <!-- Panneau action bas -->
+                    <VBox spacing="8"
+                          style="-fx-background-color: white; -fx-padding: 12 15 12 15; -fx-border-color: #e0e0e0; -fx-border-width: 1 0 0 0;">
+                        <Label text="Traiter la demande selectionnee :"
+                               style="-fx-font-size: 12; -fx-font-weight: bold; -fx-text-fill: #555;"/>
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <TextField fx:id="tfCommentaireTraitement" promptText="Commentaire (optionnel)..."
+                                       prefWidth="350"/>
+                            <Button fx:id="btnValiderDemande" text="Valider" onAction="#handleValiderDemande"
+                                    disable="true"
+                                    style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand;" prefHeight="34"/>
+                            <Button fx:id="btnRefuserDemande" text="Refuser" onAction="#handleRefuserDemande"
+                                    disable="true"
+                                    style="-fx-background-color: #F44336; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand;" prefHeight="34"/>
+                        </HBox>
+                        <Label fx:id="labelDemandeAction" text=""
+                               style="-fx-font-size: 11; -fx-text-fill: #388E3C;" wrapText="true"/>
+                    </VBox>
+
+                </VBox>
+            </Tab>
+
+            <!-- ============================================================ -->
+            <!-- TAB 4 : REAPPROVISIONNEMENT                                  -->
+            <!-- ============================================================ -->
+            <Tab text="Reapprovisionnement">
+                <ScrollPane fitToWidth="true" hbarPolicy="NEVER"
+                            style="-fx-background-color: #f5f5f5;">
+                    <VBox spacing="16" style="-fx-padding: 24 60 30 60; -fx-background-color: #f5f5f5;">
+
+                        <Label text="Reapprovisionnement de stock"
+                               style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #4CAF50;"/>
+                        <Separator/>
+
+                        <VBox spacing="10"
+                              style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 8; -fx-border-color: #e0e0e0; -fx-border-radius: 8;">
+                            <GridPane hgap="16" vgap="10">
+                                <columnConstraints>
+                                    <ColumnConstraints minWidth="140" prefWidth="140"/>
+                                    <ColumnConstraints hgrow="ALWAYS" fillWidth="true"/>
+                                </columnConstraints>
+
+                                <Label text="Produit *"         GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                <ComboBox fx:id="cbReapproProduit" GridPane.rowIndex="0" GridPane.columnIndex="1" maxWidth="Infinity" promptText="Choisir un produit..."/>
+
+                                <Label text="Emplacement *"     GridPane.rowIndex="1" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                <ComboBox fx:id="cbReapproEmplacement" GridPane.rowIndex="1" GridPane.columnIndex="1" maxWidth="Infinity" promptText="Choisir un emplacement..."/>
+
+                                <Label text="Lot *"             GridPane.rowIndex="2" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                <TextField fx:id="tfReapproLot" GridPane.rowIndex="2" GridPane.columnIndex="1" maxWidth="Infinity" promptText="Numero de lot"/>
+
+                                <Label text="Quantite *"        GridPane.rowIndex="3" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                <TextField fx:id="tfReapproQuantite" GridPane.rowIndex="3" GridPane.columnIndex="1" maxWidth="160" promptText="Ex : 100"/>
+
+                                <Label text="Date peremption"   GridPane.rowIndex="4" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                <DatePicker fx:id="dpReapproPeremption" GridPane.rowIndex="4" GridPane.columnIndex="1" maxWidth="200"/>
+
+                                <Label text="Prix unitaire (€)" GridPane.rowIndex="5" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                <TextField fx:id="tfReapproPrix" GridPane.rowIndex="5" GridPane.columnIndex="1" maxWidth="160" promptText="0.00"/>
+
+                                <Label text="Fournisseur"       GridPane.rowIndex="6" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                <ComboBox fx:id="cbReapproFournisseur" GridPane.rowIndex="6" GridPane.columnIndex="1" maxWidth="Infinity" promptText="Fournisseur (optionnel)"/>
+
+                                <Label text="N° Commande"       GridPane.rowIndex="7" GridPane.columnIndex="0" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                                <TextField fx:id="tfReapproCommande" GridPane.rowIndex="7" GridPane.columnIndex="1" maxWidth="Infinity" promptText="Numero de commande (optionnel)"/>
+                            </GridPane>
+
+                            <Label fx:id="labelReapproErreur" text=""
+                                   style="-fx-text-fill: #F44336; -fx-font-size: 11;" wrapText="true"/>
+                            <Label fx:id="labelReapproConfirm" text=""
+                                   style="-fx-text-fill: #388E3C; -fx-font-size: 11;" wrapText="true"/>
+                            <Button text="Reapprovisionner" onAction="#handleReapprovisionner"
+                                    style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-size: 13;" prefHeight="38" prefWidth="200"/>
+                        </VBox>
+
+                    </VBox>
+                </ScrollPane>
+            </Tab>
+
+            <!-- ============================================================ -->
+            <!-- TAB 5 : ALERTES STOCK                                        -->
+            <!-- ============================================================ -->
+            <Tab text="Alertes Stock">
+                <VBox spacing="0">
+
+                    <!-- Toolbar -->
+                    <HBox alignment="CENTER_LEFT" spacing="8"
+                          style="-fx-background-color: #f9f9f9; -fx-padding: 10 15 10 15; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+                        <Label text="Surveillance des stocks"
+                               style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #555;"/>
+                        <HBox HBox.hgrow="ALWAYS"/>
+                        <Label text="Alertes peremption (jours) :" style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                        <TextField fx:id="tfJoursAlerte" text="30" maxWidth="60"/>
+                        <Button text="Actualiser" onAction="#handleActualiserAlertes"
+                                style="-fx-background-color: #F44336; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand;"/>
+                    </HBox>
+
+                    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" hbarPolicy="NEVER"
+                                style="-fx-background-color: #f5f5f5;">
+                        <VBox spacing="16" style="-fx-padding: 16; -fx-background-color: #f5f5f5;">
+
+                            <!-- Section : Stock bas -->
+                            <VBox spacing="8"
+                                  style="-fx-background-color: white; -fx-padding: 14; -fx-background-radius: 8; -fx-border-color: #FF9800; -fx-border-radius: 8; -fx-border-width: 2;">
+                                <Label text="Produits en stock bas ou rupture"
+                                       style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #FF9800;"/>
+                                <Separator/>
+                                <TableView fx:id="tableStockBas" prefHeight="200" maxWidth="Infinity">
+                                    <columns>
+                                        <TableColumn fx:id="colAlerteCode"    text="Code"      prefWidth="90"/>
+                                        <TableColumn fx:id="colAlerteNom"     text="Produit"   prefWidth="220"/>
+                                        <TableColumn fx:id="colAlerteStock"   text="Stock actuel" prefWidth="110"/>
+                                        <TableColumn fx:id="colAlerteSeuil"   text="Seuil"     prefWidth="80"/>
+                                        <TableColumn fx:id="colAlerteDanger"  text="Danger"    prefWidth="90"/>
+                                    </columns>
+                                    <placeholder>
+                                        <Label text="Aucun produit en stock bas" style="-fx-text-fill: #4CAF50;"/>
+                                    </placeholder>
+                                </TableView>
+                            </VBox>
+
+                            <!-- Section : Proches peremption -->
+                            <VBox spacing="8"
+                                  style="-fx-background-color: white; -fx-padding: 14; -fx-background-radius: 8; -fx-border-color: #F44336; -fx-border-radius: 8; -fx-border-width: 2;">
+                                <Label text="Stocks proches de la peremption"
+                                       style="-fx-font-size: 13; -fx-font-weight: bold; -fx-text-fill: #F44336;"/>
+                                <Separator/>
+                                <TableView fx:id="tablePeremption" prefHeight="200" maxWidth="Infinity">
+                                    <columns>
+                                        <TableColumn fx:id="colPeremProduit"  text="Produit"      prefWidth="200"/>
+                                        <TableColumn fx:id="colPeremLot"      text="Lot"          prefWidth="110"/>
+                                        <TableColumn fx:id="colPeremQte"      text="Quantite"     prefWidth="80"/>
+                                        <TableColumn fx:id="colPeremDate"     text="Peremption"   prefWidth="110"/>
+                                        <TableColumn fx:id="colPeremJours"    text="Jours restants" prefWidth="110"/>
+                                    </columns>
+                                    <placeholder>
+                                        <Label text="Aucun stock proche de peremption" style="-fx-text-fill: #4CAF50;"/>
+                                    </placeholder>
+                                </TableView>
+                            </VBox>
+
+                        </VBox>
+                    </ScrollPane>
+
+                </VBox>
+            </Tab>
+
+        </TabPane>
     </center>
+
+    <!-- BARRE DE STATUT -->
+    <bottom>
+        <HBox alignment="CENTER_LEFT" spacing="20"
+              style="-fx-background-color: #eeeeee; -fx-padding: 7 15 7 15;">
+            <Label fx:id="labelStatus" text=""
+                   style="-fx-text-fill: #555; -fx-font-size: 11;"/>
+            <HBox HBox.hgrow="ALWAYS"/>
+            <Label text="HSP - Gestion du Stock"
+                   style="-fx-text-fill: #999; -fx-font-size: 11;"/>
+        </HBox>
+    </bottom>
 
 </BorderPane>
