@@ -86,7 +86,9 @@ public class RoleGuard {
             case "demandes" -> hasPermission(Fonctionnalite.DEMANDE_PRODUITS) || hasPermission(Fonctionnalite.VALIDATION_DEMANDES);
             case "utilisateurs" -> hasPermission(Fonctionnalite.GESTION_UTILISATEURS);
             case "journal" -> hasPermission(Fonctionnalite.CONSULTATION_JOURNAL);
-            case "triage" -> hasPermission(Fonctionnalite.TRIAGE);
+            case "triage"  -> hasPermission(Fonctionnalite.TRIAGE);
+            case "dossier" -> hasPermission(Fonctionnalite.GESTION_HOSPITALISATIONS)
+                           || hasPermission(Fonctionnalite.GESTION_DOSSIERS);
             default -> false;
         };
     }

@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="appli.ui.controller.DossierController"
+            prefHeight="700.0" prefWidth="900.0"
+            style="-fx-background-color: #f5f5f5;">
+
+    <!-- BARRE DE NAVIGATION -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="12"
+              style="-fx-background-color: #FF9800; -fx-padding: 12 20 12 20;">
+            <Button text="&lt; Salle d'attente" onAction="#handleRetour"
+                    style="-fx-background-color: rgba(255,255,255,0.15); -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand; -fx-border-color: rgba(255,255,255,0.3); -fx-border-radius: 5;"/>
+            <Separator orientation="VERTICAL" prefHeight="28" style="-fx-opacity: 0.4;"/>
+            <Label fx:id="labelTitreDossier" text="Dossier"
+                   style="-fx-text-fill: white; -fx-font-weight: bold;">
+                <font><Font size="16.0"/></font>
+            </Label>
+            <HBox HBox.hgrow="ALWAYS"/>
+            <Label fx:id="welcomeLabel" text=""
+                   style="-fx-text-fill: white;">
+                <font><Font size="12.0"/></font>
+            </Label>
+            <Label text="|" style="-fx-text-fill: rgba(255,255,255,0.5);"/>
+            <Label fx:id="roleLabel" text=""
+                   style="-fx-text-fill: white; -fx-background-color: rgba(255,255,255,0.2); -fx-padding: 3 8 3 8; -fx-background-radius: 10;">
+                <font><Font size="11.0"/></font>
+            </Label>
+            <Button text="Deconnexion" onAction="#handleLogout"
+                    style="-fx-background-color: rgba(255,255,255,0.15); -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand; -fx-border-color: rgba(255,255,255,0.3); -fx-border-radius: 5;"/>
+        </HBox>
+    </top>
+
+    <!-- CONTENU PRINCIPAL -->
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER"
+                    style="-fx-background-color: #f5f5f5;">
+            <VBox spacing="14" style="-fx-padding: 20 40 30 40; -fx-background-color: #f5f5f5;">
+
+                <!-- CARTE : INFORMATIONS PATIENT / DOSSIER -->
+                <VBox spacing="8"
+                      style="-fx-background-color: white; -fx-padding: 16; -fx-background-radius: 8; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.06),6,0,0,2);">
+                    <HBox spacing="20" alignment="CENTER_LEFT">
+                        <VBox spacing="4" HBox.hgrow="ALWAYS">
+                            <Label fx:id="labelPatientNom" text=""
+                                   style="-fx-font-size: 18; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                            <Label fx:id="labelPatientInfo" text=""
+                                   style="-fx-font-size: 12; -fx-text-fill: #666;"/>
+                        </VBox>
+                        <VBox spacing="4" alignment="CENTER_RIGHT">
+                            <Label fx:id="labelNumeroDossier" text=""
+                                   style="-fx-font-size: 13; -fx-text-fill: #888;"/>
+                            <Label fx:id="labelArrivee" text=""
+                                   style="-fx-font-size: 12; -fx-text-fill: #888;"/>
+                        </VBox>
+                        <Label fx:id="labelGravite" text=""
+                               style="-fx-font-size: 14; -fx-font-weight: bold; -fx-padding: 6 14 6 14; -fx-background-radius: 8; -fx-text-fill: white;"/>
+                    </HBox>
+                    <Separator/>
+                    <HBox spacing="16">
+                        <Label text="Mode arrivee :" style="-fx-text-fill: #888; -fx-font-size: 11;"/>
+                        <Label fx:id="labelModeArrivee" text="" style="-fx-text-fill: #444; -fx-font-size: 11;"/>
+                        <Label text="  |  Statut :" style="-fx-text-fill: #888; -fx-font-size: 11;"/>
+                        <Label fx:id="labelStatut" text="" style="-fx-text-fill: #444; -fx-font-size: 11; -fx-font-weight: bold;"/>
+                    </HBox>
+                    <Label fx:id="labelSymptomes" text=""
+                           style="-fx-text-fill: #555; -fx-font-size: 12;" wrapText="true"/>
+                </VBox>
+
+                <!-- MESSAGE GLOBAL (erreurs / confirmations) -->
+                <Label fx:id="labelMessage" text=""
+                       style="-fx-font-size: 12; -fx-text-fill: #388E3C;" wrapText="true"/>
+
+                <!-- ============================================================ -->
+                <!-- SECTION : ORDONNANCE                                         -->
+                <!-- ============================================================ -->
+                <VBox spacing="10"
+                      style="-fx-background-color: white; -fx-padding: 16; -fx-background-radius: 8; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.06),6,0,0,2);">
+
+                    <Label text="Ordonnance"
+                           style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #2196F3;"/>
+                    <Separator/>
+
+                    <Label fx:id="labelOrdonnancesExistantes" text=""
+                           style="-fx-font-size: 11; -fx-text-fill: #666;" wrapText="true"/>
+
+                    <Label text="Nouvelle ordonnance :"
+                           style="-fx-font-size: 12; -fx-text-fill: #555; -fx-font-weight: bold;"/>
+
+                    <GridPane hgap="12" vgap="8">
+                        <columnConstraints>
+                            <ColumnConstraints minWidth="130" prefWidth="130"/>
+                            <ColumnConstraints hgrow="ALWAYS" fillWidth="true"/>
+                        </columnConstraints>
+                        <Label text="Prescriptions / Notes *" GridPane.rowIndex="0" GridPane.columnIndex="0"
+                               style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                        <TextArea fx:id="taNotesOrdonnance" GridPane.rowIndex="0" GridPane.columnIndex="1"
+                                  prefRowCount="4" wrapText="true" maxWidth="Infinity"
+                                  promptText="Medicaments, posologie, instructions..."/>
+                        <Label text="Valide jusqu'au" GridPane.rowIndex="1" GridPane.columnIndex="0"
+                               style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                        <DatePicker fx:id="dpDateFinOrdonnance" GridPane.rowIndex="1" GridPane.columnIndex="1"
+                                    maxWidth="200"/>
+                    </GridPane>
+
+                    <Label fx:id="labelErreurOrdonnance" text=""
+                           style="-fx-text-fill: #F44336; -fx-font-size: 11;"/>
+                    <Button text="Creer l'ordonnance" onAction="#handleCreerOrdonnance"
+                            fx:id="btnCreerOrdonnance"
+                            style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand;"/>
+                </VBox>
+
+                <!-- ============================================================ -->
+                <!-- SECTION : HOSPITALISATION                                    -->
+                <!-- ============================================================ -->
+                <VBox fx:id="sectionHospitalisation" spacing="10"
+                      style="-fx-background-color: white; -fx-padding: 16; -fx-background-radius: 8; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.06),6,0,0,2);">
+
+                    <Label text="Hospitalisation"
+                           style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #FF9800;"/>
+                    <Separator/>
+
+                    <Label fx:id="labelHospitalisationInfo" text=""
+                           style="-fx-font-size: 12; -fx-text-fill: #555;" wrapText="true"/>
+
+                    <!-- Formulaire d'hospitalisation (affiché si pas encore hospitalisé) -->
+                    <VBox fx:id="formHospitalisation" spacing="8">
+                        <GridPane hgap="12" vgap="8">
+                            <columnConstraints>
+                                <ColumnConstraints minWidth="130" prefWidth="130"/>
+                                <ColumnConstraints hgrow="ALWAYS" fillWidth="true"/>
+                            </columnConstraints>
+                            <Label text="Chambre disponible *" GridPane.rowIndex="0" GridPane.columnIndex="0"
+                                   style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                            <ComboBox fx:id="cbChambre" GridPane.rowIndex="0" GridPane.columnIndex="1"
+                                      maxWidth="Infinity"/>
+                            <Label text="Diagnostic entree *" GridPane.rowIndex="1" GridPane.columnIndex="0"
+                                   style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                            <TextArea fx:id="taDiagnostic" GridPane.rowIndex="1" GridPane.columnIndex="1"
+                                      prefRowCount="3" wrapText="true" maxWidth="Infinity"
+                                      promptText="Description de la maladie / diagnostic..."/>
+                            <Label text="Sortie prevue" GridPane.rowIndex="2" GridPane.columnIndex="0"
+                                   style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                            <DatePicker fx:id="dpSortiePrevue" GridPane.rowIndex="2" GridPane.columnIndex="1"
+                                        maxWidth="200"/>
+                        </GridPane>
+
+                        <Label fx:id="labelErreurHospitalisation" text=""
+                               style="-fx-text-fill: #F44336; -fx-font-size: 11;"/>
+                        <Button fx:id="btnHospitaliser" text="Hospitaliser le patient"
+                                onAction="#handleHospitaliser"
+                                style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand;"/>
+                    </VBox>
+
+                </VBox>
+
+                <!-- ============================================================ -->
+                <!-- SECTION : CLOTURE DU DOSSIER                                -->
+                <!-- ============================================================ -->
+                <VBox fx:id="sectionCloture" spacing="10"
+                      style="-fx-background-color: white; -fx-padding: 16; -fx-background-radius: 8; -fx-border-color: #e0e0e0; -fx-border-radius: 8; -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.06),6,0,0,2);">
+
+                    <Label text="Cloture du dossier"
+                           style="-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #607D8B;"/>
+                    <Separator/>
+
+                    <VBox fx:id="formCloture" spacing="8">
+                        <GridPane hgap="12" vgap="8">
+                            <columnConstraints>
+                                <ColumnConstraints minWidth="130" prefWidth="130"/>
+                                <ColumnConstraints hgrow="ALWAYS" fillWidth="true"/>
+                            </columnConstraints>
+                            <Label text="Destination sortie *" GridPane.rowIndex="0" GridPane.columnIndex="0"
+                                   style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                            <ComboBox fx:id="cbDestination" GridPane.rowIndex="0" GridPane.columnIndex="1"
+                                      maxWidth="260"/>
+                            <Label text="Notes de cloture" GridPane.rowIndex="1" GridPane.columnIndex="0"
+                                   style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                            <TextArea fx:id="taNotesCloture" GridPane.rowIndex="1" GridPane.columnIndex="1"
+                                      prefRowCount="3" wrapText="true" maxWidth="Infinity"
+                                      promptText="Observations finales, recommandations..."/>
+                        </GridPane>
+
+                        <Label fx:id="labelErreurCloture" text=""
+                               style="-fx-text-fill: #F44336; -fx-font-size: 11;"/>
+                        <Button fx:id="btnCloturer" text="Cloturer le dossier"
+                                onAction="#handleCloturerDossier"
+                                style="-fx-background-color: #607D8B; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand;"/>
+                    </VBox>
+
+                    <Label fx:id="labelDossierClos" text="Dossier clos."
+                           visible="false" managed="false"
+                           style="-fx-font-size: 13; -fx-text-fill: #888; -fx-font-style: italic;"/>
+
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <!-- BARRE DE STATUT -->
+    <bottom>
+        <HBox alignment="CENTER"
+              style="-fx-background-color: #eeeeee; -fx-padding: 7 15 7 15;">
+            <Label text="HSP - Detail Dossier"
+                   style="-fx-text-fill: #999; -fx-font-size: 11;"/>
+        </HBox>
+    </bottom>
+
+</BorderPane>

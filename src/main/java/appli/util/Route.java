@@ -14,7 +14,8 @@ public enum Route {
     DEMANDES("demandes", "HSP - Demandes de Produits"),
     UTILISATEURS("utilisateurs", "HSP - Gestion des Utilisateurs"),
     JOURNAL("journal", "HSP - Journal des Actions"),
-    TRIAGE("triage", "HSP - Nouveau Cas de Triage");
+    TRIAGE("triage", "HSP - Nouveau Cas de Triage"),
+    DOSSIER("dossier", "HSP - Detail du Dossier");
 
     private final String viewName;
     private final String title;
