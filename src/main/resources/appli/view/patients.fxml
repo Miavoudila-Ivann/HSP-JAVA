@@ -2,50 +2,252 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="appli.ui.controller.PatientsController"
-            prefHeight="600.0" prefWidth="900.0"
+            prefHeight="680.0" prefWidth="1100.0"
             style="-fx-background-color: #f5f5f5;">
 
+    <!-- BARRE DE NAVIGATION -->
     <top>
-        <HBox alignment="CENTER_LEFT" spacing="15"
-              style="-fx-background-color: #2196F3; -fx-padding: 15 25 15 25;">
-            <Button text="Dashboard" onAction="#goToDashboard"
-                    style="-fx-background-color: rgba(255,255,255,0.2); -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-weight: bold;"/>
-            <Separator orientation="VERTICAL" prefHeight="30" style="-fx-opacity: 0.3;"/>
-            <Label text="Gestion des Patients" style="-fx-text-fill: white;">
-                <font><Font name="System Bold" size="16.0"/></font>
+        <HBox alignment="CENTER_LEFT" spacing="12"
+              style="-fx-background-color: #2196F3; -fx-padding: 12 20 12 20;">
+            <Button text="&lt; Dashboard" onAction="#goToDashboard"
+                    style="-fx-background-color: rgba(255,255,255,0.15); -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand; -fx-border-color: rgba(255,255,255,0.3); -fx-border-radius: 5;"/>
+            <Separator orientation="VERTICAL" prefHeight="28" style="-fx-opacity: 0.4;"/>
+            <Label text="Gestion des Patients"
+                   style="-fx-text-fill: white; -fx-font-weight: bold;">
+                <font><Font size="16.0"/></font>
             </Label>
             <HBox HBox.hgrow="ALWAYS"/>
-            <Label fx:id="welcomeLabel" text="" style="-fx-text-fill: white;">
-                <font><Font size="13.0"/></font>
-            </Label>
-            <Label fx:id="roleLabel" text=""
-                   style="-fx-text-fill: white; -fx-background-color: rgba(255,255,255,0.2); -fx-padding: 4 10 4 10; -fx-background-radius: 12;">
+            <Label fx:id="welcomeLabel" text=""
+                   style="-fx-text-fill: white;">
                 <font><Font size="12.0"/></font>
+            </Label>
+            <Label text="|" style="-fx-text-fill: rgba(255,255,255,0.5);"/>
+            <Label fx:id="roleLabel" text=""
+                   style="-fx-text-fill: white; -fx-background-color: rgba(255,255,255,0.2); -fx-padding: 3 8 3 8; -fx-background-radius: 10;">
+                <font><Font size="11.0"/></font>
             </Label>
             <Button text="Deconnexion" onAction="#handleLogout"
                     style="-fx-background-color: rgba(255,255,255,0.15); -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand; -fx-border-color: rgba(255,255,255,0.3); -fx-border-radius: 5;"/>
         </HBox>
     </top>
 
+    <!-- CONTENU CENTRAL -->
     <center>
-        <VBox alignment="CENTER" spacing="15">
-            <padding><Insets top="40" right="50" bottom="40" left="50"/></padding>
-            <Label text="Module Patients" style="-fx-text-fill: #2196F3;">
-                <font><Font name="System Bold" size="24.0"/></font>
-            </Label>
-            <Label text="Contenu a implementer" style="-fx-text-fill: #999999;">
-                <font><Font size="14.0"/></font>
-            </Label>
+        <VBox spacing="0">
+
+            <!-- BARRE D'OUTILS -->
+            <HBox alignment="CENTER_LEFT" spacing="8"
+                  style="-fx-background-color: white; -fx-padding: 10 15 10 15; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+                <TextField fx:id="tfSearch" promptText="Rechercher (nom, prenom, NSS)..."
+                           prefWidth="280" onAction="#handleRecherche"/>
+                <Button text="Rechercher" onAction="#handleRecherche"
+                        style="-fx-background-color: #607D8B; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand;"/>
+                <Button text="Tout afficher" onAction="#handleAfficherTous"
+                        style="-fx-background-color: #e0e0e0; -fx-text-fill: #333; -fx-background-radius: 5; -fx-cursor: hand;"/>
+                <Separator orientation="VERTICAL" prefHeight="28"/>
+                <Button fx:id="btnNouveau" text="+ Nouveau patient" onAction="#handleNouveau"
+                        style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand;"/>
+                <Button fx:id="btnTriage" text="Nouveau Triage" onAction="#goToTriage"
+                        style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand;"/>
+                <Separator orientation="VERTICAL" prefHeight="28"/>
+                <Button fx:id="btnModifier" text="Modifier" onAction="#handleModifier"
+                        disable="true"
+                        style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand;"/>
+                <Button fx:id="btnSupprimer" text="Supprimer" onAction="#handleSupprimer"
+                        disable="true"
+                        style="-fx-background-color: #F44336; -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand;"/>
+            </HBox>
+
+            <!-- TABLE + PANNEAU FORMULAIRE -->
+            <HBox VBox.vgrow="ALWAYS">
+
+                <!-- TABLE DES PATIENTS -->
+                <TableView fx:id="tablePatients" HBox.hgrow="ALWAYS"
+                           maxHeight="Infinity" maxWidth="Infinity">
+                    <columns>
+                        <TableColumn fx:id="colNom"           text="Nom"            prefWidth="130"/>
+                        <TableColumn fx:id="colPrenom"        text="Prenom"         prefWidth="130"/>
+                        <TableColumn fx:id="colDateNaissance" text="Date naissance" prefWidth="120"/>
+                        <TableColumn fx:id="colNss"           text="NSS"            prefWidth="150"/>
+                        <TableColumn fx:id="colSexe"          text="Sexe"           prefWidth="80"/>
+                        <TableColumn fx:id="colTelephone"     text="Telephone"      prefWidth="120"/>
+                        <TableColumn fx:id="colAge"           text="Age"            prefWidth="55"/>
+                    </columns>
+                    <placeholder>
+                        <Label text="Aucun patient trouve" style="-fx-text-fill: #aaaaaa;"/>
+                    </placeholder>
+                </TableView>
+
+                <!-- PANNEAU FORMULAIRE (cache par defaut, affiche a droite en mode creation/edition) -->
+                <ScrollPane fx:id="scrollFormPane" prefWidth="400"
+                            visible="false" managed="false"
+                            fitToWidth="true" hbarPolicy="NEVER"
+                            style="-fx-background-color: white; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 0 1;">
+                    <VBox spacing="10"
+                          style="-fx-background-color: white; -fx-padding: 15 15 20 15;">
+
+                        <Label fx:id="formTitle" text="Nouveau Patient"
+                               style="-fx-font-size: 15; -fx-font-weight: bold; -fx-text-fill: #2196F3;"/>
+                        <Separator/>
+
+                        <!-- IDENTIFICATION -->
+                        <Label text="IDENTIFICATION"
+                               style="-fx-font-size: 10; -fx-text-fill: #888888; -fx-font-weight: bold;"/>
+                        <GridPane hgap="8" vgap="8">
+                            <columnConstraints>
+                                <ColumnConstraints minWidth="90" prefWidth="90"/>
+                                <ColumnConstraints hgrow="ALWAYS" fillWidth="true"/>
+                            </columnConstraints>
+                            <Label text="NSS" GridPane.rowIndex="0" GridPane.columnIndex="0"
+                                   style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                            <TextField fx:id="tfNss" GridPane.rowIndex="0" GridPane.columnIndex="1"
+                                       maxWidth="Infinity" promptText="Numero securite sociale"/>
+                            <Label text="Nom *" GridPane.rowIndex="1" GridPane.columnIndex="0"
+                                   style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                            <TextField fx:id="tfNom" GridPane.rowIndex="1" GridPane.columnIndex="1"
+                                       maxWidth="Infinity"/>
+                            <Label text="Prenom *" GridPane.rowIndex="2" GridPane.columnIndex="0"
+                                   style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                            <TextField fx:id="tfPrenom" GridPane.rowIndex="2" GridPane.columnIndex="1"
+                                       maxWidth="Infinity"/>
+                            <Label text="Naissance *" GridPane.rowIndex="3" GridPane.columnIndex="0"
+                                   style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                            <DatePicker fx:id="dpDateNaissance" GridPane.rowIndex="3" GridPane.columnIndex="1"
+                                        maxWidth="Infinity"/>
+                            <Label text="Sexe *" GridPane.rowIndex="4" GridPane.columnIndex="0"
+                                   style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                            <ComboBox fx:id="cbSexe" GridPane.rowIndex="4" GridPane.columnIndex="1"
+                                      maxWidth="Infinity"/>
+                        </GridPane>
+
+                        <!-- COORDONNEES -->
+                        <Label text="COORDONNEES"
+                               style="-fx-font-size: 10; -fx-text-fill: #888888; -fx-font-weight: bold;"/>
+                        <GridPane hgap="8" vgap="8">
+                            <columnConstraints>
+                                <ColumnConstraints minWidth="90" prefWidth="90"/>
+                                <ColumnConstraints hgrow="ALWAYS" fillWidth="true"/>
+                            </columnConstraints>
+                            <Label text="Telephone" GridPane.rowIndex="0" GridPane.columnIndex="0"
+                                   style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                            <TextField fx:id="tfTelephone" GridPane.rowIndex="0" GridPane.columnIndex="1"
+                                       maxWidth="Infinity"/>
+                            <Label text="Mobile" GridPane.rowIndex="1" GridPane.columnIndex="0"
+                                   style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                            <TextField fx:id="tfMobile" GridPane.rowIndex="1" GridPane.columnIndex="1"
+                                       maxWidth="Infinity"/>
+                            <Label text="Email" GridPane.rowIndex="2" GridPane.columnIndex="0"
+                                   style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                            <TextField fx:id="tfEmail" GridPane.rowIndex="2" GridPane.columnIndex="1"
+                                       maxWidth="Infinity"/>
+                            <Label text="Adresse" GridPane.rowIndex="3" GridPane.columnIndex="0"
+                                   style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                            <TextField fx:id="tfAdresse" GridPane.rowIndex="3" GridPane.columnIndex="1"
+                                       maxWidth="Infinity"/>
+                            <Label text="Code postal" GridPane.rowIndex="4" GridPane.columnIndex="0"
+                                   style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                            <TextField fx:id="tfCodePostal" GridPane.rowIndex="4" GridPane.columnIndex="1"
+                                       maxWidth="Infinity"/>
+                            <Label text="Ville" GridPane.rowIndex="5" GridPane.columnIndex="0"
+                                   style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                            <TextField fx:id="tfVille" GridPane.rowIndex="5" GridPane.columnIndex="1"
+                                       maxWidth="Infinity"/>
+                        </GridPane>
+
+                        <!-- INFORMATIONS MEDICALES -->
+                        <Label text="INFORMATIONS MEDICALES"
+                               style="-fx-font-size: 10; -fx-text-fill: #888888; -fx-font-weight: bold;"/>
+                        <GridPane hgap="8" vgap="8">
+                            <columnConstraints>
+                                <ColumnConstraints minWidth="90" prefWidth="90"/>
+                                <ColumnConstraints hgrow="ALWAYS" fillWidth="true"/>
+                            </columnConstraints>
+                            <Label text="Gr. sanguin" GridPane.rowIndex="0" GridPane.columnIndex="0"
+                                   style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                            <ComboBox fx:id="cbGroupeSanguin" GridPane.rowIndex="0" GridPane.columnIndex="1"
+                                      maxWidth="Infinity"/>
+                            <Label text="Allergies" GridPane.rowIndex="1" GridPane.columnIndex="0"
+                                   style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                            <TextArea fx:id="taAllergies" GridPane.rowIndex="1" GridPane.columnIndex="1"
+                                      prefRowCount="2" maxWidth="Infinity" wrapText="true"/>
+                            <Label text="Antecedents" GridPane.rowIndex="2" GridPane.columnIndex="0"
+                                   style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                            <TextArea fx:id="taAntecedents" GridPane.rowIndex="2" GridPane.columnIndex="1"
+                                      prefRowCount="2" maxWidth="Infinity" wrapText="true"/>
+                            <Label text="Med. traitant" GridPane.rowIndex="3" GridPane.columnIndex="0"
+                                   style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                            <TextField fx:id="tfMedecinTraitant" GridPane.rowIndex="3" GridPane.columnIndex="1"
+                                       maxWidth="Infinity"/>
+                        </GridPane>
+
+                        <!-- CONTACT D'URGENCE -->
+                        <Label text="CONTACT D'URGENCE"
+                               style="-fx-font-size: 10; -fx-text-fill: #888888; -fx-font-weight: bold;"/>
+                        <GridPane hgap="8" vgap="8">
+                            <columnConstraints>
+                                <ColumnConstraints minWidth="90" prefWidth="90"/>
+                                <ColumnConstraints hgrow="ALWAYS" fillWidth="true"/>
+                            </columnConstraints>
+                            <Label text="Nom" GridPane.rowIndex="0" GridPane.columnIndex="0"
+                                   style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                            <TextField fx:id="tfContactNom" GridPane.rowIndex="0" GridPane.columnIndex="1"
+                                       maxWidth="Infinity"/>
+                            <Label text="Telephone" GridPane.rowIndex="1" GridPane.columnIndex="0"
+                                   style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                            <TextField fx:id="tfContactTel" GridPane.rowIndex="1" GridPane.columnIndex="1"
+                                       maxWidth="Infinity"/>
+                            <Label text="Lien" GridPane.rowIndex="2" GridPane.columnIndex="0"
+                                   style="-fx-font-size: 12; -fx-text-fill: #555;"/>
+                            <TextField fx:id="tfContactLien" GridPane.rowIndex="2" GridPane.columnIndex="1"
+                                       maxWidth="Infinity"/>
+                        </GridPane>
+
+                        <Separator/>
+                        <Label fx:id="labelFormError" text=""
+                               style="-fx-text-fill: #F44336; -fx-font-size: 11;"
+                               wrapText="true"/>
+                        <HBox spacing="8">
+                            <Button text="Enregistrer" onAction="#handleEnregistrer"
+                                    style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand;"/>
+                            <Button text="Annuler" onAction="#handleAnnuler"
+                                    style="-fx-background-color: #e0e0e0; -fx-text-fill: #333; -fx-background-radius: 5; -fx-cursor: hand;"/>
+                        </HBox>
+
+                    </VBox>
+                </ScrollPane>
+
+            </HBox>
         </VBox>
     </center>
+
+    <!-- BARRE DE STATUT -->
+    <bottom>
+        <HBox alignment="CENTER_LEFT" spacing="10"
+              style="-fx-background-color: #eeeeee; -fx-padding: 7 15 7 15; -fx-border-color: #e0e0e0; -fx-border-width: 1 0 0 0;">
+            <Label fx:id="labelStatus" text=""
+                   style="-fx-text-fill: #555555; -fx-font-size: 11;"/>
+            <HBox HBox.hgrow="ALWAYS"/>
+            <Label text="HSP - Gestion des Patients"
+                   style="-fx-text-fill: #999999; -fx-font-size: 11;"/>
+        </HBox>
+    </bottom>
 
 </BorderPane>
