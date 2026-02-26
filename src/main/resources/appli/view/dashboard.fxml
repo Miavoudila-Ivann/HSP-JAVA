@@ -5,6 +5,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -41,7 +42,7 @@
         </HBox>
     </top>
 
-    <!-- Contenu central : grille de navigation -->
+    <!-- Contenu central : grille adaptative de navigation -->
     <center>
         <VBox alignment="TOP_CENTER" spacing="30">
             <padding>
@@ -56,41 +57,98 @@
                 <font><Font size="13.0"/></font>
             </Label>
 
-            <!-- Ligne 1 : Patients, Hospitalisations, Stock -->
-            <HBox alignment="CENTER" spacing="20">
-                <Button fx:id="btnPatients" text="Patients" onAction="#goToPatients"
-                        prefWidth="220" prefHeight="100"
-                        style="-fx-background-color: white; -fx-text-fill: #2196F3; -fx-font-size: 16; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2); -fx-border-color: #e0e0e0; -fx-border-radius: 10;">
+            <!--
+                FlowPane : les boutons s'arrangent automatiquement selon ceux qui sont visibles.
+                Chaque role verra uniquement ses modules autorises, centres a l'ecran.
+            -->
+            <FlowPane alignment="CENTER" hgap="20" vgap="20">
+
+                <!-- Patients : SECRETAIRE, MEDECIN, ADMIN -->
+                <Button fx:id="btnPatients" onAction="#goToPatients"
+                        prefWidth="200" prefHeight="110"
+                        style="-fx-background-color: white; -fx-background-radius: 10; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2); -fx-border-color: #e0e0e0; -fx-border-radius: 10;">
+                    <graphic>
+                        <VBox alignment="CENTER" spacing="6">
+                            <Label text="Patients"
+                                   style="-fx-font-size: 15; -fx-font-weight: bold; -fx-text-fill: #2196F3;"/>
+                            <Label text="Dossiers &amp; admissions"
+                                   style="-fx-font-size: 10; -fx-text-fill: #888888;"/>
+                        </VBox>
+                    </graphic>
                 </Button>
 
-                <Button fx:id="btnHospitalisations" text="Hospitalisations" onAction="#goToHospitalisations"
-                        prefWidth="220" prefHeight="100"
-                        style="-fx-background-color: white; -fx-text-fill: #FF9800; -fx-font-size: 16; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2); -fx-border-color: #e0e0e0; -fx-border-radius: 10;">
+                <!-- Hospitalisations : MEDECIN, ADMIN -->
+                <Button fx:id="btnHospitalisations" onAction="#goToHospitalisations"
+                        prefWidth="200" prefHeight="110"
+                        style="-fx-background-color: white; -fx-background-radius: 10; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2); -fx-border-color: #e0e0e0; -fx-border-radius: 10;">
+                    <graphic>
+                        <VBox alignment="CENTER" spacing="6">
+                            <Label text="Hospitalisations"
+                                   style="-fx-font-size: 15; -fx-font-weight: bold; -fx-text-fill: #FF9800;"/>
+                            <Label text="Chambres &amp; sejours"
+                                   style="-fx-font-size: 10; -fx-text-fill: #888888;"/>
+                        </VBox>
+                    </graphic>
                 </Button>
 
-                <Button fx:id="btnStock" text="Stock" onAction="#goToStock"
-                        prefWidth="220" prefHeight="100"
-                        style="-fx-background-color: white; -fx-text-fill: #4CAF50; -fx-font-size: 16; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2); -fx-border-color: #e0e0e0; -fx-border-radius: 10;">
-                </Button>
-            </HBox>
-
-            <!-- Ligne 2 : Demandes, Utilisateurs, Journal -->
-            <HBox alignment="CENTER" spacing="20">
-                <Button fx:id="btnDemandes" text="Demandes" onAction="#goToDemandes"
-                        prefWidth="220" prefHeight="100"
-                        style="-fx-background-color: white; -fx-text-fill: #9C27B0; -fx-font-size: 16; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2); -fx-border-color: #e0e0e0; -fx-border-radius: 10;">
-                </Button>
-
-                <Button fx:id="btnUtilisateurs" text="Utilisateurs" onAction="#goToUtilisateurs"
-                        prefWidth="220" prefHeight="100"
-                        style="-fx-background-color: white; -fx-text-fill: #F44336; -fx-font-size: 16; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2); -fx-border-color: #e0e0e0; -fx-border-radius: 10;">
+                <!-- Stock : GESTIONNAIRE, ADMIN -->
+                <Button fx:id="btnStock" onAction="#goToStock"
+                        prefWidth="200" prefHeight="110"
+                        style="-fx-background-color: white; -fx-background-radius: 10; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2); -fx-border-color: #e0e0e0; -fx-border-radius: 10;">
+                    <graphic>
+                        <VBox alignment="CENTER" spacing="6">
+                            <Label text="Stock"
+                                   style="-fx-font-size: 15; -fx-font-weight: bold; -fx-text-fill: #4CAF50;"/>
+                            <Label text="Produits &amp; inventaire"
+                                   style="-fx-font-size: 10; -fx-text-fill: #888888;"/>
+                        </VBox>
+                    </graphic>
                 </Button>
 
-                <Button fx:id="btnJournal" text="Journal" onAction="#goToJournal"
-                        prefWidth="220" prefHeight="100"
-                        style="-fx-background-color: white; -fx-text-fill: #607D8B; -fx-font-size: 16; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2); -fx-border-color: #e0e0e0; -fx-border-radius: 10;">
+                <!-- Demandes : MEDECIN, GESTIONNAIRE, ADMIN -->
+                <Button fx:id="btnDemandes" onAction="#goToDemandes"
+                        prefWidth="200" prefHeight="110"
+                        style="-fx-background-color: white; -fx-background-radius: 10; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2); -fx-border-color: #e0e0e0; -fx-border-radius: 10;">
+                    <graphic>
+                        <VBox alignment="CENTER" spacing="6">
+                            <Label text="Demandes"
+                                   style="-fx-font-size: 15; -fx-font-weight: bold; -fx-text-fill: #9C27B0;"/>
+                            <Label text="Produits &amp; validation"
+                                   style="-fx-font-size: 10; -fx-text-fill: #888888;"/>
+                        </VBox>
+                    </graphic>
                 </Button>
-            </HBox>
+
+                <!-- Utilisateurs : ADMIN uniquement -->
+                <Button fx:id="btnUtilisateurs" onAction="#goToUtilisateurs"
+                        prefWidth="200" prefHeight="110"
+                        style="-fx-background-color: white; -fx-background-radius: 10; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2); -fx-border-color: #e0e0e0; -fx-border-radius: 10;">
+                    <graphic>
+                        <VBox alignment="CENTER" spacing="6">
+                            <Label text="Utilisateurs"
+                                   style="-fx-font-size: 15; -fx-font-weight: bold; -fx-text-fill: #F44336;"/>
+                            <Label text="Comptes &amp; acces"
+                                   style="-fx-font-size: 10; -fx-text-fill: #888888;"/>
+                        </VBox>
+                    </graphic>
+                </Button>
+
+                <!-- Journal : ADMIN uniquement -->
+                <Button fx:id="btnJournal" onAction="#goToJournal"
+                        prefWidth="200" prefHeight="110"
+                        style="-fx-background-color: white; -fx-background-radius: 10; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2); -fx-border-color: #e0e0e0; -fx-border-radius: 10;">
+                    <graphic>
+                        <VBox alignment="CENTER" spacing="6">
+                            <Label text="Journal"
+                                   style="-fx-font-size: 15; -fx-font-weight: bold; -fx-text-fill: #607D8B;"/>
+                            <Label text="Historique des actions"
+                                   style="-fx-font-size: 10; -fx-text-fill: #888888;"/>
+                        </VBox>
+                    </graphic>
+                </Button>
+
+            </FlowPane>
+
         </VBox>
     </center>
 
