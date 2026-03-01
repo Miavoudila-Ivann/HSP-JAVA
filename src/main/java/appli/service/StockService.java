@@ -19,6 +19,7 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -682,6 +683,32 @@ public class StockService {
      */
     public List<MouvementStock> getMouvementsByPeriode(LocalDateTime debut, LocalDateTime fin) {
         return mouvementStockDAO.findByDateRange(debut, fin);
+    }
+
+    // ==================== EMPLACEMENTS ====================
+
+    public List<EmplacementStock> getEmplacementsDisponibles() {
+        List<EmplacementStock> emplacements = new ArrayList<>();
+        String sql = "SELECT id, code, nom, type_emplacement FROM emplacements_stock WHERE actif = TRUE ORDER BY nom";
+        try (Connection conn = DBConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                EmplacementStock e = new EmplacementStock();
+                e.setId(rs.getInt("id"));
+                e.setCode(rs.getString("code"));
+                e.setNom(rs.getString("nom"));
+                String type = rs.getString("type_emplacement");
+                if (type != null) {
+                    try { e.setTypeEmplacement(EmplacementStock.TypeEmplacement.valueOf(type)); }
+                    catch (IllegalArgumentException ignored) {}
+                }
+                emplacements.add(e);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur chargement emplacements: " + e.getMessage(), e);
+        }
+        return emplacements;
     }
 
     // ==================== UTILITAIRES ====================
