@@ -79,10 +79,10 @@
                 <version>3.2.5</version>
                 <configuration>
                     <argLine>
-                        --add-opens appli.bibliotheque/appli.service=ALL-UNNAMED
-                        --add-opens appli.bibliotheque/appli.dao=ALL-UNNAMED
-                        --add-opens appli.bibliotheque/appli.model=ALL-UNNAMED
-                        --add-opens appli.bibliotheque/appli.security=ALL-UNNAMED
+                        --add-opens appli.hsp/appli.service=ALL-UNNAMED
+                        --add-opens appli.hsp/appli.dao=ALL-UNNAMED
+                        --add-opens appli.hsp/appli.model=ALL-UNNAMED
+                        --add-opens appli.hsp/appli.security=ALL-UNNAMED
                         --add-opens java.base/java.lang=ALL-UNNAMED
                         --add-opens java.base/java.lang.reflect=ALL-UNNAMED
                         --add-opens java.base/java.lang.invoke=ALL-UNNAMED
@@ -99,7 +99,7 @@
                     <execution>
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>appli.bibliotheque/appli.StartApplication</mainClass>
+                            <mainClass>appli.hsp/appli.StartApplication</mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
                             <jlinkImageName>app</jlinkImageName>

@@ -21,7 +21,16 @@
       "Bash(cmd /c \"mvn --version\")",
       "Bash(powershell -Command:*)",
       "Bash(cmd /c \"mvnw.cmd test\")",
-      "Bash(JAVA_HOME=\"C:/Users/miavoudila_iv/.jdks/openjdk-25.0.2\" PATH=\"$JAVA_HOME/bin:$PATH\" bash:*)"
+      "Bash(JAVA_HOME=\"C:/Users/miavoudila_iv/.jdks/openjdk-25.0.2\" PATH=\"$JAVA_HOME/bin:$PATH\" bash:*)",
+      "Bash(del \"C:\\\\Users\\\\OBSCURUS\\\\IdeaProjects\\\\HSP-JAVA\\\\src\\\\main\\\\resources\\\\appli\\\\auteur\\\\helloView.fxml\")",
+      "Bash(ls:*)",
+      "Bash(./mvnw clean compile:*)",
+      "Bash(export JAVA_HOME=\"/c/Program Files/Java/openjdk-25.0.2\")",
+      "Bash(export PATH=\"$JAVA_HOME/bin:$PATH\")",
+      "Bash(java:*)",
+      "Bash(cmd.exe:*)",
+      "Bash(export JAVA_HOME=\"/c/Users/OBSCURUS/.jdks/openjdk-25.0.2\")",
+      "Bash(./mvnw test:*)"
     ]
   }
 }

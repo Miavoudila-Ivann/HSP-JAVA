@@ -56,6 +56,29 @@ public class ValidationUtils {
         return value >= 0;
     }
 
+    /**
+     * Valide la force d'un mot de passe.
+     * @return message d'erreur ou null si le mot de passe est valide
+     */
+    public static String validatePasswordStrength(String password) {
+        if (password == null || password.length() < 8) {
+            return "Le mot de passe doit contenir au moins 8 caracteres";
+        }
+        if (!password.matches(".*[A-Z].*")) {
+            return "Le mot de passe doit contenir au moins une majuscule";
+        }
+        if (!password.matches(".*[a-z].*")) {
+            return "Le mot de passe doit contenir au moins une minuscule";
+        }
+        if (!password.matches(".*\\d.*")) {
+            return "Le mot de passe doit contenir au moins un chiffre";
+        }
+        if (!password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?].*")) {
+            return "Le mot de passe doit contenir au moins un caractere special";
+        }
+        return null;
+    }
+
     public static String sanitize(String input) {
         if (input == null) {
             return null;

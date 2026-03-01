@@ -70,7 +70,7 @@ public class RoleGuard {
     public static boolean canAccessView(String viewName) {
         User currentUser = SessionManager.getInstance().getCurrentUser();
         if (currentUser == null) {
-            return "login".equals(viewName);
+            return "login".equals(viewName) || "inscription".equals(viewName);
         }
 
         if (currentUser.getRole() == User.Role.ADMIN) {

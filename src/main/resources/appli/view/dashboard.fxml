@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.net.URL?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
@@ -12,92 +13,180 @@
 <BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="appli.ui.controller.DashboardController"
             prefHeight="600.0" prefWidth="900.0"
-            style="-fx-background-color: #f5f5f5;">
+            style="-fx-background-color: #FFF9E7;">
 
-    <!-- Barre du haut : info utilisateur + deconnexion -->
+    <stylesheets>
+        <URL value="@cartoon.css"/>
+    </stylesheets>
+
+    <!-- ===== EN-TETE ===== -->
     <top>
         <HBox alignment="CENTER_LEFT" spacing="15"
-              style="-fx-background-color: #2196F3; -fx-padding: 15 25 15 25;">
-            <Label text="HSP" style="-fx-text-fill: white; -fx-font-weight: bold;">
-                <font><Font size="20.0"/></font>
+              style="-fx-background-color: #6C5CE7;
+                     -fx-padding: 14 25 14 25;
+                     -fx-border-color: #1a1a1a;
+                     -fx-border-width: 0 0 4 0;
+                     -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.45), 0, 0, 0, 5);">
+            <Label text="HSP" style="-fx-text-fill: white; -fx-font-weight: bold;
+                                      -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.3), 0, 0, 1, 1);">
+                <font><Font size="22.0"/></font>
             </Label>
-            <Separator orientation="VERTICAL" prefHeight="30" style="-fx-opacity: 0.3;"/>
-            <Label text="Tableau de bord" style="-fx-text-fill: white;">
+            <Separator orientation="VERTICAL" prefHeight="28" style="-fx-opacity: 0.4;"/>
+            <Label text="Tableau de bord" style="-fx-text-fill: white; -fx-font-weight: bold;">
                 <font><Font size="16.0"/></font>
             </Label>
-            <!-- Spacer -->
             <HBox HBox.hgrow="ALWAYS"/>
-            <Label fx:id="welcomeLabel" text="Bienvenue" style="-fx-text-fill: white;">
+            <Label fx:id="welcomeLabel" text="Bienvenue"
+                   style="-fx-text-fill: white; -fx-font-weight: bold;">
                 <font><Font size="13.0"/></font>
             </Label>
-            <Label text="|" style="-fx-text-fill: rgba(255,255,255,0.5);"/>
+            <Label text="|" style="-fx-text-fill: rgba(255,255,255,0.4);"/>
             <Label fx:id="roleLabel" text="Role"
-                   style="-fx-text-fill: white; -fx-background-color: rgba(255,255,255,0.2); -fx-padding: 4 10 4 10; -fx-background-radius: 12;">
+                   style="-fx-text-fill: #1a1a1a;
+                          -fx-background-color: rgba(255,255,255,0.9);
+                          -fx-padding: 4 12 4 12;
+                          -fx-background-radius: 14;
+                          -fx-border-color: #1a1a1a;
+                          -fx-border-width: 2;
+                          -fx-border-radius: 14;
+                          -fx-font-weight: bold;">
                 <font><Font size="12.0"/></font>
             </Label>
             <Button text="Deconnexion" onAction="#handleLogout"
-                    style="-fx-background-color: rgba(255,255,255,0.15); -fx-text-fill: white; -fx-background-radius: 5; -fx-cursor: hand; -fx-border-color: rgba(255,255,255,0.3); -fx-border-radius: 5;">
+                    style="-fx-background-color: #FF7675;
+                           -fx-text-fill: white;
+                           -fx-font-weight: bold;
+                           -fx-border-color: #1a1a1a;
+                           -fx-border-width: 2;
+                           -fx-border-radius: 8;
+                           -fx-background-radius: 8;
+                           -fx-cursor: hand;
+                           -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.6), 0, 0, 2, 2);">
             </Button>
         </HBox>
     </top>
 
-    <!-- Contenu central : grille de navigation -->
+    <!-- ===== CONTENU : GRILLE DE NAVIGATION ===== -->
     <center>
         <VBox alignment="TOP_CENTER" spacing="30">
             <padding>
-                <Insets top="40" right="50" bottom="40" left="50"/>
+                <Insets top="35" right="50" bottom="35" left="50"/>
             </padding>
 
-            <Label text="Menu Principal" style="-fx-text-fill: #333333;">
-                <font><Font name="System Bold" size="22.0"/></font>
-            </Label>
+            <!-- Titre section -->
+            <VBox alignment="CENTER" spacing="6">
+                <Label text="Menu Principal"
+                       style="-fx-text-fill: #1a1a1a; -fx-font-weight: bold;
+                              -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.15), 0, 0, 1, 1);">
+                    <font><Font name="System Bold" size="24.0"/></font>
+                </Label>
+                <Label text="Choisissez un module"
+                       style="-fx-text-fill: #636E72; -fx-font-weight: bold;">
+                    <font><Font size="13.0"/></font>
+                </Label>
+            </VBox>
 
-            <Label text="Selectionnez un module pour commencer" style="-fx-text-fill: #888888;">
-                <font><Font size="13.0"/></font>
-            </Label>
-
-            <!-- Ligne 1 : Patients, Hospitalisations, Stock -->
-            <HBox alignment="CENTER" spacing="20">
+            <!-- Ligne 1 : Patients | Hospitalisations | Stock -->
+            <HBox alignment="CENTER" spacing="22">
                 <Button fx:id="btnPatients" text="Patients" onAction="#goToPatients"
-                        prefWidth="220" prefHeight="100"
-                        style="-fx-background-color: white; -fx-text-fill: #2196F3; -fx-font-size: 16; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2); -fx-border-color: #e0e0e0; -fx-border-radius: 10;">
+                        prefWidth="225" prefHeight="105"
+                        style="-fx-background-color: #74B9FF;
+                               -fx-text-fill: white;
+                               -fx-font-size: 17;
+                               -fx-font-weight: bold;
+                               -fx-background-radius: 16;
+                               -fx-border-color: #1a1a1a;
+                               -fx-border-width: 3;
+                               -fx-border-radius: 16;
+                               -fx-cursor: hand;
+                               -fx-effect: dropshadow(three_pass_box, #1a1a1a, 0, 0, 5, 5);">
                 </Button>
 
                 <Button fx:id="btnHospitalisations" text="Hospitalisations" onAction="#goToHospitalisations"
-                        prefWidth="220" prefHeight="100"
-                        style="-fx-background-color: white; -fx-text-fill: #FF9800; -fx-font-size: 16; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2); -fx-border-color: #e0e0e0; -fx-border-radius: 10;">
+                        prefWidth="225" prefHeight="105"
+                        style="-fx-background-color: #FDCB6E;
+                               -fx-text-fill: #1a1a1a;
+                               -fx-font-size: 17;
+                               -fx-font-weight: bold;
+                               -fx-background-radius: 16;
+                               -fx-border-color: #1a1a1a;
+                               -fx-border-width: 3;
+                               -fx-border-radius: 16;
+                               -fx-cursor: hand;
+                               -fx-effect: dropshadow(three_pass_box, #1a1a1a, 0, 0, 5, 5);">
                 </Button>
 
                 <Button fx:id="btnStock" text="Stock" onAction="#goToStock"
-                        prefWidth="220" prefHeight="100"
-                        style="-fx-background-color: white; -fx-text-fill: #4CAF50; -fx-font-size: 16; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2); -fx-border-color: #e0e0e0; -fx-border-radius: 10;">
+                        prefWidth="225" prefHeight="105"
+                        style="-fx-background-color: #55EFC4;
+                               -fx-text-fill: #1a1a1a;
+                               -fx-font-size: 17;
+                               -fx-font-weight: bold;
+                               -fx-background-radius: 16;
+                               -fx-border-color: #1a1a1a;
+                               -fx-border-width: 3;
+                               -fx-border-radius: 16;
+                               -fx-cursor: hand;
+                               -fx-effect: dropshadow(three_pass_box, #1a1a1a, 0, 0, 5, 5);">
                 </Button>
             </HBox>
 
-            <!-- Ligne 2 : Demandes, Utilisateurs, Journal -->
-            <HBox alignment="CENTER" spacing="20">
+            <!-- Ligne 2 : Demandes | Utilisateurs | Journal -->
+            <HBox alignment="CENTER" spacing="22">
                 <Button fx:id="btnDemandes" text="Demandes" onAction="#goToDemandes"
-                        prefWidth="220" prefHeight="100"
-                        style="-fx-background-color: white; -fx-text-fill: #9C27B0; -fx-font-size: 16; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2); -fx-border-color: #e0e0e0; -fx-border-radius: 10;">
+                        prefWidth="225" prefHeight="105"
+                        style="-fx-background-color: #A29BFE;
+                               -fx-text-fill: white;
+                               -fx-font-size: 17;
+                               -fx-font-weight: bold;
+                               -fx-background-radius: 16;
+                               -fx-border-color: #1a1a1a;
+                               -fx-border-width: 3;
+                               -fx-border-radius: 16;
+                               -fx-cursor: hand;
+                               -fx-effect: dropshadow(three_pass_box, #1a1a1a, 0, 0, 5, 5);">
                 </Button>
 
                 <Button fx:id="btnUtilisateurs" text="Utilisateurs" onAction="#goToUtilisateurs"
-                        prefWidth="220" prefHeight="100"
-                        style="-fx-background-color: white; -fx-text-fill: #F44336; -fx-font-size: 16; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2); -fx-border-color: #e0e0e0; -fx-border-radius: 10;">
+                        prefWidth="225" prefHeight="105"
+                        style="-fx-background-color: #FF7675;
+                               -fx-text-fill: white;
+                               -fx-font-size: 17;
+                               -fx-font-weight: bold;
+                               -fx-background-radius: 16;
+                               -fx-border-color: #1a1a1a;
+                               -fx-border-width: 3;
+                               -fx-border-radius: 16;
+                               -fx-cursor: hand;
+                               -fx-effect: dropshadow(three_pass_box, #1a1a1a, 0, 0, 5, 5);">
                 </Button>
 
                 <Button fx:id="btnJournal" text="Journal" onAction="#goToJournal"
-                        prefWidth="220" prefHeight="100"
-                        style="-fx-background-color: white; -fx-text-fill: #607D8B; -fx-font-size: 16; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2); -fx-border-color: #e0e0e0; -fx-border-radius: 10;">
+                        prefWidth="225" prefHeight="105"
+                        style="-fx-background-color: #636E72;
+                               -fx-text-fill: white;
+                               -fx-font-size: 17;
+                               -fx-font-weight: bold;
+                               -fx-background-radius: 16;
+                               -fx-border-color: #1a1a1a;
+                               -fx-border-width: 3;
+                               -fx-border-radius: 16;
+                               -fx-cursor: hand;
+                               -fx-effect: dropshadow(three_pass_box, #1a1a1a, 0, 0, 5, 5);">
                 </Button>
             </HBox>
         </VBox>
     </center>
 
-    <!-- Barre du bas -->
+    <!-- ===== BAS DE PAGE ===== -->
     <bottom>
-        <HBox alignment="CENTER" style="-fx-background-color: #eeeeee; -fx-padding: 10;">
-            <Label text="HSP - Systeme de Gestion Hospitaliere" style="-fx-text-fill: #999999;">
+        <HBox alignment="CENTER"
+              style="-fx-background-color: #FFEAA7;
+                     -fx-padding: 10;
+                     -fx-border-color: #1a1a1a;
+                     -fx-border-width: 3 0 0 0;">
+            <Label text="HSP - Systeme de Gestion Hospitaliere"
+                   style="-fx-text-fill: #636E72; -fx-font-weight: bold;">
                 <font><Font size="11.0"/></font>
             </Label>
         </HBox>
