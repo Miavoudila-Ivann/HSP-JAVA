@@ -78,6 +78,17 @@
                            -fx-cursor: hand;
                            -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.6), 0, 0, 2, 2);">
             </Button>
+            <Button fx:id="btnExportPDF" text="Exporter PDF" onAction="#handleExportRapport"
+                    style="-fx-background-color: #E17055;
+                           -fx-text-fill: white;
+                           -fx-font-weight: bold;
+                           -fx-border-color: #1a1a1a;
+                           -fx-border-width: 2;
+                           -fx-border-radius: 8;
+                           -fx-background-radius: 8;
+                           -fx-cursor: hand;
+                           -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.6), 0, 0, 2, 2);">
+            </Button>
             <Button text="Deconnexion" onAction="#handleLogout"
                     style="-fx-background-color: #FF7675;
                            -fx-text-fill: white;
