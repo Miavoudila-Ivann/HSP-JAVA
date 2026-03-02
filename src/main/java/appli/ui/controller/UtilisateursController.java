@@ -136,12 +136,17 @@ public class UtilisateursController {
         TextField prenomField = new TextField();
         TextField emailField = new TextField();
         PasswordField passwordField = new PasswordField();
+        PasswordField confirmPasswordField = new PasswordField();
         ComboBox<User.Role> roleCombo = new ComboBox<>();
         roleCombo.getItems().addAll(User.Role.values());
+
         Label passwordHint = new Label();
-        passwordHint.setStyle("-fx-text-fill: #F44336; -fx-font-size: 11;");
         passwordHint.setWrapText(true);
         passwordHint.setMaxWidth(250);
+
+        Label confirmHint = new Label();
+        confirmHint.setWrapText(true);
+        confirmHint.setMaxWidth(250);
 
         if (existingUser != null) {
             nomField.setText(existingUser.getNom());
@@ -149,26 +154,37 @@ public class UtilisateursController {
             emailField.setText(existingUser.getEmail());
             roleCombo.setValue(existingUser.getRole());
             passwordField.setPromptText("Laisser vide pour ne pas changer");
+            confirmPasswordField.setPromptText("Confirmer le nouveau mot de passe");
         } else {
             passwordField.setPromptText("Mot de passe (min 8 car.)");
+            confirmPasswordField.setPromptText("Confirmer le mot de passe");
         }
 
         passwordField.textProperty().addListener((obs, old, newVal) -> {
             if (newVal != null && !newVal.isEmpty()) {
                 String error = ValidationUtils.validatePasswordStrength(newVal);
                 passwordHint.setText(error != null ? error : "Mot de passe valide");
-                passwordHint.setStyle(error != null ? "-fx-text-fill: #F44336; -fx-font-size: 11;" : "-fx-text-fill: #4CAF50; -fx-font-size: 11;");
+                passwordHint.setStyle(error != null
+                        ? "-fx-text-fill: #F44336; -fx-font-size: 11;"
+                        : "-fx-text-fill: #4CAF50; -fx-font-size: 11;");
             } else {
                 passwordHint.setText("");
             }
+            updateConfirmHint(confirmHint, newVal, confirmPasswordField.getText());
         });
 
-        grid.add(new Label("Nom :"), 0, 0); grid.add(nomField, 1, 0);
-        grid.add(new Label("Prenom :"), 0, 1); grid.add(prenomField, 1, 1);
-        grid.add(new Label("Email :"), 0, 2); grid.add(emailField, 1, 2);
-        grid.add(new Label("Role :"), 0, 3); grid.add(roleCombo, 1, 3);
-        grid.add(new Label("Mot de passe :"), 0, 4); grid.add(passwordField, 1, 4);
+        confirmPasswordField.textProperty().addListener((obs, old, newVal) -> {
+            updateConfirmHint(confirmHint, passwordField.getText(), newVal);
+        });
+
+        grid.add(new Label("Nom :"), 0, 0);           grid.add(nomField, 1, 0);
+        grid.add(new Label("Prenom :"), 0, 1);        grid.add(prenomField, 1, 1);
+        grid.add(new Label("Email :"), 0, 2);         grid.add(emailField, 1, 2);
+        grid.add(new Label("Role :"), 0, 3);          grid.add(roleCombo, 1, 3);
+        grid.add(new Label("Mot de passe :"), 0, 4);  grid.add(passwordField, 1, 4);
         grid.add(passwordHint, 1, 5);
+        grid.add(new Label("Confirmer :"), 0, 6);     grid.add(confirmPasswordField, 1, 6);
+        grid.add(confirmHint, 1, 7);
 
         dialog.getDialogPane().setContent(grid);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
@@ -180,6 +196,7 @@ public class UtilisateursController {
             String prenom = prenomField.getText().trim();
             String email = emailField.getText().trim();
             String password = passwordField.getText();
+            String confirmPassword = confirmPasswordField.getText();
             User.Role role = roleCombo.getValue();
 
             if (!ValidationUtils.isNotEmpty(nom) || !ValidationUtils.isNotEmpty(prenom)) {
@@ -206,6 +223,10 @@ public class UtilisateursController {
                         AlertHelper.showError("Mot de passe faible", pwdError);
                         return;
                     }
+                    if (!password.equals(confirmPassword)) {
+                        AlertHelper.showError("Erreur", "Les mots de passe ne correspondent pas");
+                        return;
+                    }
                     authService.createUser(email, password, nom, prenom, role);
                     AlertHelper.showInfo("Succes", "Utilisateur cree avec succes");
                 } else {
@@ -219,6 +240,10 @@ public class UtilisateursController {
                             AlertHelper.showError("Mot de passe faible", pwdError);
                             return;
                         }
+                        if (!password.equals(confirmPassword)) {
+                            AlertHelper.showError("Erreur", "Les mots de passe ne correspondent pas");
+                            return;
+                        }
                         existingUser.setPasswordHash(PasswordHasher.hash(password));
                     }
                     userRepository.save(existingUser);
@@ -229,6 +254,20 @@ public class UtilisateursController {
                 AlertHelper.showError("Erreur", e.getMessage());
             }
         });
+    }
+
+    private void updateConfirmHint(Label hint, String password, String confirm) {
+        if (confirm == null || confirm.isEmpty()) {
+            hint.setText("");
+            return;
+        }
+        if (password != null && password.equals(confirm)) {
+            hint.setText("Les mots de passe correspondent");
+            hint.setStyle("-fx-text-fill: #4CAF50; -fx-font-size: 11;");
+        } else {
+            hint.setText("Les mots de passe ne correspondent pas");
+            hint.setStyle("-fx-text-fill: #F44336; -fx-font-size: 11;");
+        }
     }
 
     @FXML
