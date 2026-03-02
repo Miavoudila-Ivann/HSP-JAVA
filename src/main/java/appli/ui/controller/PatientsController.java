@@ -5,6 +5,10 @@ import appli.model.Patient;
 import appli.security.RoleGuard;
 import appli.security.RoleGuard.Fonctionnalite;
 import appli.security.SessionManager;
+import appli.model.JournalAction.TypeAction;
+import appli.model.User;
+import appli.service.JournalService;
+import appli.service.PDFExportService;
 import appli.service.PatientService;
 import appli.service.TriageService;
 import appli.ui.util.AlertHelper;
@@ -18,7 +22,9 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.stage.FileChooser;
 
+import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -41,10 +47,13 @@ public class PatientsController {
     @FXML private Button btnModifier;
     @FXML private Button btnDossier;
     @FXML private Button btnSupprimer;
+    @FXML private Button btnExportPDF;
     @FXML private Label statusLabel;
 
     private final PatientService patientService = new PatientService();
     private final TriageService triageService = new TriageService();
+    private final PDFExportService pdfExportService = new PDFExportService();
+    private final JournalService journalService = new JournalService();
     private final ObservableList<Patient> patientData = FXCollections.observableArrayList();
 
     @FXML
@@ -62,11 +71,13 @@ public class PatientsController {
         btnModifier.setDisable(true);
         btnDossier.setDisable(true);
         btnSupprimer.setDisable(true);
+        btnExportPDF.setDisable(true);
 
         patientTable.getSelectionModel().selectedItemProperty().addListener((obs, old, newVal) -> {
             btnModifier.setDisable(newVal == null);
             btnDossier.setDisable(newVal == null);
             btnSupprimer.setDisable(newVal == null);
+            btnExportPDF.setDisable(newVal == null);
         });
 
         loadPatients();
@@ -96,6 +107,10 @@ public class PatientsController {
         boolean isAdmin = SessionManager.getInstance().isAdmin();
         btnSupprimer.setVisible(isAdmin);
         btnSupprimer.setManaged(isAdmin);
+
+        boolean canExport = RoleGuard.hasPermission(Fonctionnalite.EXPORT_DONNEES);
+        btnExportPDF.setVisible(canExport);
+        btnExportPDF.setManaged(canExport);
     }
 
     private void loadPatients() {
@@ -158,6 +173,34 @@ public class PatientsController {
                 loadPatients();
             } catch (Exception e) {
                 AlertHelper.showError("Erreur", e.getMessage());
+            }
+        }
+    }
+
+    @FXML
+    private void handleExportPatient() {
+        Patient selected = patientTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            AlertHelper.showError("Erreur", "Veuillez selectionner un patient");
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Enregistrer la fiche patient");
+        fileChooser.setInitialFileName("fiche_patient_" + selected.getNom() + "_" + selected.getPrenom() + ".pdf");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fichiers PDF", "*.pdf"));
+        File file = fileChooser.showSaveDialog(patientTable.getScene().getWindow());
+
+        if (file != null) {
+            try {
+                pdfExportService.exportFichePatient(selected, file);
+                User currentUser = SessionManager.getInstance().getCurrentUser();
+                journalService.logAction(currentUser, TypeAction.EXPORT,
+                        "Export PDF fiche patient #" + selected.getId() + " - " + selected.getNomComplet(),
+                        "Patient", selected.getId());
+                AlertHelper.showInfo("Succes", "Fiche patient exportee avec succes :\n" + file.getAbsolutePath());
+            } catch (Exception e) {
+                AlertHelper.showError("Erreur", "Impossible d'exporter le PDF : " + e.getMessage());
             }
         }
     }

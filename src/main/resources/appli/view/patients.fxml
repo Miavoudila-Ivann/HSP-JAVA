@@ -138,6 +138,16 @@
                                -fx-background-radius: 8;
                                -fx-cursor: hand;
                                -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.7), 0, 0, 3, 3);"/>
+                <Button fx:id="btnExportPDF" text="Export PDF" onAction="#handleExportPatient" disable="true"
+                        style="-fx-background-color: #E17055;
+                               -fx-text-fill: white;
+                               -fx-font-weight: bold;
+                               -fx-border-color: #1a1a1a;
+                               -fx-border-width: 2.5;
+                               -fx-border-radius: 8;
+                               -fx-background-radius: 8;
+                               -fx-cursor: hand;
+                               -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.7), 0, 0, 3, 3);"/>
             </HBox>
 
             <!-- Tableau patients -->

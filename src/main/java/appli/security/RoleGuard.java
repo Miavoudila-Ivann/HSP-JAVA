@@ -42,13 +42,15 @@ public class RoleGuard {
                 Fonctionnalite.GESTION_HOSPITALISATIONS,
                 Fonctionnalite.GESTION_DOSSIERS,
                 Fonctionnalite.DEMANDE_PRODUITS,
-                Fonctionnalite.CONSULTATION_STATISTIQUES
+                Fonctionnalite.CONSULTATION_STATISTIQUES,
+                Fonctionnalite.EXPORT_DONNEES
         ));
 
         PERMISSIONS.put(User.Role.GESTIONNAIRE, EnumSet.of(
                 Fonctionnalite.GESTION_STOCK,
                 Fonctionnalite.VALIDATION_DEMANDES,
-                Fonctionnalite.CONSULTATION_STATISTIQUES
+                Fonctionnalite.CONSULTATION_STATISTIQUES,
+                Fonctionnalite.EXPORT_DONNEES
         ));
     }
 
