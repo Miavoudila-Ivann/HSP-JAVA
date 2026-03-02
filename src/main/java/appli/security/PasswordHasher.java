@@ -1,5 +1,6 @@
 package appli.security;
 
+
 import org.mindrot.jbcrypt.BCrypt;
 
 /**
