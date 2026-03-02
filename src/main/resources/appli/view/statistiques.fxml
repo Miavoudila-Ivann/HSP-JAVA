@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="appli.ui.controller.StatistiquesController"
+            prefHeight="700.0" prefWidth="1100.0"
+            style="-fx-background-color: #FFF9E7;">
+
+    <stylesheets>
+        <URL value="@cartoon.css"/>
+    </stylesheets>
+
+    <!-- ===== EN-TETE ===== -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="15"
+              style="-fx-background-color: #6C5CE7;
+                     -fx-padding: 14 25 14 25;
+                     -fx-border-color: #1a1a1a;
+                     -fx-border-width: 0 0 4 0;
+                     -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.45), 0, 0, 0, 5);">
+            <Button text="Dashboard" onAction="#goToDashboard"
+                    style="-fx-background-color: #FFEAA7;
+                           -fx-text-fill: #1a1a1a;
+                           -fx-font-weight: bold;
+                           -fx-border-color: #1a1a1a;
+                           -fx-border-width: 2;
+                           -fx-border-radius: 8;
+                           -fx-background-radius: 8;
+                           -fx-cursor: hand;
+                           -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.6), 0, 0, 2, 2);">
+            </Button>
+            <Separator orientation="VERTICAL" prefHeight="28" style="-fx-opacity: 0.4;"/>
+            <Label text="Statistiques" style="-fx-text-fill: white; -fx-font-weight: bold;">
+                <font><Font size="16.0"/></font>
+            </Label>
+            <HBox HBox.hgrow="ALWAYS"/>
+            <Label fx:id="welcomeLabel" text="Utilisateur"
+                   style="-fx-text-fill: white; -fx-font-weight: bold;">
+                <font><Font size="13.0"/></font>
+            </Label>
+            <Label text="|" style="-fx-text-fill: rgba(255,255,255,0.4);"/>
+            <Label fx:id="roleLabel" text="Role"
+                   style="-fx-text-fill: #1a1a1a;
+                          -fx-background-color: rgba(255,255,255,0.9);
+                          -fx-padding: 4 12 4 12;
+                          -fx-background-radius: 14;
+                          -fx-border-color: #1a1a1a;
+                          -fx-border-width: 2;
+                          -fx-border-radius: 14;
+                          -fx-font-weight: bold;">
+                <font><Font size="12.0"/></font>
+            </Label>
+            <Button text="Rafraichir" onAction="#handleRefresh"
+                    style="-fx-background-color: #55EFC4;
+                           -fx-text-fill: #1a1a1a;
+                           -fx-font-weight: bold;
+                           -fx-border-color: #1a1a1a;
+                           -fx-border-width: 2;
+                           -fx-border-radius: 8;
+                           -fx-background-radius: 8;
+                           -fx-cursor: hand;
+                           -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.6), 0, 0, 2, 2);">
+            </Button>
+            <Button text="Deconnexion" onAction="#handleLogout"
+                    style="-fx-background-color: #FF7675;
+                           -fx-text-fill: white;
+                           -fx-font-weight: bold;
+                           -fx-border-color: #1a1a1a;
+                           -fx-border-width: 2;
+                           -fx-border-radius: 8;
+                           -fx-background-radius: 8;
+                           -fx-cursor: hand;
+                           -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.6), 0, 0, 2, 2);">
+            </Button>
+        </HBox>
+    </top>
+
+    <!-- ===== CONTENU ===== -->
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-border-width: 0;">
+            <VBox spacing="20">
+                <padding>
+                    <Insets top="20" right="25" bottom="20" left="25"/>
+                </padding>
+
+                <!-- === CARDS KPI === -->
+                <HBox spacing="18" alignment="CENTER">
+                    <!-- Card 1 : Hospitalises -->
+                    <VBox alignment="CENTER" spacing="6" prefWidth="220" prefHeight="100"
+                          style="-fx-background-color: #74B9FF;
+                                 -fx-background-radius: 14;
+                                 -fx-border-color: #1a1a1a;
+                                 -fx-border-width: 3;
+                                 -fx-border-radius: 14;
+                                 -fx-effect: dropshadow(three_pass_box, #1a1a1a, 0, 0, 4, 4);">
+                        <Label fx:id="lblHospitalises" text="0"
+                               style="-fx-text-fill: white; -fx-font-weight: bold;">
+                            <font><Font size="32.0"/></font>
+                        </Label>
+                        <Label text="Patients hospitalises"
+                               style="-fx-text-fill: white; -fx-font-weight: bold;">
+                            <font><Font size="12.0"/></font>
+                        </Label>
+                    </VBox>
+
+                    <!-- Card 2 : En attente -->
+                    <VBox alignment="CENTER" spacing="6" prefWidth="220" prefHeight="100"
+                          style="-fx-background-color: #FDCB6E;
+                                 -fx-background-radius: 14;
+                                 -fx-border-color: #1a1a1a;
+                                 -fx-border-width: 3;
+                                 -fx-border-radius: 14;
+                                 -fx-effect: dropshadow(three_pass_box, #1a1a1a, 0, 0, 4, 4);">
+                        <Label fx:id="lblEnAttente" text="0"
+                               style="-fx-text-fill: #1a1a1a; -fx-font-weight: bold;">
+                            <font><Font size="32.0"/></font>
+                        </Label>
+                        <Label text="Dossiers en attente"
+                               style="-fx-text-fill: #1a1a1a; -fx-font-weight: bold;">
+                            <font><Font size="12.0"/></font>
+                        </Label>
+                    </VBox>
+
+                    <!-- Card 3 : Stocks critiques -->
+                    <VBox alignment="CENTER" spacing="6" prefWidth="220" prefHeight="100"
+                          style="-fx-background-color: #FF7675;
+                                 -fx-background-radius: 14;
+                                 -fx-border-color: #1a1a1a;
+                                 -fx-border-width: 3;
+                                 -fx-border-radius: 14;
+                                 -fx-effect: dropshadow(three_pass_box, #1a1a1a, 0, 0, 4, 4);">
+                        <Label fx:id="lblStocksCritiques" text="0"
+                               style="-fx-text-fill: white; -fx-font-weight: bold;">
+                            <font><Font size="32.0"/></font>
+                        </Label>
+                        <Label text="Stocks critiques"
+                               style="-fx-text-fill: white; -fx-font-weight: bold;">
+                            <font><Font size="12.0"/></font>
+                        </Label>
+                    </VBox>
+
+                    <!-- Card 4 : Taux occupation -->
+                    <VBox alignment="CENTER" spacing="6" prefWidth="220" prefHeight="100"
+                          style="-fx-background-color: #55EFC4;
+                                 -fx-background-radius: 14;
+                                 -fx-border-color: #1a1a1a;
+                                 -fx-border-width: 3;
+                                 -fx-border-radius: 14;
+                                 -fx-effect: dropshadow(three_pass_box, #1a1a1a, 0, 0, 4, 4);">
+                        <Label fx:id="lblTauxOccupation" text="0%"
+                               style="-fx-text-fill: #1a1a1a; -fx-font-weight: bold;">
+                            <font><Font size="32.0"/></font>
+                        </Label>
+                        <Label text="Taux d'occupation"
+                               style="-fx-text-fill: #1a1a1a; -fx-font-weight: bold;">
+                            <font><Font size="12.0"/></font>
+                        </Label>
+                    </VBox>
+                </HBox>
+
+                <!-- === GRAPHIQUES 2x2 === -->
+                <GridPane hgap="18" vgap="18">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="50"/>
+                        <ColumnConstraints percentWidth="50"/>
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints prefHeight="320"/>
+                        <RowConstraints prefHeight="320"/>
+                    </rowConstraints>
+
+                    <!-- BarChart : Hospitalisations par semaine -->
+                    <VBox GridPane.columnIndex="0" GridPane.rowIndex="0"
+                          style="-fx-background-color: white;
+                                 -fx-background-radius: 14;
+                                 -fx-border-color: #1a1a1a;
+                                 -fx-border-width: 3;
+                                 -fx-border-radius: 14;
+                                 -fx-padding: 10;
+                                 -fx-effect: dropshadow(three_pass_box, #1a1a1a, 0, 0, 4, 4);">
+                        <Label text="Hospitalisations (8 dernieres semaines)"
+                               style="-fx-font-weight: bold; -fx-text-fill: #1a1a1a;">
+                            <font><Font size="13.0"/></font>
+                        </Label>
+                        <BarChart fx:id="chartHospitalisations" VBox.vgrow="ALWAYS"
+                                  animated="false" legendVisible="false"
+                                  style="-fx-bar-fill: #74B9FF;">
+                            <xAxis><CategoryAxis fx:id="axeHospiX" label="Semaine"/></xAxis>
+                            <yAxis><NumberAxis fx:id="axeHospiY" label="Nombre"/></yAxis>
+                        </BarChart>
+                    </VBox>
+
+                    <!-- PieChart : Repartition gravite -->
+                    <VBox GridPane.columnIndex="1" GridPane.rowIndex="0"
+                          style="-fx-background-color: white;
+                                 -fx-background-radius: 14;
+                                 -fx-border-color: #1a1a1a;
+                                 -fx-border-width: 3;
+                                 -fx-border-radius: 14;
+                                 -fx-padding: 10;
+                                 -fx-effect: dropshadow(three_pass_box, #1a1a1a, 0, 0, 4, 4);">
+                        <Label text="Repartition par niveau de gravite"
+                               style="-fx-font-weight: bold; -fx-text-fill: #1a1a1a;">
+                            <font><Font size="13.0"/></font>
+                        </Label>
+                        <PieChart fx:id="chartGravite" VBox.vgrow="ALWAYS"
+                                  animated="false" labelsVisible="true"/>
+                    </VBox>
+
+                    <!-- BarChart : Top 5 produits -->
+                    <VBox GridPane.columnIndex="0" GridPane.rowIndex="1"
+                          style="-fx-background-color: white;
+                                 -fx-background-radius: 14;
+                                 -fx-border-color: #1a1a1a;
+                                 -fx-border-width: 3;
+                                 -fx-border-radius: 14;
+                                 -fx-padding: 10;
+                                 -fx-effect: dropshadow(three_pass_box, #1a1a1a, 0, 0, 4, 4);">
+                        <Label text="Top 5 produits les plus demandes"
+                               style="-fx-font-weight: bold; -fx-text-fill: #1a1a1a;">
+                            <font><Font size="13.0"/></font>
+                        </Label>
+                        <BarChart fx:id="chartProduits" VBox.vgrow="ALWAYS"
+                                  animated="false" legendVisible="false">
+                            <xAxis><CategoryAxis fx:id="axeProduitsX" label="Produit"/></xAxis>
+                            <yAxis><NumberAxis fx:id="axeProduitsY" label="Demandes"/></yAxis>
+                        </BarChart>
+                    </VBox>
+
+                    <!-- PieChart : Occupation par type -->
+                    <VBox GridPane.columnIndex="1" GridPane.rowIndex="1"
+                          style="-fx-background-color: white;
+                                 -fx-background-radius: 14;
+                                 -fx-border-color: #1a1a1a;
+                                 -fx-border-width: 3;
+                                 -fx-border-radius: 14;
+                                 -fx-padding: 10;
+                                 -fx-effect: dropshadow(three_pass_box, #1a1a1a, 0, 0, 4, 4);">
+                        <Label text="Occupation par type de chambre"
+                               style="-fx-font-weight: bold; -fx-text-fill: #1a1a1a;">
+                            <font><Font size="13.0"/></font>
+                        </Label>
+                        <PieChart fx:id="chartOccupation" VBox.vgrow="ALWAYS"
+                                  animated="false" labelsVisible="true"/>
+                    </VBox>
+                </GridPane>
+            </VBox>
+        </ScrollPane>
+    </center>
+
+    <!-- ===== BAS DE PAGE ===== -->
+    <bottom>
+        <HBox alignment="CENTER"
+              style="-fx-background-color: #FFEAA7;
+                     -fx-padding: 10;
+                     -fx-border-color: #1a1a1a;
+                     -fx-border-width: 3 0 0 0;">
+            <Label text="HSP - Systeme de Gestion Hospitaliere"
+                   style="-fx-text-fill: #636E72; -fx-font-weight: bold;">
+                <font><Font size="11.0"/></font>
+            </Label>
+        </HBox>
+    </bottom>
+
+</BorderPane>

@@ -20,6 +20,7 @@ public class DashboardController {
     @FXML private Button btnDemandes;
     @FXML private Button btnUtilisateurs;
     @FXML private Button btnJournal;
+    @FXML private Button btnStatistiques;
 
     @FXML
     public void initialize() {
@@ -53,6 +54,9 @@ public class DashboardController {
 
         btnJournal.setVisible(RoleGuard.hasPermission(Fonctionnalite.CONSULTATION_JOURNAL));
         btnJournal.setManaged(btnJournal.isVisible());
+
+        btnStatistiques.setVisible(RoleGuard.hasPermission(Fonctionnalite.CONSULTATION_STATISTIQUES));
+        btnStatistiques.setManaged(btnStatistiques.isVisible());
     }
 
     // --- Actions de navigation ---
@@ -85,6 +89,11 @@ public class DashboardController {
     @FXML
     private void goToJournal() {
         Router.goTo(Route.JOURNAL);
+    }
+
+    @FXML
+    private void goToStatistiques() {
+        Router.goTo(Route.STATISTIQUES);
     }
 
     @FXML
