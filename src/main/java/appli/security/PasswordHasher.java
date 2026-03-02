@@ -1,5 +1,6 @@
 package appli.security;
 
+
 import org.mindrot.jbcrypt.BCrypt;
 
 /**
@@ -39,3 +40,4 @@ public class PasswordHasher {
         }
     }
 }
+
