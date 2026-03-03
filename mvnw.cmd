@@ -59,6 +59,8 @@ set ERROR_CODE=0
 
 @REM ==== START VALIDATION ====
 if not "%JAVA_HOME%" == "" goto OkJHome
+set "JAVA_HOME=C:\Program Files\JetBrains\IntelliJ IDEA 2025.1.1.1\jbr"
+if not "%JAVA_HOME%" == "" goto OkJHome
 
 echo.
 echo Error: JAVA_HOME not found in your environment. >&2
