@@ -349,8 +349,15 @@ public class StockService {
             conn = DBConnection.getInstance().getConnection();
             conn.setAutoCommit(false);
 
-            // 1. Recuperer la demande
-            DemandeProduit demande = demandeProduitDAO.findById(demandeId);
+            // 1. Recuperer la demande (via conn pour rester dans la transaction)
+            DemandeProduit demande = null;
+            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM demandes_produits WHERE id = ?")) {
+                ps.setInt(1, demandeId);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) {
+                    demande = demandeProduitDAO.mapFromResultSet(rs);
+                }
+            }
             if (demande == null) {
                 throw new IllegalArgumentException("Demande non trouvee");
             }
@@ -401,7 +408,7 @@ public class StockService {
                     mouvement.setDateValidation(LocalDateTime.now());
                     mouvement.setValidateurId(currentUser.getId());
 
-                    mouvementStockDAO.insert(mouvement);
+                    mouvementStockDAO.insert(mouvement, conn);
 
                     quantiteRestante -= quantiteARetirer;
                     quantiteLivree += quantiteARetirer;
@@ -423,7 +430,7 @@ public class StockService {
                 );
             }
 
-            demandeProduitDAO.update(demande);
+            demandeProduitDAO.update(demande, conn);
 
             conn.commit();
 
@@ -450,9 +457,9 @@ public class StockService {
         } finally {
             if (conn != null) {
                 try {
-                    conn.setAutoCommit(true);
+                    conn.close();
                 } catch (SQLException e) {
-                    System.err.println("Erreur lors du reset autocommit: " + e.getMessage());
+                    System.err.println("Erreur lors de la fermeture de la connexion: " + e.getMessage());
                 }
             }
         }
@@ -571,7 +578,7 @@ public class StockService {
                 stock.setNumeroCommande(numeroCommande);
                 stock.setDateReception(LocalDateTime.now());
 
-                stockId = stockDAO.insert(stock);
+                stockId = stockDAO.insert(stock, conn);
                 stock.setId(stockId);
             }
 
@@ -592,7 +599,7 @@ public class StockService {
             mouvement.setDateValidation(LocalDateTime.now());
             mouvement.setValidateurId(currentUser.getId());
 
-            mouvementStockDAO.insert(mouvement);
+            mouvementStockDAO.insert(mouvement, conn);
 
             conn.commit();
 
@@ -618,9 +625,9 @@ public class StockService {
         } finally {
             if (conn != null) {
                 try {
-                    conn.setAutoCommit(true);
+                    conn.close();
                 } catch (SQLException e) {
-                    System.err.println("Erreur lors du reset autocommit: " + e.getMessage());
+                    System.err.println("Erreur lors de la fermeture de la connexion: " + e.getMessage());
                 }
             }
         }

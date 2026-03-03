@@ -273,6 +273,7 @@ public class StockController {
         TextField uniteField = new TextField();
         TextField prixField = new TextField();
         TextField seuilField = new TextField();
+        TextField qteInitField = new TextField("0");
 
         if (existing != null) {
             codeField.setText(existing.getCode());
@@ -293,6 +294,13 @@ public class StockController {
         grid.add(new Label("Unite :"), 0, 5); grid.add(uniteField, 1, 5);
         grid.add(new Label("Prix unitaire :"), 0, 6); grid.add(prixField, 1, 6);
         grid.add(new Label("Seuil alerte :"), 0, 7); grid.add(seuilField, 1, 7);
+        if (existing == null) {
+            grid.add(new Label("Quantite initiale :"), 0, 8); grid.add(qteInitField, 1, 8);
+        } else {
+            int qteActuelle = stockQuantities.getOrDefault(existing.getId(), 0);
+            qteInitField.setText(String.valueOf(qteActuelle));
+            grid.add(new Label("Quantite en stock :"), 0, 8); grid.add(qteInitField, 1, 8);
+        }
 
         dialog.getDialogPane().setContent(grid);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
@@ -325,10 +333,35 @@ public class StockController {
                 }
 
                 if (existing == null) {
-                    stockService.creerProduit(produit);
-                    AlertHelper.showInfo("Succes", "Produit cree");
+                    Produit saved = stockService.creerProduit(produit);
+                    int qteInit = 0;
+                    try { qteInit = Integer.parseInt(qteInitField.getText().trim()); } catch (NumberFormatException ignored) {}
+                    if (qteInit > 0) {
+                        List<EmplacementStock> emplacements = stockService.getEmplacementsDisponibles();
+                        if (emplacements.isEmpty()) {
+                            AlertHelper.showError("Erreur", "Aucun emplacement de stock disponible. Reapprovisionnez manuellement.");
+                        } else {
+                            int emplacementId = emplacements.get(0).getId();
+                            BigDecimal prixInit = ValidationUtils.isNotEmpty(prixField.getText())
+                                    ? new BigDecimal(prixField.getText().trim()) : BigDecimal.ZERO;
+                            stockService.reapprovisionner(saved.getId(), emplacementId, "INITIAL",
+                                    qteInit, null, prixInit, null, null);
+                        }
+                    }
+                    AlertHelper.showInfo("Succes", "Produit cree" + (qteInit > 0 ? " avec " + qteInit + " en stock" : ""));
                 } else {
                     stockService.modifierProduit(produit);
+                    int nouvelleQte = 0;
+                    try { nouvelleQte = Integer.parseInt(qteInitField.getText().trim()); } catch (NumberFormatException ignored) {}
+                    int qteActuelle = stockQuantities.getOrDefault(existing.getId(), 0);
+                    int diff = nouvelleQte - qteActuelle;
+                    if (diff > 0) {
+                        List<EmplacementStock> emplacements = stockService.getEmplacementsDisponibles();
+                        if (!emplacements.isEmpty()) {
+                            stockService.reapprovisionner(existing.getId(), emplacements.get(0).getId(),
+                                    "AJUSTEMENT", diff, null, BigDecimal.ZERO, null, null);
+                        }
+                    }
                     AlertHelper.showInfo("Succes", "Produit modifie");
                 }
                 loadAll();

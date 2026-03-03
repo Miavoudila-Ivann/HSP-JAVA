@@ -95,41 +95,55 @@ public class StockDAO {
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setInt(1, stock.getProduitId());
-            stmt.setInt(2, stock.getEmplacementId());
-            stmt.setString(3, stock.getLot());
-            stmt.setInt(4, stock.getQuantite());
-            stmt.setInt(5, stock.getQuantiteReservee());
-            if (stock.getDatePeremption() != null) {
-                stmt.setDate(6, Date.valueOf(stock.getDatePeremption()));
-            } else {
-                stmt.setNull(6, Types.DATE);
-            }
-            if (stock.getDateReception() != null) {
-                stmt.setTimestamp(7, Timestamp.valueOf(stock.getDateReception()));
-            } else {
-                stmt.setTimestamp(7, Timestamp.valueOf(LocalDateTime.now()));
-            }
-            if (stock.getPrixUnitaireAchat() != null) {
-                stmt.setBigDecimal(8, stock.getPrixUnitaireAchat());
-            } else {
-                stmt.setNull(8, Types.DECIMAL);
-            }
-            if (stock.getFournisseurId() != null) {
-                stmt.setInt(9, stock.getFournisseurId());
-            } else {
-                stmt.setNull(9, Types.INTEGER);
-            }
-            stmt.setString(10, stock.getNumeroCommande());
-            stmt.setTimestamp(11, Timestamp.valueOf(LocalDateTime.now()));
-            stmt.executeUpdate();
-
-            ResultSet generatedKeys = stmt.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                return generatedKeys.getInt(1);
-            }
+            return executeInsert(stock, stmt);
         } catch (SQLException e) {
             System.err.println("Erreur lors de l'insertion du stock : " + e.getMessage());
+        }
+        return -1;
+    }
+
+    public int insert(Stock stock, Connection conn) throws SQLException {
+        String sql = "INSERT INTO stocks (produit_id, emplacement_id, lot, quantite, quantite_reservee, date_peremption, " +
+                "date_reception, prix_unitaire_achat, fournisseur_id, numero_commande, date_derniere_maj) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            return executeInsert(stock, stmt);
+        }
+    }
+
+    private int executeInsert(Stock stock, PreparedStatement stmt) throws SQLException {
+        stmt.setInt(1, stock.getProduitId());
+        stmt.setInt(2, stock.getEmplacementId());
+        stmt.setString(3, stock.getLot());
+        stmt.setInt(4, stock.getQuantite());
+        stmt.setInt(5, stock.getQuantiteReservee());
+        if (stock.getDatePeremption() != null) {
+            stmt.setDate(6, Date.valueOf(stock.getDatePeremption()));
+        } else {
+            stmt.setNull(6, Types.DATE);
+        }
+        if (stock.getDateReception() != null) {
+            stmt.setTimestamp(7, Timestamp.valueOf(stock.getDateReception()));
+        } else {
+            stmt.setTimestamp(7, Timestamp.valueOf(LocalDateTime.now()));
+        }
+        if (stock.getPrixUnitaireAchat() != null) {
+            stmt.setBigDecimal(8, stock.getPrixUnitaireAchat());
+        } else {
+            stmt.setNull(8, Types.DECIMAL);
+        }
+        if (stock.getFournisseurId() != null) {
+            stmt.setInt(9, stock.getFournisseurId());
+        } else {
+            stmt.setNull(9, Types.INTEGER);
+        }
+        stmt.setString(10, stock.getNumeroCommande());
+        stmt.setTimestamp(11, Timestamp.valueOf(LocalDateTime.now()));
+        stmt.executeUpdate();
+
+        ResultSet generatedKeys = stmt.getGeneratedKeys();
+        if (generatedKeys.next()) {
+            return generatedKeys.getInt(1);
         }
         return -1;
     }

@@ -141,55 +141,67 @@ public class MouvementStockDAO {
         String sql = "INSERT INTO mouvements_stock (stock_id, produit_id, type_mouvement, quantite, quantite_avant, quantite_apres, motif, reference_document, emplacement_source_id, emplacement_destination_id, dossier_id, ordonnance_id, user_id, date_mouvement, valide, date_validation, validateur_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setInt(1, mouvement.getStockId());
-            stmt.setInt(2, mouvement.getProduitId());
-            stmt.setString(3, mouvement.getTypeMouvement().name());
-            stmt.setInt(4, mouvement.getQuantite());
-            stmt.setInt(5, mouvement.getQuantiteAvant());
-            stmt.setInt(6, mouvement.getQuantiteApres());
-            stmt.setString(7, mouvement.getMotif());
-            stmt.setString(8, mouvement.getReferenceDocument());
-            if (mouvement.getEmplacementSourceId() != null) {
-                stmt.setInt(9, mouvement.getEmplacementSourceId());
-            } else {
-                stmt.setNull(9, Types.INTEGER);
-            }
-            if (mouvement.getEmplacementDestinationId() != null) {
-                stmt.setInt(10, mouvement.getEmplacementDestinationId());
-            } else {
-                stmt.setNull(10, Types.INTEGER);
-            }
-            if (mouvement.getDossierId() != null) {
-                stmt.setInt(11, mouvement.getDossierId());
-            } else {
-                stmt.setNull(11, Types.INTEGER);
-            }
-            if (mouvement.getOrdonnanceId() != null) {
-                stmt.setInt(12, mouvement.getOrdonnanceId());
-            } else {
-                stmt.setNull(12, Types.INTEGER);
-            }
-            stmt.setInt(13, mouvement.getUserId());
-            stmt.setTimestamp(14, Timestamp.valueOf(mouvement.getDateMouvement()));
-            stmt.setBoolean(15, mouvement.isValide());
-            if (mouvement.getDateValidation() != null) {
-                stmt.setTimestamp(16, Timestamp.valueOf(mouvement.getDateValidation()));
-            } else {
-                stmt.setNull(16, Types.TIMESTAMP);
-            }
-            if (mouvement.getValidateurId() != null) {
-                stmt.setInt(17, mouvement.getValidateurId());
-            } else {
-                stmt.setNull(17, Types.INTEGER);
-            }
-            stmt.executeUpdate();
-
-            ResultSet generatedKeys = stmt.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                return generatedKeys.getInt(1);
-            }
+            return executeInsert(mouvement, stmt);
         } catch (SQLException e) {
             System.err.println("Erreur lors de l'insertion du mouvement de stock : " + e.getMessage());
+        }
+        return -1;
+    }
+
+    public int insert(MouvementStock mouvement, Connection conn) throws SQLException {
+        String sql = "INSERT INTO mouvements_stock (stock_id, produit_id, type_mouvement, quantite, quantite_avant, quantite_apres, motif, reference_document, emplacement_source_id, emplacement_destination_id, dossier_id, ordonnance_id, user_id, date_mouvement, valide, date_validation, validateur_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            return executeInsert(mouvement, stmt);
+        }
+    }
+
+    private int executeInsert(MouvementStock mouvement, PreparedStatement stmt) throws SQLException {
+        stmt.setInt(1, mouvement.getStockId());
+        stmt.setInt(2, mouvement.getProduitId());
+        stmt.setString(3, mouvement.getTypeMouvement().name());
+        stmt.setInt(4, mouvement.getQuantite());
+        stmt.setInt(5, mouvement.getQuantiteAvant());
+        stmt.setInt(6, mouvement.getQuantiteApres());
+        stmt.setString(7, mouvement.getMotif());
+        stmt.setString(8, mouvement.getReferenceDocument());
+        if (mouvement.getEmplacementSourceId() != null) {
+            stmt.setInt(9, mouvement.getEmplacementSourceId());
+        } else {
+            stmt.setNull(9, Types.INTEGER);
+        }
+        if (mouvement.getEmplacementDestinationId() != null) {
+            stmt.setInt(10, mouvement.getEmplacementDestinationId());
+        } else {
+            stmt.setNull(10, Types.INTEGER);
+        }
+        if (mouvement.getDossierId() != null) {
+            stmt.setInt(11, mouvement.getDossierId());
+        } else {
+            stmt.setNull(11, Types.INTEGER);
+        }
+        if (mouvement.getOrdonnanceId() != null) {
+            stmt.setInt(12, mouvement.getOrdonnanceId());
+        } else {
+            stmt.setNull(12, Types.INTEGER);
+        }
+        stmt.setInt(13, mouvement.getUserId());
+        stmt.setTimestamp(14, Timestamp.valueOf(mouvement.getDateMouvement()));
+        stmt.setBoolean(15, mouvement.isValide());
+        if (mouvement.getDateValidation() != null) {
+            stmt.setTimestamp(16, Timestamp.valueOf(mouvement.getDateValidation()));
+        } else {
+            stmt.setNull(16, Types.TIMESTAMP);
+        }
+        if (mouvement.getValidateurId() != null) {
+            stmt.setInt(17, mouvement.getValidateurId());
+        } else {
+            stmt.setNull(17, Types.INTEGER);
+        }
+        stmt.executeUpdate();
+
+        ResultSet generatedKeys = stmt.getGeneratedKeys();
+        if (generatedKeys.next()) {
+            return generatedKeys.getInt(1);
         }
         return -1;
     }

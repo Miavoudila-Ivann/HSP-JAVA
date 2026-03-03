@@ -204,72 +204,86 @@ public class DemandeProduitDAO {
                 "date_traitement = ?, commentaire_traitement = ?, date_livraison = ?, livreur_id = ? WHERE id = ?";
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, demande.getNumeroDemande());
-            stmt.setInt(2, demande.getProduitId());
-            stmt.setInt(3, demande.getQuantiteDemandee());
-            if (demande.getQuantiteLivree() != null) {
-                stmt.setInt(4, demande.getQuantiteLivree());
-            } else {
-                stmt.setNull(4, Types.INTEGER);
-            }
-            stmt.setInt(5, demande.getMedecinId());
-            if (demande.getDossierId() != null) {
-                stmt.setInt(6, demande.getDossierId());
-            } else {
-                stmt.setNull(6, Types.INTEGER);
-            }
-            if (demande.getHospitalisationId() != null) {
-                stmt.setInt(7, demande.getHospitalisationId());
-            } else {
-                stmt.setNull(7, Types.INTEGER);
-            }
-            if (demande.getOrdonnanceId() != null) {
-                stmt.setInt(8, demande.getOrdonnanceId());
-            } else {
-                stmt.setNull(8, Types.INTEGER);
-            }
-            if (demande.getEmplacementDestinationId() != null) {
-                stmt.setInt(9, demande.getEmplacementDestinationId());
-            } else {
-                stmt.setNull(9, Types.INTEGER);
-            }
-            stmt.setTimestamp(10, Timestamp.valueOf(demande.getDateDemande()));
-            if (demande.getDateBesoin() != null) {
-                stmt.setDate(11, Date.valueOf(demande.getDateBesoin()));
-            } else {
-                stmt.setNull(11, Types.DATE);
-            }
-            stmt.setBoolean(12, demande.isUrgence());
-            stmt.setInt(13, demande.getPriorite());
-            stmt.setString(14, demande.getMotif());
-            stmt.setString(15, demande.getStatut().name());
-            if (demande.getGestionnaireId() != null) {
-                stmt.setInt(16, demande.getGestionnaireId());
-            } else {
-                stmt.setNull(16, Types.INTEGER);
-            }
-            if (demande.getDateTraitement() != null) {
-                stmt.setTimestamp(17, Timestamp.valueOf(demande.getDateTraitement()));
-            } else {
-                stmt.setNull(17, Types.TIMESTAMP);
-            }
-            stmt.setString(18, demande.getCommentaireTraitement());
-            if (demande.getDateLivraison() != null) {
-                stmt.setTimestamp(19, Timestamp.valueOf(demande.getDateLivraison()));
-            } else {
-                stmt.setNull(19, Types.TIMESTAMP);
-            }
-            if (demande.getLivreurId() != null) {
-                stmt.setInt(20, demande.getLivreurId());
-            } else {
-                stmt.setNull(20, Types.INTEGER);
-            }
-            stmt.setInt(21, demande.getId());
-            return stmt.executeUpdate() > 0;
+            return executeUpdate(demande, stmt);
         } catch (SQLException e) {
             System.err.println("Erreur lors de la mise a jour de la demande : " + e.getMessage());
         }
         return false;
+    }
+
+    public boolean update(DemandeProduit demande, Connection conn) throws SQLException {
+        String sql = "UPDATE demandes_produits SET numero_demande = ?, produit_id = ?, quantite_demandee = ?, quantite_livree = ?, " +
+                "medecin_id = ?, dossier_id = ?, hospitalisation_id = ?, ordonnance_id = ?, emplacement_destination_id = ?, " +
+                "date_demande = ?, date_besoin = ?, urgence = ?, priorite = ?, motif = ?, statut = ?, gestionnaire_id = ?, " +
+                "date_traitement = ?, commentaire_traitement = ?, date_livraison = ?, livreur_id = ? WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            return executeUpdate(demande, stmt);
+        }
+    }
+
+    private boolean executeUpdate(DemandeProduit demande, PreparedStatement stmt) throws SQLException {
+        stmt.setString(1, demande.getNumeroDemande());
+        stmt.setInt(2, demande.getProduitId());
+        stmt.setInt(3, demande.getQuantiteDemandee());
+        if (demande.getQuantiteLivree() != null) {
+            stmt.setInt(4, demande.getQuantiteLivree());
+        } else {
+            stmt.setNull(4, Types.INTEGER);
+        }
+        stmt.setInt(5, demande.getMedecinId());
+        if (demande.getDossierId() != null) {
+            stmt.setInt(6, demande.getDossierId());
+        } else {
+            stmt.setNull(6, Types.INTEGER);
+        }
+        if (demande.getHospitalisationId() != null) {
+            stmt.setInt(7, demande.getHospitalisationId());
+        } else {
+            stmt.setNull(7, Types.INTEGER);
+        }
+        if (demande.getOrdonnanceId() != null) {
+            stmt.setInt(8, demande.getOrdonnanceId());
+        } else {
+            stmt.setNull(8, Types.INTEGER);
+        }
+        if (demande.getEmplacementDestinationId() != null) {
+            stmt.setInt(9, demande.getEmplacementDestinationId());
+        } else {
+            stmt.setNull(9, Types.INTEGER);
+        }
+        stmt.setTimestamp(10, Timestamp.valueOf(demande.getDateDemande()));
+        if (demande.getDateBesoin() != null) {
+            stmt.setDate(11, Date.valueOf(demande.getDateBesoin()));
+        } else {
+            stmt.setNull(11, Types.DATE);
+        }
+        stmt.setBoolean(12, demande.isUrgence());
+        stmt.setInt(13, demande.getPriorite());
+        stmt.setString(14, demande.getMotif());
+        stmt.setString(15, demande.getStatut().name());
+        if (demande.getGestionnaireId() != null) {
+            stmt.setInt(16, demande.getGestionnaireId());
+        } else {
+            stmt.setNull(16, Types.INTEGER);
+        }
+        if (demande.getDateTraitement() != null) {
+            stmt.setTimestamp(17, Timestamp.valueOf(demande.getDateTraitement()));
+        } else {
+            stmt.setNull(17, Types.TIMESTAMP);
+        }
+        stmt.setString(18, demande.getCommentaireTraitement());
+        if (demande.getDateLivraison() != null) {
+            stmt.setTimestamp(19, Timestamp.valueOf(demande.getDateLivraison()));
+        } else {
+            stmt.setNull(19, Types.TIMESTAMP);
+        }
+        if (demande.getLivreurId() != null) {
+            stmt.setInt(20, demande.getLivreurId());
+        } else {
+            stmt.setNull(20, Types.INTEGER);
+        }
+        stmt.setInt(21, demande.getId());
+        return stmt.executeUpdate() > 0;
     }
 
     public boolean updateStatut(int id, DemandeProduit.Statut statut, Integer gestionnaireId,
@@ -308,6 +322,10 @@ public class DemandeProduitDAO {
             System.err.println("Erreur lors de la suppression de la demande : " + e.getMessage());
         }
         return false;
+    }
+
+    public DemandeProduit mapFromResultSet(ResultSet rs) throws SQLException {
+        return mapResultSetToDemandeProduit(rs);
     }
 
     private DemandeProduit mapResultSetToDemandeProduit(ResultSet rs) throws SQLException {

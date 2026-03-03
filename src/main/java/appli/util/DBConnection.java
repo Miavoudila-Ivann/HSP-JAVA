@@ -12,8 +12,6 @@ public class DBConnection {
     private static final String MOT_DE_PASSE = "";
 
     private static DBConnection instance;
-    private Connection connection;
-
     private DBConnection() {}
 
     public static synchronized DBConnection getInstance() {
@@ -29,22 +27,14 @@ public class DBConnection {
 
     public Connection getConnection() {
         try {
-            if (connection == null || connection.isClosed()) {
-                connection = DriverManager.getConnection(getUrl(), UTILISATEUR, MOT_DE_PASSE);
-            }
+            return DriverManager.getConnection(getUrl(), UTILISATEUR, MOT_DE_PASSE);
         } catch (SQLException e) {
             System.err.println("Erreur de connexion a la base de donnees : " + e.getMessage());
+            return null;
         }
-        return connection;
     }
 
     public void closeConnection() {
-        if (connection != null) {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                System.err.println("Erreur lors de la fermeture de la connexion : " + e.getMessage());
-            }
-        }
+        // Les connexions sont desormais gerees par les appelants via try-with-resources
     }
 }
