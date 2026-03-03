@@ -3,6 +3,7 @@ module appli.hsp {
     requires javafx.fxml;
     requires java.sql;
     requires jbcrypt;
+    requires org.apache.pdfbox;
 
     opens appli to javafx.fxml;
     opens appli.ui.controller to javafx.fxml;

@@ -1,14 +1,26 @@
 package appli.ui.controller;
 
+import appli.model.JournalAction.TypeAction;
 import appli.model.User;
+import appli.security.RoleGuard;
+import appli.security.RoleGuard.Fonctionnalite;
+import appli.security.SessionManager;
+import appli.service.JournalService;
+import appli.service.PDFExportService;
 import appli.service.StatistiquesService;
 import appli.service.StatistiquesService.Indicateurs;
+import appli.ui.util.AlertHelper;
 import appli.util.Route;
 import appli.util.Router;
 import javafx.fxml.FXML;
 import javafx.scene.chart.*;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.stage.FileChooser;
 
+import java.io.File;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 public class StatistiquesController {
@@ -32,8 +44,11 @@ public class StatistiquesController {
     @FXML private NumberAxis axeProduitsY;
 
     @FXML private PieChart chartOccupation;
+    @FXML private Button btnExportPDF;
 
     private final StatistiquesService service = new StatistiquesService();
+    private final PDFExportService pdfExportService = new PDFExportService();
+    private final JournalService journalService = new JournalService();
 
     @FXML
     public void initialize() {
@@ -43,6 +58,39 @@ public class StatistiquesController {
             roleLabel.setText(user.getRole().getLibelle());
         }
         chargerDonnees();
+
+        boolean canExport = RoleGuard.hasPermission(Fonctionnalite.EXPORT_DONNEES);
+        btnExportPDF.setVisible(canExport);
+        btnExportPDF.setManaged(canExport);
+    }
+
+    @FXML
+    private void handleExportRapport() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Enregistrer le rapport statistiques");
+        fileChooser.setInitialFileName("rapport_statistiques_" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + ".pdf");
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fichiers PDF", "*.pdf"));
+        File file = fileChooser.showSaveDialog(lblHospitalises.getScene().getWindow());
+
+        if (file != null) {
+            try {
+                Indicateurs indicateurs = service.getIndicateurs();
+                Map<String, Integer> hospitalisations = service.getHospitalisationsParSemaine();
+                Map<String, Integer> gravite = service.getRepartitionGravite();
+                Map<String, Integer> produits = service.getProduitsLesPlusDemandes(5);
+                Map<String, Double> occupation = service.getTauxOccupationParType();
+
+                pdfExportService.exportRapportStatistiques(indicateurs, hospitalisations, gravite, produits, occupation, file);
+
+                User currentUser = SessionManager.getInstance().getCurrentUser();
+                journalService.logAction(currentUser, TypeAction.EXPORT,
+                        "Export PDF rapport statistiques", "Statistiques", null);
+
+                AlertHelper.showInfo("Succes", "Rapport statistiques exporte avec succes :\n" + file.getAbsolutePath());
+            } catch (Exception e) {
+                AlertHelper.showError("Erreur", "Impossible d'exporter le PDF : " + e.getMessage());
+            }
+        }
     }
 
     @FXML
