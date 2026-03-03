@@ -227,7 +227,12 @@ public class MedicalService {
             conn.setAutoCommit(false);
 
             // 1. Verifier le dossier
-            DossierPriseEnCharge dossier = dossierDAO.findById(dossierId);
+            DossierPriseEnCharge dossier = null;
+            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM dossiers_prise_en_charge WHERE id = ?")) {
+                ps.setInt(1, dossierId);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) { dossier = dossierDAO.mapFromResultSet(rs); }
+            }
             if (dossier == null) {
                 throw new IllegalArgumentException("Dossier non trouve");
             }
@@ -274,7 +279,7 @@ public class MedicalService {
             hospitalisation.setStatut(Hospitalisation.Statut.EN_COURS);
             hospitalisation.setMedecinId(currentUser.getId());
 
-            int hospId = hospitalisationDAO.insert(hospitalisation);
+            int hospId = hospitalisationDAO.insert(hospitalisation, conn);
             hospitalisation.setId(hospId);
 
             // 4. Incrementer le nombre de lits occupes
@@ -286,7 +291,7 @@ public class MedicalService {
 
             // 5. Mettre a jour le statut du dossier
             dossier.setStatut(DossierPriseEnCharge.Statut.HOSPITALISE);
-            dossierDAO.update(dossier);
+            dossierDAO.update(dossier, conn);
 
             conn.commit();
 
@@ -313,9 +318,9 @@ public class MedicalService {
         } finally {
             if (conn != null) {
                 try {
-                    conn.setAutoCommit(true);
+                    conn.close();
                 } catch (SQLException e) {
-                    System.err.println("Erreur lors du reset autocommit: " + e.getMessage());
+                    System.err.println("Erreur lors de la fermeture de la connexion: " + e.getMessage());
                 }
             }
         }
@@ -345,7 +350,12 @@ public class MedicalService {
             conn.setAutoCommit(false);
 
             // 1. Recuperer l'hospitalisation
-            Hospitalisation hospitalisation = hospitalisationDAO.findById(hospitalisationId);
+            Hospitalisation hospitalisation = null;
+            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM hospitalisations WHERE id = ?")) {
+                ps.setInt(1, hospitalisationId);
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) { hospitalisation = hospitalisationDAO.mapFromResultSet(rs); }
+            }
             if (hospitalisation == null) {
                 throw new IllegalArgumentException("Hospitalisation non trouvee");
             }
@@ -369,7 +379,7 @@ public class MedicalService {
             hospitalisation.setObservations(observations);
             hospitalisation.setMedecinSortieId(currentUser.getId());
 
-            hospitalisationDAO.update(hospitalisation);
+            hospitalisationDAO.update(hospitalisation, conn);
 
             // 4. Liberer le lit dans la chambre
             String updateChambreSql = "UPDATE chambres SET nb_lits_occupes = nb_lits_occupes - 1 WHERE id = ? AND nb_lits_occupes > 0";
@@ -379,12 +389,17 @@ public class MedicalService {
             }
 
             // 5. Mettre a jour le dossier
-            DossierPriseEnCharge dossier = dossierDAO.findById(hospitalisation.getDossierId());
+            DossierPriseEnCharge dossier = null;
+            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM dossiers_prise_en_charge WHERE id = ?")) {
+                ps.setInt(1, hospitalisation.getDossierId());
+                ResultSet rs = ps.executeQuery();
+                if (rs.next()) { dossier = dossierDAO.mapFromResultSet(rs); }
+            }
             if (dossier != null) {
                 dossier.setStatut(DossierPriseEnCharge.Statut.TERMINE);
                 dossier.setDateCloture(LocalDateTime.now());
                 dossier.setDestinationSortie(DossierPriseEnCharge.DestinationSortie.DOMICILE);
-                dossierDAO.update(dossier);
+                dossierDAO.update(dossier, conn);
             }
 
             conn.commit();
@@ -412,9 +427,9 @@ public class MedicalService {
         } finally {
             if (conn != null) {
                 try {
-                    conn.setAutoCommit(true);
+                    conn.close();
                 } catch (SQLException e) {
-                    System.err.println("Erreur lors du reset autocommit: " + e.getMessage());
+                    System.err.println("Erreur lors de la fermeture de la connexion: " + e.getMessage());
                 }
             }
         }

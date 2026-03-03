@@ -121,39 +121,50 @@ public class HospitalisationDAO {
         String sql = "INSERT INTO hospitalisations (numero_sejour, dossier_id, chambre_id, lit_numero, date_entree, date_sortie_prevue, date_sortie_effective, motif_hospitalisation, diagnostic_entree, diagnostic_sortie, traitement, observations, evolution, statut, type_sortie, medecin_id, medecin_sortie_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, hospitalisation.getNumeroSejour());
-            stmt.setInt(2, hospitalisation.getDossierId());
-            stmt.setInt(3, hospitalisation.getChambreId());
-            if (hospitalisation.getLitNumero() != null) {
-                stmt.setInt(4, hospitalisation.getLitNumero());
-            } else {
-                stmt.setNull(4, Types.INTEGER);
-            }
-            stmt.setTimestamp(5, Timestamp.valueOf(hospitalisation.getDateEntree()));
-            stmt.setDate(6, hospitalisation.getDateSortiePrevue() != null ? Date.valueOf(hospitalisation.getDateSortiePrevue()) : null);
-            stmt.setTimestamp(7, hospitalisation.getDateSortieEffective() != null ? Timestamp.valueOf(hospitalisation.getDateSortieEffective()) : null);
-            stmt.setString(8, hospitalisation.getMotifHospitalisation());
-            stmt.setString(9, hospitalisation.getDiagnosticEntree());
-            stmt.setString(10, hospitalisation.getDiagnosticSortie());
-            stmt.setString(11, hospitalisation.getTraitement());
-            stmt.setString(12, hospitalisation.getObservations());
-            stmt.setString(13, hospitalisation.getEvolution());
-            stmt.setString(14, hospitalisation.getStatut().name());
-            stmt.setString(15, hospitalisation.getTypeSortie() != null ? hospitalisation.getTypeSortie().name() : null);
-            stmt.setInt(16, hospitalisation.getMedecinId());
-            if (hospitalisation.getMedecinSortieId() != null) {
-                stmt.setInt(17, hospitalisation.getMedecinSortieId());
-            } else {
-                stmt.setNull(17, Types.INTEGER);
-            }
-            stmt.executeUpdate();
-
-            ResultSet generatedKeys = stmt.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                return generatedKeys.getInt(1);
-            }
+            return executeInsert(hospitalisation, stmt);
         } catch (SQLException e) {
             System.err.println("Erreur lors de l'insertion de l'hospitalisation : " + e.getMessage());
+        }
+        return -1;
+    }
+
+    public int insert(Hospitalisation hospitalisation, Connection conn) throws SQLException {
+        String sql = "INSERT INTO hospitalisations (numero_sejour, dossier_id, chambre_id, lit_numero, date_entree, date_sortie_prevue, date_sortie_effective, motif_hospitalisation, diagnostic_entree, diagnostic_sortie, traitement, observations, evolution, statut, type_sortie, medecin_id, medecin_sortie_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            return executeInsert(hospitalisation, stmt);
+        }
+    }
+
+    private int executeInsert(Hospitalisation hospitalisation, PreparedStatement stmt) throws SQLException {
+        stmt.setString(1, hospitalisation.getNumeroSejour());
+        stmt.setInt(2, hospitalisation.getDossierId());
+        stmt.setInt(3, hospitalisation.getChambreId());
+        if (hospitalisation.getLitNumero() != null) {
+            stmt.setInt(4, hospitalisation.getLitNumero());
+        } else {
+            stmt.setNull(4, Types.INTEGER);
+        }
+        stmt.setTimestamp(5, Timestamp.valueOf(hospitalisation.getDateEntree()));
+        stmt.setDate(6, hospitalisation.getDateSortiePrevue() != null ? Date.valueOf(hospitalisation.getDateSortiePrevue()) : null);
+        stmt.setTimestamp(7, hospitalisation.getDateSortieEffective() != null ? Timestamp.valueOf(hospitalisation.getDateSortieEffective()) : null);
+        stmt.setString(8, hospitalisation.getMotifHospitalisation());
+        stmt.setString(9, hospitalisation.getDiagnosticEntree());
+        stmt.setString(10, hospitalisation.getDiagnosticSortie());
+        stmt.setString(11, hospitalisation.getTraitement());
+        stmt.setString(12, hospitalisation.getObservations());
+        stmt.setString(13, hospitalisation.getEvolution());
+        stmt.setString(14, hospitalisation.getStatut().name());
+        stmt.setString(15, hospitalisation.getTypeSortie() != null ? hospitalisation.getTypeSortie().name() : null);
+        stmt.setInt(16, hospitalisation.getMedecinId());
+        if (hospitalisation.getMedecinSortieId() != null) {
+            stmt.setInt(17, hospitalisation.getMedecinSortieId());
+        } else {
+            stmt.setNull(17, Types.INTEGER);
+        }
+        stmt.executeUpdate();
+        ResultSet generatedKeys = stmt.getGeneratedKeys();
+        if (generatedKeys.next()) {
+            return generatedKeys.getInt(1);
         }
         return -1;
     }
@@ -162,37 +173,48 @@ public class HospitalisationDAO {
         String sql = "UPDATE hospitalisations SET numero_sejour = ?, dossier_id = ?, chambre_id = ?, lit_numero = ?, date_entree = ?, date_sortie_prevue = ?, date_sortie_effective = ?, motif_hospitalisation = ?, diagnostic_entree = ?, diagnostic_sortie = ?, traitement = ?, observations = ?, evolution = ?, statut = ?, type_sortie = ?, medecin_id = ?, medecin_sortie_id = ? WHERE id = ?";
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, hospitalisation.getNumeroSejour());
-            stmt.setInt(2, hospitalisation.getDossierId());
-            stmt.setInt(3, hospitalisation.getChambreId());
-            if (hospitalisation.getLitNumero() != null) {
-                stmt.setInt(4, hospitalisation.getLitNumero());
-            } else {
-                stmt.setNull(4, Types.INTEGER);
-            }
-            stmt.setTimestamp(5, Timestamp.valueOf(hospitalisation.getDateEntree()));
-            stmt.setDate(6, hospitalisation.getDateSortiePrevue() != null ? Date.valueOf(hospitalisation.getDateSortiePrevue()) : null);
-            stmt.setTimestamp(7, hospitalisation.getDateSortieEffective() != null ? Timestamp.valueOf(hospitalisation.getDateSortieEffective()) : null);
-            stmt.setString(8, hospitalisation.getMotifHospitalisation());
-            stmt.setString(9, hospitalisation.getDiagnosticEntree());
-            stmt.setString(10, hospitalisation.getDiagnosticSortie());
-            stmt.setString(11, hospitalisation.getTraitement());
-            stmt.setString(12, hospitalisation.getObservations());
-            stmt.setString(13, hospitalisation.getEvolution());
-            stmt.setString(14, hospitalisation.getStatut().name());
-            stmt.setString(15, hospitalisation.getTypeSortie() != null ? hospitalisation.getTypeSortie().name() : null);
-            stmt.setInt(16, hospitalisation.getMedecinId());
-            if (hospitalisation.getMedecinSortieId() != null) {
-                stmt.setInt(17, hospitalisation.getMedecinSortieId());
-            } else {
-                stmt.setNull(17, Types.INTEGER);
-            }
-            stmt.setInt(18, hospitalisation.getId());
-            return stmt.executeUpdate() > 0;
+            return executeUpdate(hospitalisation, stmt);
         } catch (SQLException e) {
             System.err.println("Erreur lors de la mise a jour de l'hospitalisation : " + e.getMessage());
         }
         return false;
+    }
+
+    public boolean update(Hospitalisation hospitalisation, Connection conn) throws SQLException {
+        String sql = "UPDATE hospitalisations SET numero_sejour = ?, dossier_id = ?, chambre_id = ?, lit_numero = ?, date_entree = ?, date_sortie_prevue = ?, date_sortie_effective = ?, motif_hospitalisation = ?, diagnostic_entree = ?, diagnostic_sortie = ?, traitement = ?, observations = ?, evolution = ?, statut = ?, type_sortie = ?, medecin_id = ?, medecin_sortie_id = ? WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            return executeUpdate(hospitalisation, stmt);
+        }
+    }
+
+    private boolean executeUpdate(Hospitalisation hospitalisation, PreparedStatement stmt) throws SQLException {
+        stmt.setString(1, hospitalisation.getNumeroSejour());
+        stmt.setInt(2, hospitalisation.getDossierId());
+        stmt.setInt(3, hospitalisation.getChambreId());
+        if (hospitalisation.getLitNumero() != null) {
+            stmt.setInt(4, hospitalisation.getLitNumero());
+        } else {
+            stmt.setNull(4, Types.INTEGER);
+        }
+        stmt.setTimestamp(5, Timestamp.valueOf(hospitalisation.getDateEntree()));
+        stmt.setDate(6, hospitalisation.getDateSortiePrevue() != null ? Date.valueOf(hospitalisation.getDateSortiePrevue()) : null);
+        stmt.setTimestamp(7, hospitalisation.getDateSortieEffective() != null ? Timestamp.valueOf(hospitalisation.getDateSortieEffective()) : null);
+        stmt.setString(8, hospitalisation.getMotifHospitalisation());
+        stmt.setString(9, hospitalisation.getDiagnosticEntree());
+        stmt.setString(10, hospitalisation.getDiagnosticSortie());
+        stmt.setString(11, hospitalisation.getTraitement());
+        stmt.setString(12, hospitalisation.getObservations());
+        stmt.setString(13, hospitalisation.getEvolution());
+        stmt.setString(14, hospitalisation.getStatut().name());
+        stmt.setString(15, hospitalisation.getTypeSortie() != null ? hospitalisation.getTypeSortie().name() : null);
+        stmt.setInt(16, hospitalisation.getMedecinId());
+        if (hospitalisation.getMedecinSortieId() != null) {
+            stmt.setInt(17, hospitalisation.getMedecinSortieId());
+        } else {
+            stmt.setNull(17, Types.INTEGER);
+        }
+        stmt.setInt(18, hospitalisation.getId());
+        return stmt.executeUpdate() > 0;
     }
 
     public boolean endHospitalisation(int id, java.time.LocalDateTime dateSortie,
@@ -224,6 +246,10 @@ public class HospitalisationDAO {
             System.err.println("Erreur lors de la suppression de l'hospitalisation : " + e.getMessage());
         }
         return false;
+    }
+
+    public Hospitalisation mapFromResultSet(ResultSet rs) throws SQLException {
+        return mapResultSetToHospitalisation(rs);
     }
 
     private Hospitalisation mapResultSetToHospitalisation(ResultSet rs) throws SQLException {

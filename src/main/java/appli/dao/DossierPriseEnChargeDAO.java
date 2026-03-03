@@ -164,39 +164,54 @@ public class DossierPriseEnChargeDAO {
         String sql = "UPDATE dossiers_prise_en_charge SET numero_dossier = ?, patient_id = ?, date_admission = ?, motif_admission = ?, niveau_gravite = ?, mode_arrivee = ?, symptomes = ?, constantes_vitales = ?, antecedents = ?, allergies = ?, traitement_en_cours = ?, statut = ?, priorite_triage = ?, medecin_responsable_id = ?, cree_par = ?, date_prise_en_charge = ?, date_cloture = ?, notes_cloture = ?, destination_sortie = ? WHERE id = ?";
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, dossier.getNumeroDossier());
-            stmt.setInt(2, dossier.getPatientId());
-            stmt.setTimestamp(3, dossier.getDateAdmission() != null ? Timestamp.valueOf(dossier.getDateAdmission()) : null);
-            stmt.setString(4, dossier.getMotifAdmission());
-            stmt.setString(5, dossier.getNiveauGravite().name());
-            stmt.setString(6, dossier.getModeArrivee() != null ? dossier.getModeArrivee().name() : null);
-            stmt.setString(7, dossier.getSymptomes());
-            stmt.setString(8, dossier.getConstantesVitales());
-            stmt.setString(9, dossier.getAntecedents());
-            stmt.setString(10, dossier.getAllergies());
-            stmt.setString(11, dossier.getTraitementEnCours());
-            stmt.setString(12, dossier.getStatut().name());
-            stmt.setInt(13, dossier.getPrioriteTriage());
-            if (dossier.getMedecinResponsableId() != null) {
-                stmt.setInt(14, dossier.getMedecinResponsableId());
-            } else {
-                stmt.setNull(14, Types.INTEGER);
-            }
-            if (dossier.getCreePar() != null) {
-                stmt.setInt(15, dossier.getCreePar());
-            } else {
-                stmt.setNull(15, Types.INTEGER);
-            }
-            stmt.setTimestamp(16, dossier.getDatePriseEnCharge() != null ? Timestamp.valueOf(dossier.getDatePriseEnCharge()) : null);
-            stmt.setTimestamp(17, dossier.getDateCloture() != null ? Timestamp.valueOf(dossier.getDateCloture()) : null);
-            stmt.setString(18, dossier.getNotesCloture());
-            stmt.setString(19, dossier.getDestinationSortie() != null ? dossier.getDestinationSortie().name() : null);
-            stmt.setInt(20, dossier.getId());
-            return stmt.executeUpdate() > 0;
+            return executeUpdate(dossier, stmt);
         } catch (SQLException e) {
             System.err.println("Erreur lors de la mise a jour du dossier : " + e.getMessage());
         }
         return false;
+    }
+
+    public boolean update(DossierPriseEnCharge dossier, Connection conn) throws SQLException {
+        String sql = "UPDATE dossiers_prise_en_charge SET numero_dossier = ?, patient_id = ?, date_admission = ?, motif_admission = ?, niveau_gravite = ?, mode_arrivee = ?, symptomes = ?, constantes_vitales = ?, antecedents = ?, allergies = ?, traitement_en_cours = ?, statut = ?, priorite_triage = ?, medecin_responsable_id = ?, cree_par = ?, date_prise_en_charge = ?, date_cloture = ?, notes_cloture = ?, destination_sortie = ? WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            return executeUpdate(dossier, stmt);
+        }
+    }
+
+    private boolean executeUpdate(DossierPriseEnCharge dossier, PreparedStatement stmt) throws SQLException {
+        stmt.setString(1, dossier.getNumeroDossier());
+        stmt.setInt(2, dossier.getPatientId());
+        stmt.setTimestamp(3, dossier.getDateAdmission() != null ? Timestamp.valueOf(dossier.getDateAdmission()) : null);
+        stmt.setString(4, dossier.getMotifAdmission());
+        stmt.setString(5, dossier.getNiveauGravite().name());
+        stmt.setString(6, dossier.getModeArrivee() != null ? dossier.getModeArrivee().name() : null);
+        stmt.setString(7, dossier.getSymptomes());
+        stmt.setString(8, dossier.getConstantesVitales());
+        stmt.setString(9, dossier.getAntecedents());
+        stmt.setString(10, dossier.getAllergies());
+        stmt.setString(11, dossier.getTraitementEnCours());
+        stmt.setString(12, dossier.getStatut().name());
+        stmt.setInt(13, dossier.getPrioriteTriage());
+        if (dossier.getMedecinResponsableId() != null) {
+            stmt.setInt(14, dossier.getMedecinResponsableId());
+        } else {
+            stmt.setNull(14, Types.INTEGER);
+        }
+        if (dossier.getCreePar() != null) {
+            stmt.setInt(15, dossier.getCreePar());
+        } else {
+            stmt.setNull(15, Types.INTEGER);
+        }
+        stmt.setTimestamp(16, dossier.getDatePriseEnCharge() != null ? Timestamp.valueOf(dossier.getDatePriseEnCharge()) : null);
+        stmt.setTimestamp(17, dossier.getDateCloture() != null ? Timestamp.valueOf(dossier.getDateCloture()) : null);
+        stmt.setString(18, dossier.getNotesCloture());
+        stmt.setString(19, dossier.getDestinationSortie() != null ? dossier.getDestinationSortie().name() : null);
+        stmt.setInt(20, dossier.getId());
+        return stmt.executeUpdate() > 0;
+    }
+
+    public DossierPriseEnCharge mapFromResultSet(ResultSet rs) throws SQLException {
+        return mapResultSetToDossier(rs);
     }
 
     public boolean updateStatut(int id, DossierPriseEnCharge.Statut statut) {
