@@ -27,7 +27,7 @@ public class PasswordValidatorService {
             result.addError("Le mot de passe doit contenir au moins un chiffre.");
         }
 
-        if (!password.matches(".*[@#$%^&+=!].*")) {
+        if (!password.matches(".*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?].*")) {
             result.addError("Le mot de passe doit contenir au moins un caractère spécial.");
         }
 
