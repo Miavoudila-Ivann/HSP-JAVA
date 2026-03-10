@@ -250,7 +250,7 @@ CREATE TABLE produits (
                           unite_mesure VARCHAR(50) NOT NULL,
                           prix_unitaire DECIMAL(10,2) NULL,
                           tva DECIMAL(5,2) NULL DEFAULT 20.00,
-                          niveau_dangerosite ENUM('FAIBLE', 'MOYEN', 'ELEVE', 'TRES_ELEVE') NOT NULL DEFAULT 'FAIBLE',
+                          niveau_dangerosite ENUM('FAIBLE', 'MOYEN', 'ELEVE', 'TRES_ELEVE', 'CRITIQUE') NOT NULL DEFAULT 'FAIBLE',
                           conditions_stockage TEXT NULL,
                           temperature_min DECIMAL(5,2) NULL,
                           temperature_max DECIMAL(5,2) NULL,

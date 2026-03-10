@@ -138,6 +138,37 @@ public class StockController {
             var nd = cell.getValue().getNiveauDangerosite();
             return new SimpleStringProperty(nd != null ? nd.getLibelle() : "");
         });
+        colProdDangerosite.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                    setStyle("");
+                } else {
+                    Produit produit = getTableView().getItems().get(getIndex());
+                    Produit.NiveauDangerosite nd = produit.getNiveauDangerosite();
+                    String couleur = nd != null ? nd.getCouleur() : "#999999";
+
+                    Label badge = new Label(item);
+                    badge.setStyle(
+                            "-fx-background-color: " + couleur + ";" +
+                            "-fx-text-fill: white;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-font-size: 11;" +
+                            "-fx-padding: 3 10 3 10;" +
+                            "-fx-background-radius: 8;" +
+                            "-fx-border-radius: 8;" +
+                            "-fx-border-color: #1a1a1a;" +
+                            "-fx-border-width: 1.5;"
+                    );
+                    setGraphic(badge);
+                    setText(null);
+                    setAlignment(Pos.CENTER);
+                }
+            }
+        });
         colProdStock.setCellValueFactory(cell -> {
             int qty = stockQuantities.getOrDefault(cell.getValue().getId(), 0);
             return new SimpleStringProperty(String.valueOf(qty));

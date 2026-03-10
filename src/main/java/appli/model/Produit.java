@@ -9,7 +9,8 @@ public class Produit {
         FAIBLE("Faible", "#4CAF50"),
         MOYEN("Moyen", "#FFC107"),
         ELEVE("Eleve", "#FF9800"),
-        TRES_ELEVE("Tres eleve", "#F44336");
+        TRES_ELEVE("Tres eleve", "#F44336"),
+        CRITIQUE("Critique", "#9C27B0");
 
         private final String libelle;
         private final String couleur;
