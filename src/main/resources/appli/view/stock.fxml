@@ -76,7 +76,34 @@
             <Tab text="Produits">
                 <VBox spacing="10">
                     <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
-                    <HBox spacing="10">
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <TextField fx:id="searchProduitField" promptText="Rechercher un produit (nom, code...)"
+                                   prefWidth="300" onAction="#handleSearchProduit"
+                                   style="-fx-border-color: #1a1a1a;
+                                          -fx-border-width: 2;
+                                          -fx-border-radius: 8;
+                                          -fx-background-radius: 8;"/>
+                        <Button text="Rechercher" onAction="#handleSearchProduit"
+                                style="-fx-background-color: #74B9FF;
+                                       -fx-text-fill: white;
+                                       -fx-font-weight: bold;
+                                       -fx-border-color: #1a1a1a;
+                                       -fx-border-width: 2.5;
+                                       -fx-border-radius: 8;
+                                       -fx-background-radius: 8;
+                                       -fx-cursor: hand;
+                                       -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.7), 0, 0, 3, 3);"/>
+                        <Button text="Reinitialiser" onAction="#handleRefreshProduit"
+                                style="-fx-background-color: rgba(255,255,255,0.9);
+                                       -fx-text-fill: #1a1a1a;
+                                       -fx-font-weight: bold;
+                                       -fx-border-color: #1a1a1a;
+                                       -fx-border-width: 2.5;
+                                       -fx-border-radius: 8;
+                                       -fx-background-radius: 8;
+                                       -fx-cursor: hand;
+                                       -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.7), 0, 0, 3, 3);"/>
+                        <HBox HBox.hgrow="ALWAYS"/>
                         <Button fx:id="btnAddProduit" text="+ Ajouter produit"
                                 onAction="#handleAddProduit"
                                 style="-fx-background-color: #55EFC4;
@@ -226,6 +253,95 @@
                             <TableColumn fx:id="colMvtRef" text="Reference" prefWidth="150"/>
                         </columns>
                         <placeholder><Label text="Aucun mouvement"/></placeholder>
+                    </TableView>
+                </VBox>
+            </Tab>
+
+            <!-- ====== ONGLET ALERTES ====== -->
+            <Tab text="Alertes">
+                <VBox spacing="12">
+                    <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
+
+                    <!-- Barre du haut -->
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Button fx:id="btnActualiserAlertes" text="Actualiser les alertes"
+                                onAction="#handleActualiserAlertes"
+                                style="-fx-background-color: #00B894;
+                                       -fx-text-fill: white;
+                                       -fx-font-weight: bold;
+                                       -fx-border-color: #1a1a1a;
+                                       -fx-border-width: 2.5;
+                                       -fx-border-radius: 8;
+                                       -fx-background-radius: 8;
+                                       -fx-cursor: hand;
+                                       -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.7), 0, 0, 3, 3);"/>
+                        <Button fx:id="btnToutMarquerLu" text="Tout marquer comme lu"
+                                onAction="#handleToutMarquerLu"
+                                style="-fx-background-color: #74B9FF;
+                                       -fx-text-fill: white;
+                                       -fx-font-weight: bold;
+                                       -fx-border-color: #1a1a1a;
+                                       -fx-border-width: 2.5;
+                                       -fx-border-radius: 8;
+                                       -fx-background-radius: 8;
+                                       -fx-cursor: hand;
+                                       -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.7), 0, 0, 3, 3);"/>
+                    </HBox>
+
+                    <!-- Cartes KPI -->
+                    <HBox spacing="15" alignment="CENTER">
+                        <!-- Critiques -->
+                        <VBox alignment="CENTER" prefWidth="200" prefHeight="80"
+                              style="-fx-background-color: #FF7675;
+                                     -fx-background-radius: 14;
+                                     -fx-border-color: #1a1a1a;
+                                     -fx-border-width: 3;
+                                     -fx-border-radius: 14;
+                                     -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.5), 0, 0, 4, 4);">
+                            <Label fx:id="lblCritiques" text="0"
+                                   style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 28;"/>
+                            <Label text="Critiques"
+                                   style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13;"/>
+                        </VBox>
+                        <!-- Avertissements -->
+                        <VBox alignment="CENTER" prefWidth="200" prefHeight="80"
+                              style="-fx-background-color: #FDCB6E;
+                                     -fx-background-radius: 14;
+                                     -fx-border-color: #1a1a1a;
+                                     -fx-border-width: 3;
+                                     -fx-border-radius: 14;
+                                     -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.5), 0, 0, 4, 4);">
+                            <Label fx:id="lblWarnings" text="0"
+                                   style="-fx-text-fill: #1a1a1a; -fx-font-weight: bold; -fx-font-size: 28;"/>
+                            <Label text="Avertissements"
+                                   style="-fx-text-fill: #1a1a1a; -fx-font-weight: bold; -fx-font-size: 13;"/>
+                        </VBox>
+                        <!-- Informations -->
+                        <VBox alignment="CENTER" prefWidth="200" prefHeight="80"
+                              style="-fx-background-color: #74B9FF;
+                                     -fx-background-radius: 14;
+                                     -fx-border-color: #1a1a1a;
+                                     -fx-border-width: 3;
+                                     -fx-border-radius: 14;
+                                     -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.5), 0, 0, 4, 4);">
+                            <Label fx:id="lblInfos" text="0"
+                                   style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 28;"/>
+                            <Label text="Informations"
+                                   style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13;"/>
+                        </VBox>
+                    </HBox>
+
+                    <!-- Tableau des alertes -->
+                    <TableView fx:id="alerteTable" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="colAlNiveau" text="Niveau" prefWidth="100"/>
+                            <TableColumn fx:id="colAlType" text="Type" prefWidth="130"/>
+                            <TableColumn fx:id="colAlTitre" text="Titre" prefWidth="200"/>
+                            <TableColumn fx:id="colAlMessage" text="Message" prefWidth="300"/>
+                            <TableColumn fx:id="colAlDate" text="Date" prefWidth="140"/>
+                            <TableColumn fx:id="colAlActions" text="Actions" prefWidth="100"/>
+                        </columns>
+                        <placeholder><Label text="Aucune alerte active"/></placeholder>
                     </TableView>
                 </VBox>
             </Tab>

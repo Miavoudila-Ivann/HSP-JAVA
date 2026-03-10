@@ -1,5 +1,6 @@
 package appli.ui.controller;
 
+import appli.dao.ChambreDAO;
 import appli.model.*;
 import appli.security.SessionManager;
 import appli.service.MedicalService;
@@ -14,14 +15,18 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class HospitalisationsController {
 
@@ -53,9 +58,13 @@ public class HospitalisationsController {
     @FXML private Button btnSortie;
     @FXML private Label statusLabel;
 
+    // Plan des chambres
+    @FXML private VBox chambresContainer;
+
     private final MedicalService medicalService = new MedicalService();
     private final TriageService triageService = new TriageService();
     private final PatientService patientService = new PatientService();
+    private final ChambreDAO chambreDAO = new ChambreDAO();
 
     private final ObservableList<DossierPriseEnCharge> attenteData = FXCollections.observableArrayList();
     private final ObservableList<Hospitalisation> hospData = FXCollections.observableArrayList();
@@ -160,6 +169,8 @@ public class HospitalisationsController {
         } catch (Exception e) {
             AlertHelper.showError("Erreur", "Impossible de charger les donnees : " + e.getMessage());
         }
+
+        loadChambres();
     }
 
     @FXML
@@ -350,6 +361,116 @@ public class HospitalisationsController {
                 AlertHelper.showError("Erreur", e.getMessage());
             }
         });
+    }
+
+    // =============== Plan des chambres ===============
+
+    private void loadChambres() {
+        chambresContainer.getChildren().clear();
+        try {
+            List<Chambre> toutes = chambreDAO.findAll();
+
+            // Grouper par etage
+            Map<Integer, List<Chambre>> parEtage = new TreeMap<>();
+            for (Chambre c : toutes) {
+                parEtage.computeIfAbsent(c.getEtage(), k -> new java.util.ArrayList<>()).add(c);
+            }
+
+            for (Map.Entry<Integer, List<Chambre>> entry : parEtage.entrySet()) {
+                int etage = entry.getKey();
+                List<Chambre> chambres = entry.getValue();
+
+                // Titre de l'etage
+                Label etageLabel = new Label("Etage " + etage);
+                etageLabel.setStyle("-fx-font-size: 14; -fx-font-weight: bold; -fx-text-fill: #2D3436;");
+
+                FlowPane flowPane = new FlowPane();
+                flowPane.setHgap(12);
+                flowPane.setVgap(12);
+                flowPane.setPadding(new Insets(5, 0, 10, 0));
+
+                for (Chambre chambre : chambres) {
+                    VBox card = createChambreCard(chambre);
+                    flowPane.getChildren().add(card);
+                }
+
+                chambresContainer.getChildren().addAll(etageLabel, flowPane);
+            }
+
+            if (toutes.isEmpty()) {
+                Label vide = new Label("Aucune chambre configuree");
+                vide.setStyle("-fx-text-fill: #636E72; -fx-font-size: 13;");
+                chambresContainer.getChildren().add(vide);
+            }
+        } catch (Exception e) {
+            AlertHelper.showError("Erreur", "Impossible de charger les chambres : " + e.getMessage());
+        }
+    }
+
+    private VBox createChambreCard(Chambre chambre) {
+        String bgColor;
+        String statusText;
+
+        if (chambre.isEnMaintenance()) {
+            bgColor = "#B2BEC3";
+            statusText = "Maintenance";
+        } else if (!chambre.isActif()) {
+            bgColor = "#B2BEC3";
+            statusText = "Inactif";
+        } else if (chambre.getNbLitsOccupes() >= chambre.getCapacite()) {
+            bgColor = "#FF7675";
+            statusText = "Complet";
+        } else if (chambre.getNbLitsOccupes() > 0) {
+            bgColor = "#FDCB6E";
+            statusText = chambre.getNbLitsOccupes() + "/" + chambre.getCapacite() + " occupe(s)";
+        } else {
+            bgColor = "#55EFC4";
+            statusText = "Disponible";
+        }
+
+        Label numLabel = new Label(chambre.getNumero());
+        numLabel.setStyle("-fx-font-size: 15; -fx-font-weight: bold; -fx-text-fill: #1a1a1a;");
+
+        Label typeLabel = new Label(chambre.getTypeChambre().getLibelle());
+        typeLabel.setStyle("-fx-font-size: 11; -fx-text-fill: #2D3436;");
+
+        Label litsLabel = new Label("Lits: " + chambre.getNbLitsOccupes() + "/" + chambre.getCapacite());
+        litsLabel.setStyle("-fx-font-size: 11; -fx-text-fill: #2D3436; -fx-font-weight: bold;");
+
+        Label statLabel = new Label(statusText);
+        statLabel.setStyle("-fx-font-size: 10; -fx-text-fill: #2D3436; -fx-font-style: italic;");
+
+        VBox card = new VBox(4, numLabel, typeLabel, litsLabel, statLabel);
+        card.setAlignment(Pos.CENTER);
+        card.setPrefWidth(140);
+        card.setPrefHeight(100);
+        card.setPadding(new Insets(8));
+        card.setStyle("-fx-background-color: " + bgColor + ";" +
+                " -fx-background-radius: 10;" +
+                " -fx-border-color: #1a1a1a;" +
+                " -fx-border-width: 2.5;" +
+                " -fx-border-radius: 10;" +
+                " -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.5), 0, 0, 3, 3);" +
+                " -fx-cursor: hand;");
+
+        // Tooltip avec details
+        Tooltip tooltip = new Tooltip(
+                "Chambre " + chambre.getNumero() + "\n" +
+                "Type: " + chambre.getTypeChambre().getLibelle() + "\n" +
+                "Batiment: " + chambre.getBatiment() + "\n" +
+                "Capacite: " + chambre.getCapacite() + " lit(s)\n" +
+                "Occupes: " + chambre.getNbLitsOccupes() + "\n" +
+                "Disponibles: " + chambre.getLitsDisponibles() + "\n" +
+                (chambre.getEquipements() != null ? "Equipements: " + chambre.getEquipements() : "")
+        );
+        Tooltip.install(card, tooltip);
+
+        return card;
+    }
+
+    @FXML
+    private void handleRefreshChambres() {
+        loadChambres();
     }
 
     @FXML

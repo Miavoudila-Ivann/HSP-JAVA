@@ -1,6 +1,8 @@
 package appli.ui.controller;
 
 import appli.model.*;
+import appli.model.Alerte.Niveau;
+import appli.service.AlerteService;
 import appli.service.StockService;
 import appli.ui.util.AlertHelper;
 import appli.util.Route;
@@ -11,8 +13,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -35,6 +39,7 @@ public class StockController {
     @FXML private TableColumn<Produit, String> colProdStock;
     @FXML private TableColumn<Produit, String> colProdSeuil;
 
+    @FXML private TextField searchProduitField;
     @FXML private Button btnAddProduit;
     @FXML private Button btnEditProduit;
 
@@ -67,11 +72,27 @@ public class StockController {
 
     @FXML private Label statusLabel;
 
+    // Onglet Alertes
+    @FXML private Label lblCritiques;
+    @FXML private Label lblWarnings;
+    @FXML private Label lblInfos;
+    @FXML private TableView<Alerte> alerteTable;
+    @FXML private TableColumn<Alerte, String> colAlNiveau;
+    @FXML private TableColumn<Alerte, String> colAlType;
+    @FXML private TableColumn<Alerte, String> colAlTitre;
+    @FXML private TableColumn<Alerte, String> colAlMessage;
+    @FXML private TableColumn<Alerte, String> colAlDate;
+    @FXML private TableColumn<Alerte, String> colAlActions;
+    @FXML private Button btnActualiserAlertes;
+    @FXML private Button btnToutMarquerLu;
+
     private final StockService stockService = new StockService();
+    private final AlerteService alerteService = new AlerteService();
 
     private final ObservableList<Produit> produitData = FXCollections.observableArrayList();
     private final ObservableList<Fournisseur> fournisseurData = FXCollections.observableArrayList();
     private final ObservableList<MouvementStock> mouvementData = FXCollections.observableArrayList();
+    private final ObservableList<Alerte> alerteData = FXCollections.observableArrayList();
 
     private final Map<String, Produit> produitMap = new HashMap<>();
     private final Map<String, Fournisseur> fournisseurMap = new HashMap<>();
@@ -90,10 +111,12 @@ public class StockController {
         setupProduitColumns();
         setupFournisseurColumns();
         setupMouvementColumns();
+        setupAlerteColumns();
 
         produitTable.setItems(produitData);
         fournisseurTable.setItems(fournisseurData);
         mouvementTable.setItems(mouvementData);
+        alerteTable.setItems(alerteData);
 
         btnEditProduit.setDisable(true);
         btnEditFournisseur.setDisable(true);
@@ -178,9 +201,38 @@ public class StockController {
             mouvementData.clear();
 
             statusLabel.setText(produits.size() + " produit(s) | " + fournisseurs.size() + " fournisseur(s)");
+
+            loadAlertes();
         } catch (Exception e) {
             AlertHelper.showError("Erreur", "Erreur de chargement : " + e.getMessage());
         }
+    }
+
+    @FXML
+    private void handleSearchProduit() {
+        String term = searchProduitField.getText().trim();
+        if (term.isEmpty()) {
+            loadAll();
+            return;
+        }
+        try {
+            List<Produit> results = stockService.rechercherProduits(term);
+            produitData.clear();
+            stockQuantities.clear();
+            for (Produit p : results) {
+                stockQuantities.put(p.getId(), stockService.getQuantiteTotale(p.getId()));
+            }
+            produitData.addAll(results);
+            statusLabel.setText(results.size() + " resultat(s) pour \"" + term + "\"");
+        } catch (Exception e) {
+            AlertHelper.showError("Erreur", "Erreur de recherche : " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleRefreshProduit() {
+        searchProduitField.clear();
+        loadAll();
     }
 
     @FXML
@@ -437,6 +489,124 @@ public class StockController {
                 AlertHelper.showError("Erreur", e.getMessage());
             }
         });
+    }
+
+    // ==================== ALERTES ====================
+
+    private void setupAlerteColumns() {
+        colAlNiveau.setCellValueFactory(cell -> {
+            Niveau n = cell.getValue().getNiveau();
+            return new SimpleStringProperty(n != null ? n.getLibelle() : "");
+        });
+        colAlNiveau.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(item);
+                    setStyle("-fx-font-weight: bold;");
+                    Alerte alerte = getTableView().getItems().get(getIndex());
+                    if (alerte.getNiveau() == Niveau.CRITICAL) {
+                        setStyle("-fx-font-weight: bold; -fx-text-fill: #D63031;");
+                    } else if (alerte.getNiveau() == Niveau.WARNING) {
+                        setStyle("-fx-font-weight: bold; -fx-text-fill: #E17055;");
+                    } else {
+                        setStyle("-fx-font-weight: bold; -fx-text-fill: #0984E3;");
+                    }
+                }
+            }
+        });
+
+        colAlType.setCellValueFactory(cell -> {
+            var t = cell.getValue().getTypeAlerte();
+            return new SimpleStringProperty(t != null ? t.getLibelle() : "");
+        });
+        colAlTitre.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getTitre()));
+        colAlMessage.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getMessage()));
+        colAlDate.setCellValueFactory(cell -> {
+            var dt = cell.getValue().getDateCreation();
+            return new SimpleStringProperty(dt != null ? dt.format(DT_FORMAT) : "");
+        });
+
+        colAlActions.setCellFactory(col -> new TableCell<>() {
+            private final Button btnResoudre = new Button("Resoudre");
+            {
+                btnResoudre.setStyle("-fx-background-color: #00B894; -fx-text-fill: white; " +
+                        "-fx-font-weight: bold; -fx-font-size: 11; -fx-cursor: hand; " +
+                        "-fx-border-color: #1a1a1a; -fx-border-width: 1.5; " +
+                        "-fx-border-radius: 6; -fx-background-radius: 6;");
+                btnResoudre.setOnAction(e -> {
+                    Alerte alerte = getTableView().getItems().get(getIndex());
+                    handleResoudreAlerte(alerte);
+                });
+            }
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    HBox box = new HBox(btnResoudre);
+                    box.setAlignment(Pos.CENTER);
+                    setGraphic(box);
+                }
+            }
+        });
+    }
+
+    private void loadAlertes() {
+        try {
+            List<Alerte> alertes = alerteService.getAlertesActives();
+            alerteData.clear();
+            alerteData.addAll(alertes);
+
+            AlerteService.CompteursAlertes compteurs = alerteService.getCompteursAlertes();
+            lblCritiques.setText(String.valueOf(compteurs.critiques()));
+            lblWarnings.setText(String.valueOf(compteurs.warnings()));
+            lblInfos.setText(String.valueOf(compteurs.infos()));
+        } catch (Exception e) {
+            System.err.println("Erreur chargement alertes : " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleActualiserAlertes() {
+        try {
+            alerteService.verifierEtGenererAlertes();
+            loadAlertes();
+            AlertHelper.showInfo("Alertes", "Les alertes ont ete actualisees.");
+        } catch (Exception e) {
+            AlertHelper.showError("Erreur", "Erreur lors de l'actualisation des alertes : " + e.getMessage());
+        }
+    }
+
+    private void handleResoudreAlerte(Alerte alerte) {
+        AlertHelper.showTextAreaInput("Resoudre l'alerte",
+                "Notes de resolution pour : " + alerte.getTitre()).ifPresent(notes -> {
+            try {
+                alerteService.resoudreAlerte(alerte.getId(), notes);
+                loadAlertes();
+                AlertHelper.showInfo("Succes", "Alerte resolue.");
+            } catch (Exception e) {
+                AlertHelper.showError("Erreur", "Erreur lors de la resolution : " + e.getMessage());
+            }
+        });
+    }
+
+    @FXML
+    private void handleToutMarquerLu() {
+        List<Alerte> alertes = alerteService.getAlertesActives();
+        for (Alerte alerte : alertes) {
+            if (!alerte.isLue()) {
+                alerteService.marquerCommeLue(alerte.getId());
+            }
+        }
+        loadAlertes();
+        AlertHelper.showInfo("Succes", "Toutes les alertes ont ete marquees comme lues.");
     }
 
     @FXML

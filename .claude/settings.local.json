@@ -32,7 +32,18 @@
       "Bash(export JAVA_HOME=\"/c/Users/OBSCURUS/.jdks/openjdk-25.0.2\")",
       "Bash(./mvnw test:*)",
       "Bash(JAVA_HOME=\"C:/Program Files/JetBrains/IntelliJ IDEA 2025.1.1.1/jbr\":*)",
-      "Bash(JAVA_HOME=\"C:/Program Files/JetBrains/IntelliJ IDEA 2025.1.1.1/jbr\" ./mvnw compile:*)"
+      "Bash(JAVA_HOME=\"C:/Program Files/JetBrains/IntelliJ IDEA 2025.1.1.1/jbr\" ./mvnw compile:*)",
+      "Bash(cmd /c \"where mvn 2>nul\")",
+      "Bash(cmd /c \"dir /b C:\\\\Users\\\\miavoudila_iv\\\\IdeaProjects\\\\newhsp\\\\*.xml\")",
+      "Bash(cmd /c \"mvnw.cmd clean compile 2>&1\")",
+      "Bash(cmd /c \"mvnw.cmd clean compile\")",
+      "Bash(cmd /c \".\\\\mvnw.cmd clean compile\")",
+      "Bash(bash -c:*)",
+      "Bash(grep:*)",
+      "Bash(cmd /c:*)",
+      "Bash(set:*)",
+      "Bash(mvnw.cmd clean compile:*)",
+      "Bash(export JAVA_HOME:*)"
     ]
   }
 }
