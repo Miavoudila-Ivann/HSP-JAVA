@@ -21,7 +21,8 @@ public class RoleGuard {
         VALIDATION_DEMANDES,
         CONSULTATION_JOURNAL,
         EXPORT_DONNEES,
-        CONSULTATION_STATISTIQUES
+        CONSULTATION_STATISTIQUES,
+        GESTION_RENDEZ_VOUS
     }
 
     private static final Map<User.Role, Set<Fonctionnalite>> PERMISSIONS = new HashMap<>();
@@ -34,7 +35,8 @@ public class RoleGuard {
                 Fonctionnalite.CONSULTATION_PATIENTS,
                 Fonctionnalite.GESTION_DOSSIERS,
                 Fonctionnalite.TRIAGE,
-                Fonctionnalite.CONSULTATION_STATISTIQUES
+                Fonctionnalite.CONSULTATION_STATISTIQUES,
+                Fonctionnalite.GESTION_RENDEZ_VOUS
         ));
 
         PERMISSIONS.put(User.Role.MEDECIN, EnumSet.of(
@@ -43,7 +45,8 @@ public class RoleGuard {
                 Fonctionnalite.GESTION_DOSSIERS,
                 Fonctionnalite.DEMANDE_PRODUITS,
                 Fonctionnalite.CONSULTATION_STATISTIQUES,
-                Fonctionnalite.EXPORT_DONNEES
+                Fonctionnalite.EXPORT_DONNEES,
+                Fonctionnalite.GESTION_RENDEZ_VOUS
         ));
 
         PERMISSIONS.put(User.Role.GESTIONNAIRE, EnumSet.of(
@@ -96,6 +99,7 @@ public class RoleGuard {
             case "dossier" -> hasPermission(Fonctionnalite.GESTION_HOSPITALISATIONS)
                            || hasPermission(Fonctionnalite.GESTION_DOSSIERS);
             case "statistiques" -> hasPermission(Fonctionnalite.CONSULTATION_STATISTIQUES);
+            case "rendezvous" -> hasPermission(Fonctionnalite.GESTION_RENDEZ_VOUS);
             default -> false;
         };
     }

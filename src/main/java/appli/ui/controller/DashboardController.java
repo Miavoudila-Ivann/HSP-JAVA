@@ -24,6 +24,7 @@ public class DashboardController {
     @FXML private Button btnUtilisateurs;
     @FXML private Button btnJournal;
     @FXML private Button btnStatistiques;
+    @FXML private Button btnRendezVous;
 
     @FXML
     public void initialize() {
@@ -61,6 +62,9 @@ public class DashboardController {
 
         btnStatistiques.setVisible(RoleGuard.hasPermission(Fonctionnalite.CONSULTATION_STATISTIQUES));
         btnStatistiques.setManaged(btnStatistiques.isVisible());
+
+        btnRendezVous.setVisible(RoleGuard.hasPermission(Fonctionnalite.GESTION_RENDEZ_VOUS));
+        btnRendezVous.setManaged(btnRendezVous.isVisible());
     }
 
     private void chargerBadgeAlertes() {
@@ -115,6 +119,11 @@ public class DashboardController {
     @FXML
     private void goToStatistiques() {
         Router.goTo(Route.STATISTIQUES);
+    }
+
+    @FXML
+    private void goToRendezVous() {
+        Router.goTo(Route.RENDEZ_VOUS);
     }
 
     @FXML

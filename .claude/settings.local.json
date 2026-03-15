@@ -43,7 +43,8 @@
       "Bash(cmd /c:*)",
       "Bash(set:*)",
       "Bash(mvnw.cmd clean compile:*)",
-      "Bash(export JAVA_HOME:*)"
+      "Bash(export JAVA_HOME:*)",
+      "Bash(find \"C:\\\\Users\\\\OBSCURUS\\\\IdeaProjects\\\\HSP-JAVA\" -name \"*.java\" -newer \"C:\\\\Users\\\\OBSCURUS\\\\IdeaProjects\\\\HSP-JAVA\\\\src\\\\main\\\\java\\\\appli\\\\model\\\\Hospitalisation.java\" 2>/dev/null | head -20)"
     ]
   }
 }
