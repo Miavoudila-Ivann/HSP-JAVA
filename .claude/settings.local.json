@@ -44,7 +44,8 @@
       "Bash(set:*)",
       "Bash(mvnw.cmd clean compile:*)",
       "Bash(export JAVA_HOME:*)",
-      "Bash(find \"C:\\\\Users\\\\OBSCURUS\\\\IdeaProjects\\\\HSP-JAVA\" -name \"*.java\" -newer \"C:\\\\Users\\\\OBSCURUS\\\\IdeaProjects\\\\HSP-JAVA\\\\src\\\\main\\\\java\\\\appli\\\\model\\\\Hospitalisation.java\" 2>/dev/null | head -20)"
+      "Bash(find \"C:\\\\Users\\\\OBSCURUS\\\\IdeaProjects\\\\HSP-JAVA\" -name \"*.java\" -newer \"C:\\\\Users\\\\OBSCURUS\\\\IdeaProjects\\\\HSP-JAVA\\\\src\\\\main\\\\java\\\\appli\\\\model\\\\Hospitalisation.java\" 2>/dev/null | head -20)",
+      "Bash(mysql -u root hsp_java -e \"ALTER TABLE users ADD COLUMN IF NOT EXISTS totp_secret VARCHAR\\(64\\) NULL, ADD COLUMN IF NOT EXISTS totp_enabled BOOLEAN NOT NULL DEFAULT FALSE;\" 2>&1)"
     ]
   }
 }
