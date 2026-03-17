@@ -1,9 +1,13 @@
 module appli.hsp {
     requires javafx.controls;
     requires javafx.fxml;
+    requires javafx.swing;
     requires java.sql;
+    requires java.desktop;
     requires jbcrypt;
     requires org.apache.pdfbox;
+    requires com.google.zxing;
+    requires com.google.zxing.javase;
 
     opens appli to javafx.fxml;
     opens appli.ui.controller to javafx.fxml;

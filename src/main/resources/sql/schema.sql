@@ -26,6 +26,8 @@ CREATE TABLE users (
                        tentatives_connexion INT NOT NULL DEFAULT 0,
                        compte_verrouille BOOLEAN NOT NULL DEFAULT FALSE,
                        date_verrouillage DATETIME NULL,
+                       totp_secret VARCHAR(64) NULL COMMENT 'Cle secrete TOTP (Base32)',
+                       totp_enabled BOOLEAN NOT NULL DEFAULT FALSE COMMENT '2FA active',
 
                        CONSTRAINT uk_users_email UNIQUE (email),
                        INDEX idx_users_role (role),
