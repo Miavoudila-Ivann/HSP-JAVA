@@ -44,7 +44,11 @@
       "Bash(set:*)",
       "Bash(mvnw.cmd clean compile:*)",
       "Bash(export JAVA_HOME:*)",
-      "Bash(find \"C:\\\\Users\\\\OBSCURUS\\\\IdeaProjects\\\\HSP-JAVA\" -name \"*.java\" -newer \"C:\\\\Users\\\\OBSCURUS\\\\IdeaProjects\\\\HSP-JAVA\\\\src\\\\main\\\\java\\\\appli\\\\model\\\\Hospitalisation.java\" 2>/dev/null | head -20)"
+      "Bash(find \"C:\\\\Users\\\\OBSCURUS\\\\IdeaProjects\\\\HSP-JAVA\" -name \"*.java\" -newer \"C:\\\\Users\\\\OBSCURUS\\\\IdeaProjects\\\\HSP-JAVA\\\\src\\\\main\\\\java\\\\appli\\\\model\\\\Hospitalisation.java\" 2>/dev/null | head -20)",
+      "Read(//c/Program Files/Java//**)",
+      "Read(//c/Program Files/**)",
+      "Bash(find /c -maxdepth 4 -name javac.exe)",
+      "Bash(JAVA_HOME=\"/c/Users/miavoudila_iv/.jdks/openjdk-25.0.2\" PATH=\"$JAVA_HOME/bin:$PATH\" ./mvnw compile -q 2>&1 | tail -40)"
     ]
   }
 }

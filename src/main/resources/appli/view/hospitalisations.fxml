@@ -226,6 +226,24 @@
                         </HBox>
                     </HBox>
 
+                    <!-- Selecteur de dossier a hospitaliser depuis le plan -->
+                    <HBox spacing="12" alignment="CENTER_LEFT"
+                          style="-fx-padding: 10 14 10 14;
+                                 -fx-background-color: rgba(255,255,255,0.8);
+                                 -fx-background-radius: 10;
+                                 -fx-border-color: #1a1a1a;
+                                 -fx-border-width: 2;
+                                 -fx-border-radius: 10;
+                                 -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.25), 0, 0, 2, 2);">
+                        <Label text="Patient a hospitaliser :"
+                               style="-fx-font-weight: bold; -fx-font-size: 13;"/>
+                        <ComboBox fx:id="cbDossierPlan" prefWidth="290"
+                                  promptText="Selectionner un dossier en attente..."/>
+                        <Label fx:id="lblDossierPlanInfo"
+                               text="Cliquez sur une chambre disponible pour hospitaliser directement"
+                               style="-fx-text-fill: #636E72; -fx-font-style: italic; -fx-font-size: 12;"/>
+                    </HBox>
+
                     <!-- Conteneur dynamique des chambres par etage -->
                     <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
                                 style="-fx-background-color: transparent;">
