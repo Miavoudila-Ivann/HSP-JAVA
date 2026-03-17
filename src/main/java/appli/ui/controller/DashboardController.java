@@ -127,6 +127,11 @@ public class DashboardController {
     }
 
     @FXML
+    private void goToTotpSetup() {
+        Router.goTo(Route.TOTP_SETUP);
+    }
+
+    @FXML
     private void handleLogout() {
         Router.logout();
     }
