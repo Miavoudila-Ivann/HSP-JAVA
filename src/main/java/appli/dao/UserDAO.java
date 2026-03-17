@@ -87,7 +87,7 @@ public class UserDAO {
     }
 
     public int insert(User user) {
-        String sql = "INSERT INTO users (email, password_hash, nom, prenom, role, specialite, telephone, actif, date_creation, tentatives_connexion, compte_verrouille) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO users (email, password_hash, nom, prenom, role, specialite, telephone, actif, date_creation, tentatives_connexion, compte_verrouille, totp_secret, totp_enabled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, user.getEmail());
@@ -101,6 +101,8 @@ public class UserDAO {
             stmt.setTimestamp(9, Timestamp.valueOf(LocalDateTime.now()));
             stmt.setInt(10, user.getTentativesConnexion());
             stmt.setBoolean(11, user.isCompteVerrouille());
+            stmt.setString(12, user.getTotpSecret());
+            stmt.setBoolean(13, user.isTotpEnabled());
             stmt.executeUpdate();
 
             ResultSet generatedKeys = stmt.getGeneratedKeys();
@@ -114,7 +116,7 @@ public class UserDAO {
     }
 
     public boolean update(User user) {
-        String sql = "UPDATE users SET email = ?, password_hash = ?, nom = ?, prenom = ?, role = ?, specialite = ?, telephone = ?, actif = ?, tentatives_connexion = ?, compte_verrouille = ?, date_verrouillage = ? WHERE id = ?";
+        String sql = "UPDATE users SET email = ?, password_hash = ?, nom = ?, prenom = ?, role = ?, specialite = ?, telephone = ?, actif = ?, tentatives_connexion = ?, compte_verrouille = ?, date_verrouillage = ?, totp_secret = ?, totp_enabled = ? WHERE id = ?";
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, user.getEmail());
@@ -128,7 +130,9 @@ public class UserDAO {
             stmt.setInt(9, user.getTentativesConnexion());
             stmt.setBoolean(10, user.isCompteVerrouille());
             stmt.setTimestamp(11, user.getDateVerrouillage() != null ? Timestamp.valueOf(user.getDateVerrouillage()) : null);
-            stmt.setInt(12, user.getId());
+            stmt.setString(12, user.getTotpSecret());
+            stmt.setBoolean(13, user.isTotpEnabled());
+            stmt.setInt(14, user.getId());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Erreur lors de la mise a jour de l'utilisateur : " + e.getMessage());
@@ -201,6 +205,8 @@ public class UserDAO {
         if (dateVerrouillage != null) {
             user.setDateVerrouillage(dateVerrouillage.toLocalDateTime());
         }
+        user.setTotpSecret(rs.getString("totp_secret"));
+        user.setTotpEnabled(rs.getBoolean("totp_enabled"));
         return user;
     }
 }

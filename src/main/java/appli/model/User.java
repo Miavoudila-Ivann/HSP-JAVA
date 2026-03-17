@@ -35,6 +35,8 @@ public class User {
     private int tentativesConnexion;
     private boolean compteVerrouille;
     private LocalDateTime dateVerrouillage;
+    private String totpSecret;
+    private boolean totpEnabled;
 
     public User() {}
 
@@ -157,6 +159,22 @@ public class User {
 
     public void setDateVerrouillage(LocalDateTime dateVerrouillage) {
         this.dateVerrouillage = dateVerrouillage;
+    }
+
+    public String getTotpSecret() {
+        return totpSecret;
+    }
+
+    public void setTotpSecret(String totpSecret) {
+        this.totpSecret = totpSecret;
+    }
+
+    public boolean isTotpEnabled() {
+        return totpEnabled;
+    }
+
+    public void setTotpEnabled(boolean totpEnabled) {
+        this.totpEnabled = totpEnabled;
     }
 
     public String getNomComplet() {
