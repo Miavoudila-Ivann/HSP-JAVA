@@ -5,6 +5,7 @@ import appli.model.User;
 import appli.repository.UserRepository;
 import appli.security.PasswordHasher;
 import appli.security.SessionManager;
+import appli.security.TotpService;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -21,7 +22,9 @@ public class AuthService {
         SUCCESS,
         IDENTIFIANTS_INVALIDES,
         COMPTE_VERROUILLE,
-        COMPTE_DESACTIVE
+        COMPTE_DESACTIVE,
+        TOTP_REQUIRED,
+        TOTP_INVALIDE
     }
 
     public record LoginResult(LoginStatus status, User user) {
@@ -74,18 +77,12 @@ public class AuthService {
             return new LoginResult(LoginStatus.IDENTIFIANTS_INVALIDES, null);
         }
 
-        // Connexion reussie : reset tentatives et maj derniere connexion
-        user.setTentativesConnexion(0);
-        user.setCompteVerrouille(false);
-        user.setDateVerrouillage(null);
-        userRepository.save(user);
+        // Mot de passe OK : verifier si 2FA est active
+        if (user.isTotpEnabled()) {
+            return new LoginResult(LoginStatus.TOTP_REQUIRED, user);
+        }
 
-        SessionManager.getInstance().login(user);
-        userRepository.updateDerniereConnexion(user.getId());
-
-        journalService.logConnexionReussie(user);
-
-        return new LoginResult(LoginStatus.SUCCESS, user);
+        return completeLogin(user);
     }
 
     /**
@@ -132,6 +129,57 @@ public class AuthService {
                 "Creation utilisateur: " + email, "User", newUser.getId());
 
         return newUser;
+    }
+
+    /**
+     * Finalise la connexion apres verification du code TOTP.
+     * A appeler depuis TotpVerifyController.
+     */
+    public LoginResult completeTotpLogin(User user, String totpCode) {
+        if (!TotpService.verifyCode(user.getTotpSecret(), totpCode)) {
+            journalService.logConnexionEchec(user, "Code TOTP invalide");
+            return new LoginResult(LoginStatus.TOTP_INVALIDE, null);
+        }
+        return completeLogin(user);
+    }
+
+    /**
+     * Active le 2FA pour un utilisateur apres confirmation du premier code.
+     */
+    public boolean enableTotp(User user, String secret, String confirmationCode) {
+        if (!TotpService.verifyCode(secret, confirmationCode)) {
+            return false;
+        }
+        user.setTotpSecret(secret);
+        user.setTotpEnabled(true);
+        userRepository.save(user);
+        journalService.logAction(user, JournalAction.TypeAction.MODIFICATION,
+                "Activation 2FA", "User", user.getId());
+        return true;
+    }
+
+    /** Desactive le 2FA pour un utilisateur. */
+    public void disableTotp(User user) {
+        user.setTotpSecret(null);
+        user.setTotpEnabled(false);
+        userRepository.save(user);
+        journalService.logAction(user, JournalAction.TypeAction.MODIFICATION,
+                "Desactivation 2FA", "User", user.getId());
+    }
+
+    // --- Finalisation de connexion ---
+
+    private LoginResult completeLogin(User user) {
+        user.setTentativesConnexion(0);
+        user.setCompteVerrouille(false);
+        user.setDateVerrouillage(null);
+        userRepository.save(user);
+
+        SessionManager.getInstance().login(user);
+        userRepository.updateDerniereConnexion(user.getId());
+        journalService.logConnexionReussie(user);
+
+        return new LoginResult(LoginStatus.SUCCESS, user);
     }
 
     // --- Logique de verrouillage ---
