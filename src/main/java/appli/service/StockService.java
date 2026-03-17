@@ -676,6 +676,13 @@ public class StockService {
             .toList();
     }
 
+    /**
+     * Recherche des produits par nom ou code.
+     */
+    public List<Produit> rechercherProduits(String terme) {
+        return produitDAO.search(terme);
+    }
+
     // ==================== MOUVEMENTS DE STOCK ====================
 
     /**

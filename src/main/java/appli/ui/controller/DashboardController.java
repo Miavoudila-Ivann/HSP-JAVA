@@ -3,6 +3,8 @@ package appli.ui.controller;
 import appli.model.User;
 import appli.security.RoleGuard;
 import appli.security.RoleGuard.Fonctionnalite;
+import appli.security.SessionManager;
+import appli.service.AlerteService;
 import appli.util.Route;
 import appli.util.Router;
 import javafx.fxml.FXML;
@@ -13,6 +15,7 @@ public class DashboardController {
 
     @FXML private Label welcomeLabel;
     @FXML private Label roleLabel;
+    @FXML private Label lblAlerteBadge;
 
     @FXML private Button btnPatients;
     @FXML private Button btnHospitalisations;
@@ -21,6 +24,7 @@ public class DashboardController {
     @FXML private Button btnUtilisateurs;
     @FXML private Button btnJournal;
     @FXML private Button btnStatistiques;
+    @FXML private Button btnRendezVous;
 
     @FXML
     public void initialize() {
@@ -32,6 +36,7 @@ public class DashboardController {
         }
 
         configurerBoutonsParRole();
+        chargerBadgeAlertes();
     }
 
     private void configurerBoutonsParRole() {
@@ -57,6 +62,26 @@ public class DashboardController {
 
         btnStatistiques.setVisible(RoleGuard.hasPermission(Fonctionnalite.CONSULTATION_STATISTIQUES));
         btnStatistiques.setManaged(btnStatistiques.isVisible());
+
+        btnRendezVous.setVisible(RoleGuard.hasPermission(Fonctionnalite.GESTION_RENDEZ_VOUS));
+        btnRendezVous.setManaged(btnRendezVous.isVisible());
+    }
+
+    private void chargerBadgeAlertes() {
+        SessionManager session = SessionManager.getInstance();
+        if (session.isGestionnaire() || session.isAdmin()) {
+            try {
+                AlerteService alerteService = new AlerteService();
+                int count = alerteService.countNonResolues();
+                if (count > 0) {
+                    lblAlerteBadge.setText(count + " alerte" + (count > 1 ? "s" : ""));
+                    lblAlerteBadge.setVisible(true);
+                    lblAlerteBadge.setManaged(true);
+                }
+            } catch (Exception e) {
+                System.err.println("Erreur chargement badge alertes : " + e.getMessage());
+            }
+        }
     }
 
     // --- Actions de navigation ---
@@ -94,6 +119,11 @@ public class DashboardController {
     @FXML
     private void goToStatistiques() {
         Router.goTo(Route.STATISTIQUES);
+    }
+
+    @FXML
+    private void goToRendezVous() {
+        Router.goTo(Route.RENDEZ_VOUS);
     }
 
     @FXML

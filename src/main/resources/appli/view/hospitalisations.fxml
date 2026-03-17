@@ -77,102 +77,183 @@
         </HBox>
     </top>
 
-    <!-- ===== CONTENU ===== -->
+    <!-- ===== CONTENU : ONGLETS ===== -->
     <center>
-        <VBox spacing="12">
-            <padding><Insets top="18" right="25" bottom="18" left="25"/></padding>
+        <TabPane tabClosingPolicy="UNAVAILABLE">
+            <padding><Insets top="12" right="15" bottom="12" left="15"/></padding>
 
-            <!-- Section Salle d'attente -->
-            <Label text="Salle d'attente - Dossiers ouverts"
-                   style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #E17055;
-                          -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.12), 0, 0, 1, 1);"/>
+            <!-- ====== ONGLET GESTION ====== -->
+            <Tab text="Gestion">
+                <VBox spacing="12">
+                    <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
 
-            <HBox spacing="10">
-                <Button fx:id="btnPrendreEnCharge" text="Prendre en charge"
-                        onAction="#handlePrendreEnCharge" disable="true"
-                        style="-fx-background-color: #74B9FF;
-                               -fx-text-fill: #1a1a1a;
-                               -fx-font-weight: bold;
-                               -fx-border-color: #1a1a1a;
-                               -fx-border-width: 2.5;
-                               -fx-border-radius: 8;
-                               -fx-background-radius: 8;
-                               -fx-cursor: hand;
-                               -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.7), 0, 0, 3, 3);"/>
-                <Button fx:id="btnOrdonnance" text="Ordonnance (sortie)"
-                        onAction="#handleOrdonnance" disable="true"
-                        style="-fx-background-color: #55EFC4;
-                               -fx-text-fill: #1a1a1a;
-                               -fx-font-weight: bold;
-                               -fx-border-color: #1a1a1a;
-                               -fx-border-width: 2.5;
-                               -fx-border-radius: 8;
-                               -fx-background-radius: 8;
-                               -fx-cursor: hand;
-                               -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.7), 0, 0, 3, 3);"/>
-                <Button fx:id="btnHospitaliser" text="Hospitaliser"
-                        onAction="#handleHospitaliser" disable="true"
-                        style="-fx-background-color: #FDCB6E;
-                               -fx-text-fill: #1a1a1a;
-                               -fx-font-weight: bold;
-                               -fx-border-color: #1a1a1a;
-                               -fx-border-width: 2.5;
-                               -fx-border-radius: 8;
-                               -fx-background-radius: 8;
-                               -fx-cursor: hand;
-                               -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.7), 0, 0, 3, 3);"/>
-            </HBox>
+                    <!-- Section Salle d'attente -->
+                    <Label text="Salle d'attente - Dossiers ouverts"
+                           style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #E17055;
+                                  -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.12), 0, 0, 1, 1);"/>
 
-            <TableView fx:id="attenteTable" prefHeight="250" VBox.vgrow="ALWAYS">
-                <columns>
-                    <TableColumn fx:id="colDossierNum" text="N. Dossier" prefWidth="140"/>
-                    <TableColumn fx:id="colDossierPatient" text="Patient" prefWidth="160"/>
-                    <TableColumn fx:id="colDossierMotif" text="Motif" prefWidth="200"/>
-                    <TableColumn fx:id="colDossierGravite" text="Gravite" prefWidth="140"/>
-                    <TableColumn fx:id="colDossierDate" text="Date admission" prefWidth="140"/>
-                    <TableColumn fx:id="colDossierStatut" text="Statut" prefWidth="110"/>
-                </columns>
-                <placeholder><Label text="Aucun dossier en attente"/></placeholder>
-            </TableView>
+                    <HBox spacing="10">
+                        <Button fx:id="btnPrendreEnCharge" text="Prendre en charge"
+                                onAction="#handlePrendreEnCharge" disable="true"
+                                style="-fx-background-color: #74B9FF;
+                                       -fx-text-fill: #1a1a1a;
+                                       -fx-font-weight: bold;
+                                       -fx-border-color: #1a1a1a;
+                                       -fx-border-width: 2.5;
+                                       -fx-border-radius: 8;
+                                       -fx-background-radius: 8;
+                                       -fx-cursor: hand;
+                                       -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.7), 0, 0, 3, 3);"/>
+                        <Button fx:id="btnOrdonnance" text="Ordonnance (sortie)"
+                                onAction="#handleOrdonnance" disable="true"
+                                style="-fx-background-color: #55EFC4;
+                                       -fx-text-fill: #1a1a1a;
+                                       -fx-font-weight: bold;
+                                       -fx-border-color: #1a1a1a;
+                                       -fx-border-width: 2.5;
+                                       -fx-border-radius: 8;
+                                       -fx-background-radius: 8;
+                                       -fx-cursor: hand;
+                                       -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.7), 0, 0, 3, 3);"/>
+                        <Button fx:id="btnHospitaliser" text="Hospitaliser"
+                                onAction="#handleHospitaliser" disable="true"
+                                style="-fx-background-color: #FDCB6E;
+                                       -fx-text-fill: #1a1a1a;
+                                       -fx-font-weight: bold;
+                                       -fx-border-color: #1a1a1a;
+                                       -fx-border-width: 2.5;
+                                       -fx-border-radius: 8;
+                                       -fx-background-radius: 8;
+                                       -fx-cursor: hand;
+                                       -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.7), 0, 0, 3, 3);"/>
+                    </HBox>
 
-            <Separator/>
+                    <TableView fx:id="attenteTable" prefHeight="220" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="colDossierNum" text="N. Dossier" prefWidth="140"/>
+                            <TableColumn fx:id="colDossierPatient" text="Patient" prefWidth="160"/>
+                            <TableColumn fx:id="colDossierMotif" text="Motif" prefWidth="200"/>
+                            <TableColumn fx:id="colDossierGravite" text="Gravite" prefWidth="140"/>
+                            <TableColumn fx:id="colDossierDate" text="Date admission" prefWidth="140"/>
+                            <TableColumn fx:id="colDossierStatut" text="Statut" prefWidth="110"/>
+                        </columns>
+                        <placeholder><Label text="Aucun dossier en attente"/></placeholder>
+                    </TableView>
 
-            <!-- Section Hospitalisations en cours -->
-            <Label text="Hospitalisations en cours"
-                   style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #E17055;
-                          -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.12), 0, 0, 1, 1);"/>
+                    <Separator/>
 
-            <HBox spacing="10">
-                <Button fx:id="btnSortie" text="Sortie patient"
-                        onAction="#handleSortie" disable="true"
-                        style="-fx-background-color: #FF7675;
-                               -fx-text-fill: white;
-                               -fx-font-weight: bold;
-                               -fx-border-color: #1a1a1a;
-                               -fx-border-width: 2.5;
-                               -fx-border-radius: 8;
-                               -fx-background-radius: 8;
-                               -fx-cursor: hand;
-                               -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.7), 0, 0, 3, 3);"/>
-            </HBox>
+                    <!-- Section Hospitalisations en cours -->
+                    <Label text="Hospitalisations en cours"
+                           style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #E17055;
+                                  -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.12), 0, 0, 1, 1);"/>
 
-            <TableView fx:id="hospTable" prefHeight="250" VBox.vgrow="ALWAYS">
-                <columns>
-                    <TableColumn fx:id="colHospSejour" text="N. Sejour" prefWidth="140"/>
-                    <TableColumn fx:id="colHospChambre" text="Chambre" prefWidth="120"/>
-                    <TableColumn fx:id="colHospDiagnostic" text="Diagnostic" prefWidth="250"/>
-                    <TableColumn fx:id="colHospDateEntree" text="Date entree" prefWidth="140"/>
-                    <TableColumn fx:id="colHospDateSortie" text="Sortie prevue" prefWidth="120"/>
-                    <TableColumn fx:id="colHospStatut" text="Statut" prefWidth="100"/>
-                </columns>
-                <placeholder><Label text="Aucune hospitalisation en cours"/></placeholder>
-            </TableView>
+                    <HBox spacing="10">
+                        <Button fx:id="btnSortie" text="Sortie patient"
+                                onAction="#handleSortie" disable="true"
+                                style="-fx-background-color: #FF7675;
+                                       -fx-text-fill: white;
+                                       -fx-font-weight: bold;
+                                       -fx-border-color: #1a1a1a;
+                                       -fx-border-width: 2.5;
+                                       -fx-border-radius: 8;
+                                       -fx-background-radius: 8;
+                                       -fx-cursor: hand;
+                                       -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.7), 0, 0, 3, 3);"/>
+                    </HBox>
 
-            <HBox alignment="CENTER_RIGHT">
-                <Label fx:id="statusLabel" text=""
-                       style="-fx-text-fill: #636E72; -fx-font-weight: bold;"/>
-            </HBox>
-        </VBox>
+                    <TableView fx:id="hospTable" prefHeight="220" VBox.vgrow="ALWAYS">
+                        <columns>
+                            <TableColumn fx:id="colHospSejour" text="N. Sejour" prefWidth="140"/>
+                            <TableColumn fx:id="colHospChambre" text="Chambre" prefWidth="120"/>
+                            <TableColumn fx:id="colHospDiagnostic" text="Diagnostic" prefWidth="250"/>
+                            <TableColumn fx:id="colHospDateEntree" text="Date entree" prefWidth="140"/>
+                            <TableColumn fx:id="colHospDateSortie" text="Sortie prevue" prefWidth="120"/>
+                            <TableColumn fx:id="colHospStatut" text="Statut" prefWidth="100"/>
+                        </columns>
+                        <placeholder><Label text="Aucune hospitalisation en cours"/></placeholder>
+                    </TableView>
+
+                    <HBox alignment="CENTER_RIGHT">
+                        <Label fx:id="statusLabel" text=""
+                               style="-fx-text-fill: #636E72; -fx-font-weight: bold;"/>
+                    </HBox>
+                </VBox>
+            </Tab>
+
+            <!-- ====== ONGLET PLAN DES CHAMBRES ====== -->
+            <Tab text="Plan des chambres">
+                <VBox spacing="12">
+                    <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
+
+                    <HBox spacing="15" alignment="CENTER_LEFT">
+                        <Label text="Plan interactif des chambres"
+                               style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #E17055;
+                                      -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.12), 0, 0, 1, 1);"/>
+                        <HBox HBox.hgrow="ALWAYS"/>
+                        <Button text="Actualiser" onAction="#handleRefreshChambres"
+                                style="-fx-background-color: rgba(255,255,255,0.85);
+                                       -fx-text-fill: #1a1a1a;
+                                       -fx-font-weight: bold;
+                                       -fx-border-color: #1a1a1a;
+                                       -fx-border-width: 2;
+                                       -fx-border-radius: 8;
+                                       -fx-background-radius: 8;
+                                       -fx-cursor: hand;
+                                       -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.4), 0, 0, 2, 2);"/>
+                    </HBox>
+
+                    <!-- Legende -->
+                    <HBox spacing="20" alignment="CENTER_LEFT">
+                        <HBox spacing="5" alignment="CENTER_LEFT">
+                            <Label prefWidth="16" prefHeight="16"
+                                   style="-fx-background-color: #55EFC4; -fx-background-radius: 4; -fx-border-color: #1a1a1a; -fx-border-width: 1.5; -fx-border-radius: 4;"/>
+                            <Label text="Disponible" style="-fx-font-weight: bold; -fx-font-size: 11;"/>
+                        </HBox>
+                        <HBox spacing="5" alignment="CENTER_LEFT">
+                            <Label prefWidth="16" prefHeight="16"
+                                   style="-fx-background-color: #FDCB6E; -fx-background-radius: 4; -fx-border-color: #1a1a1a; -fx-border-width: 1.5; -fx-border-radius: 4;"/>
+                            <Label text="Partiellement occupe" style="-fx-font-weight: bold; -fx-font-size: 11;"/>
+                        </HBox>
+                        <HBox spacing="5" alignment="CENTER_LEFT">
+                            <Label prefWidth="16" prefHeight="16"
+                                   style="-fx-background-color: #FF7675; -fx-background-radius: 4; -fx-border-color: #1a1a1a; -fx-border-width: 1.5; -fx-border-radius: 4;"/>
+                            <Label text="Complet" style="-fx-font-weight: bold; -fx-font-size: 11;"/>
+                        </HBox>
+                        <HBox spacing="5" alignment="CENTER_LEFT">
+                            <Label prefWidth="16" prefHeight="16"
+                                   style="-fx-background-color: #B2BEC3; -fx-background-radius: 4; -fx-border-color: #1a1a1a; -fx-border-width: 1.5; -fx-border-radius: 4;"/>
+                            <Label text="Maintenance" style="-fx-font-weight: bold; -fx-font-size: 11;"/>
+                        </HBox>
+                    </HBox>
+
+                    <!-- Selecteur de dossier a hospitaliser depuis le plan -->
+                    <HBox spacing="12" alignment="CENTER_LEFT"
+                          style="-fx-padding: 10 14 10 14;
+                                 -fx-background-color: rgba(255,255,255,0.8);
+                                 -fx-background-radius: 10;
+                                 -fx-border-color: #1a1a1a;
+                                 -fx-border-width: 2;
+                                 -fx-border-radius: 10;
+                                 -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.25), 0, 0, 2, 2);">
+                        <Label text="Patient a hospitaliser :"
+                               style="-fx-font-weight: bold; -fx-font-size: 13;"/>
+                        <ComboBox fx:id="cbDossierPlan" prefWidth="290"
+                                  promptText="Selectionner un dossier en attente..."/>
+                        <Label fx:id="lblDossierPlanInfo"
+                               text="Cliquez sur une chambre disponible pour hospitaliser directement"
+                               style="-fx-text-fill: #636E72; -fx-font-style: italic; -fx-font-size: 12;"/>
+                    </HBox>
+
+                    <!-- Conteneur dynamique des chambres par etage -->
+                    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
+                                style="-fx-background-color: transparent;">
+                        <VBox fx:id="chambresContainer" spacing="20">
+                            <padding><Insets top="5" right="5" bottom="5" left="5"/></padding>
+                        </VBox>
+                    </ScrollPane>
+                </VBox>
+            </Tab>
+        </TabPane>
     </center>
 
 </BorderPane>

@@ -250,7 +250,7 @@ CREATE TABLE produits (
                           unite_mesure VARCHAR(50) NOT NULL,
                           prix_unitaire DECIMAL(10,2) NULL,
                           tva DECIMAL(5,2) NULL DEFAULT 20.00,
-                          niveau_dangerosite ENUM('FAIBLE', 'MOYEN', 'ELEVE', 'TRES_ELEVE') NOT NULL DEFAULT 'FAIBLE',
+                          niveau_dangerosite ENUM('FAIBLE', 'MOYEN', 'ELEVE', 'TRES_ELEVE', 'CRITIQUE') NOT NULL DEFAULT 'FAIBLE',
                           conditions_stockage TEXT NULL,
                           temperature_min DECIMAL(5,2) NULL,
                           temperature_max DECIMAL(5,2) NULL,
@@ -541,7 +541,35 @@ CREATE TABLE alertes (
 ) ENGINE=InnoDB;
 
 -- ============================================================
--- 13. VUES UTILES
+-- 13. RENDEZ-VOUS
+-- ============================================================
+
+CREATE TABLE rendezvous (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    numero_rdv VARCHAR(20) NOT NULL,
+    patient_id INT NOT NULL,
+    medecin_id INT NOT NULL,
+    date_heure DATETIME NOT NULL,
+    duree_minutes INT NOT NULL DEFAULT 30,
+    type_rdv ENUM('CONSULTATION','SUIVI','EXAMEN','CHIRURGIE','AUTRE') NOT NULL DEFAULT 'CONSULTATION',
+    statut ENUM('PLANIFIE','CONFIRME','REALISE','ANNULE','REPORTE') NOT NULL DEFAULT 'PLANIFIE',
+    motif TEXT NOT NULL,
+    notes TEXT NULL,
+    lieu VARCHAR(200) NULL,
+    date_creation DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    cree_par INT NULL,
+    CONSTRAINT uk_rendezvous_numero UNIQUE (numero_rdv),
+    INDEX idx_rdv_patient (patient_id),
+    INDEX idx_rdv_medecin (medecin_id),
+    INDEX idx_rdv_date (date_heure),
+    INDEX idx_rdv_statut (statut),
+    CONSTRAINT fk_rdv_patient FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE RESTRICT,
+    CONSTRAINT fk_rdv_medecin FOREIGN KEY (medecin_id) REFERENCES users(id) ON DELETE RESTRICT,
+    CONSTRAINT fk_rdv_cree_par FOREIGN KEY (cree_par) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+-- ============================================================
+-- 14. VUES UTILES
 -- ============================================================
 
 CREATE OR REPLACE VIEW v_stocks_details AS
@@ -613,6 +641,29 @@ SELECT
     c.actif
 FROM chambres c
 WHERE c.actif = TRUE;
+
+CREATE OR REPLACE VIEW v_rendezvous_a_venir AS
+SELECT
+    r.id,
+    r.numero_rdv,
+    r.date_heure,
+    r.duree_minutes,
+    r.type_rdv,
+    r.statut,
+    r.motif,
+    r.lieu,
+    r.patient_id,
+    p.nom AS patient_nom,
+    p.prenom AS patient_prenom,
+    r.medecin_id,
+    u.nom AS medecin_nom,
+    u.prenom AS medecin_prenom
+FROM rendezvous r
+         JOIN patients p ON r.patient_id = p.id
+         JOIN users u ON r.medecin_id = u.id
+WHERE r.date_heure >= NOW()
+  AND r.statut NOT IN ('ANNULE', 'REALISE')
+ORDER BY r.date_heure ASC;
 
 -- ============================================================
 -- FIN DU SCHEMA
