@@ -51,7 +51,7 @@ public class Router {
      */
     public static void goTo(Route route, Object data) {
         // Controle d'acces : verifier que l'utilisateur a le droit d'acceder a cette vue
-        if (route != Route.LOGIN && !RoleGuard.canAccessView(route.getViewName())) {
+        if (route != Route.LOGIN && route != Route.TOTP_VERIFY && !RoleGuard.canAccessView(route.getViewName())) {
             System.err.println("Acces refuse a la vue : " + route.getViewName());
             return;
         }

@@ -56,12 +56,14 @@ public class LoginController {
 
         switch (result.status()) {
             case SUCCESS -> Router.goTo(Route.DASHBOARD);
+            case TOTP_REQUIRED -> Router.goTo(Route.TOTP_VERIFY, result.user());
             case COMPTE_VERROUILLE -> showError("Compte verrouille - Reessayez dans 30 minutes");
             case COMPTE_DESACTIVE -> showError("Compte desactive - Contactez l'administrateur");
             case IDENTIFIANTS_INVALIDES -> {
                 showError("Email ou mot de passe incorrect");
                 passwordField.clear();
             }
+            default -> showError("Erreur inattendue");
         }
     }
 

@@ -17,7 +17,9 @@ public enum Route {
     TRIAGE("triage", "HSP - Nouveau Cas de Triage"),
     DOSSIER("dossier", "HSP - Detail du Dossier"),
     STATISTIQUES("statistiques", "HSP - Statistiques"),
-    RENDEZ_VOUS("rendezvous", "HSP - Rendez-vous");
+    RENDEZ_VOUS("rendezvous", "HSP - Rendez-vous"),
+    TOTP_VERIFY("totp_verify", "HSP - Verification 2FA"),
+    TOTP_SETUP("totp_setup", "HSP - Configuration 2FA");
 
     private final String viewName;
     private final String title;

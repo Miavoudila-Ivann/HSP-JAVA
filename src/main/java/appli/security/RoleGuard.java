@@ -79,7 +79,7 @@ public class RoleGuard {
     public static boolean canAccessView(String viewName) {
         User currentUser = SessionManager.getInstance().getCurrentUser();
         if (currentUser == null) {
-            return "login".equals(viewName) || "inscription".equals(viewName);
+            return "login".equals(viewName) || "inscription".equals(viewName) || "totp_verify".equals(viewName);
         }
 
         if (currentUser.getRole() == User.Role.ADMIN) {
@@ -100,6 +100,7 @@ public class RoleGuard {
                            || hasPermission(Fonctionnalite.GESTION_DOSSIERS);
             case "statistiques" -> hasPermission(Fonctionnalite.CONSULTATION_STATISTIQUES);
             case "rendezvous" -> hasPermission(Fonctionnalite.GESTION_RENDEZ_VOUS);
+            case "totp_verify", "totp_setup" -> true;
             default -> false;
         };
     }
