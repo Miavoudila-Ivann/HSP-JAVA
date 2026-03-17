@@ -71,6 +71,8 @@
                         </VBox>
                         <Label fx:id="labelGravite" text=""
                                style="-fx-font-size: 14; -fx-font-weight: bold; -fx-padding: 6 14 6 14; -fx-background-radius: 8; -fx-text-fill: white;"/>
+                        <Button fx:id="btnExporterPDF" text="Exporter PDF" onAction="#handleExporterPDF"
+                                style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 5; -fx-cursor: hand; -fx-font-size: 11;"/>
                     </HBox>
                     <Separator/>
                     <HBox spacing="16">

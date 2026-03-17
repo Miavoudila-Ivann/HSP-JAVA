@@ -32,7 +32,8 @@
       "Bash(export JAVA_HOME=\"/c/Users/OBSCURUS/.jdks/openjdk-25.0.2\")",
       "Bash(./mvnw test:*)",
       "Bash(JAVA_HOME=\"C:/Program Files/JetBrains/IntelliJ IDEA 2025.1.1.1/jbr\":*)",
-      "Bash(JAVA_HOME=\"C:/Program Files/JetBrains/IntelliJ IDEA 2025.1.1.1/jbr\" ./mvnw compile:*)"
+      "Bash(JAVA_HOME=\"C:/Program Files/JetBrains/IntelliJ IDEA 2025.1.1.1/jbr\" ./mvnw compile:*)",
+      "Bash(JAVA_HOME=\"/c/Users/idbraim_el/.jdks/openjdk-25.0.2\" ./mvnw compile:*)"
     ]
   }
 }
