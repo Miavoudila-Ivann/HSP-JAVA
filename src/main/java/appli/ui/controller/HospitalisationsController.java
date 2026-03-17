@@ -60,6 +60,8 @@ public class HospitalisationsController {
 
     // Plan des chambres
     @FXML private VBox chambresContainer;
+    @FXML private ComboBox<DossierPriseEnCharge> cbDossierPlan;
+    @FXML private Label lblDossierPlanInfo;
 
     private final MedicalService medicalService = new MedicalService();
     private final TriageService triageService = new TriageService();
@@ -102,7 +104,21 @@ public class HospitalisationsController {
             btnSortie.setDisable(newVal == null);
         });
 
+        setupDossierPlanComboBox();
         loadData();
+    }
+
+    private void setupDossierPlanComboBox() {
+        cbDossierPlan.setConverter(new javafx.util.StringConverter<>() {
+            @Override
+            public String toString(DossierPriseEnCharge d) {
+                if (d == null) return "";
+                String patient = patientNames.getOrDefault(d.getPatientId(), "Patient #" + d.getPatientId());
+                return d.getNumeroDossier() + " - " + patient
+                        + " [" + (d.getNiveauGravite() != null ? d.getNiveauGravite().getCode() : "?") + "]";
+            }
+            @Override public DossierPriseEnCharge fromString(String s) { return null; }
+        });
     }
 
     private void loadPatientNames() {
@@ -168,6 +184,18 @@ public class HospitalisationsController {
             statusLabel.setText(dossiers.size() + " dossier(s) ouvert(s) | " + hosps.size() + " hospitalisation(s)");
         } catch (Exception e) {
             AlertHelper.showError("Erreur", "Impossible de charger les donnees : " + e.getMessage());
+        }
+
+        // Mettre a jour le ComboBox du plan avec les dossiers EN_ATTENTE ou EN_COURS
+        DossierPriseEnCharge selectedBefore = cbDossierPlan.getValue();
+        cbDossierPlan.getItems().setAll(
+                attenteData.stream()
+                        .filter(d -> d.getStatut() == DossierPriseEnCharge.Statut.EN_ATTENTE
+                                || d.getStatut() == DossierPriseEnCharge.Statut.EN_COURS)
+                        .toList()
+        );
+        if (selectedBefore != null && cbDossierPlan.getItems().stream().anyMatch(d -> d.getId() == selectedBefore.getId())) {
+            cbDossierPlan.setValue(selectedBefore);
         }
 
         loadChambres();
@@ -454,6 +482,9 @@ public class HospitalisationsController {
                 " -fx-cursor: hand;");
 
         // Tooltip avec details
+        boolean disponible = !chambre.isEnMaintenance() && chambre.isActif()
+                && chambre.getNbLitsOccupes() < chambre.getCapacite();
+        String hint = disponible ? "\n[Cliquer pour hospitaliser]" : "";
         Tooltip tooltip = new Tooltip(
                 "Chambre " + chambre.getNumero() + "\n" +
                 "Type: " + chambre.getTypeChambre().getLibelle() + "\n" +
@@ -461,11 +492,79 @@ public class HospitalisationsController {
                 "Capacite: " + chambre.getCapacite() + " lit(s)\n" +
                 "Occupes: " + chambre.getNbLitsOccupes() + "\n" +
                 "Disponibles: " + chambre.getLitsDisponibles() + "\n" +
-                (chambre.getEquipements() != null ? "Equipements: " + chambre.getEquipements() : "")
+                (chambre.getEquipements() != null ? "Equipements: " + chambre.getEquipements() : "") +
+                hint
         );
         Tooltip.install(card, tooltip);
 
+        // Clic interactif : hospitaliser directement depuis le plan
+        if (disponible) {
+            card.setOnMouseClicked(e -> handleHospitaliserDepuisPlan(chambre));
+            card.setStyle(card.getStyle() + " -fx-cursor: hand;");
+        } else {
+            card.setStyle(card.getStyle().replace("-fx-cursor: hand;", "") + " -fx-cursor: default;");
+        }
+
         return card;
+    }
+
+    private void handleHospitaliserDepuisPlan(Chambre chambre) {
+        DossierPriseEnCharge dossier = cbDossierPlan.getValue();
+        if (dossier == null) {
+            AlertHelper.showWarning("Aucun patient selectionne",
+                    "Selectionnez d'abord un dossier dans la liste deroulante au-dessus du plan.");
+            return;
+        }
+
+        String patientNom = patientNames.getOrDefault(dossier.getPatientId(), "Patient #" + dossier.getPatientId());
+
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Hospitaliser " + patientNom);
+
+        GridPane grid = new GridPane();
+        grid.setHgap(10); grid.setVgap(10);
+        grid.setPadding(new Insets(20, 20, 10, 10));
+
+        Label infoLabel = new Label("Chambre : " + chambre.getNumero()
+                + " - " + chambre.getTypeChambre().getLibelle()
+                + "  (" + chambre.getLitsDisponibles() + " lit(s) dispo.)");
+        infoLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #2D3436;");
+
+        TextField motifField = new TextField();
+        motifField.setPromptText("Motif hospitalisation*");
+        if (dossier.getMotifAdmission() != null) motifField.setText(dossier.getMotifAdmission());
+
+        TextArea diagnosticArea = new TextArea();
+        diagnosticArea.setPromptText("Diagnostic d'entree*");
+        diagnosticArea.setPrefRowCount(3);
+
+        DatePicker sortiePicker = new DatePicker(java.time.LocalDate.now().plusDays(3));
+
+        grid.add(infoLabel, 0, 0, 2, 1);
+        grid.add(new Label("Motif* :"), 0, 1);     grid.add(motifField, 1, 1);
+        grid.add(new Label("Diagnostic* :"), 0, 2); grid.add(diagnosticArea, 1, 2);
+        grid.add(new Label("Sortie prevue :"), 0, 3); grid.add(sortiePicker, 1, 3);
+
+        dialog.getDialogPane().setContent(grid);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        dialog.showAndWait().ifPresent(bt -> {
+            if (bt != ButtonType.OK) return;
+            if (!ValidationUtils.isNotEmpty(motifField.getText()) || !ValidationUtils.isNotEmpty(diagnosticArea.getText())) {
+                AlertHelper.showError("Erreur", "Le motif et le diagnostic sont obligatoires.");
+                return;
+            }
+            try {
+                medicalService.hospitaliser(dossier.getId(), chambre.getId(),
+                        motifField.getText().trim(), diagnosticArea.getText().trim(), sortiePicker.getValue());
+                AlertHelper.showInfo("Succes", patientNom + " hospitalise(e) en chambre " + chambre.getNumero());
+                cbDossierPlan.setValue(null);
+                loadPatientNames();
+                loadData();
+            } catch (Exception e) {
+                AlertHelper.showError("Erreur", e.getMessage());
+            }
+        });
     }
 
     @FXML

@@ -4,14 +4,18 @@ import appli.model.*;
 import appli.model.DossierPriseEnCharge.DestinationSortie;
 import appli.model.DossierPriseEnCharge.Statut;
 import appli.service.MedicalService;
+import appli.service.PDFExportService;
 import appli.service.PatientService;
 import appli.util.Route;
 import appli.util.Router;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 
+import java.io.File;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -60,11 +64,15 @@ public class DossierController {
     @FXML private Button btnCloturer;
     @FXML private Label  labelDossierClos;
 
+    // Export
+    @FXML private Button btnExporterPDF;
+
     // État
     private DossierPriseEnCharge dossier;
 
     private final MedicalService  medicalService  = new MedicalService();
     private final PatientService  patientService  = new PatientService();
+    private final PDFExportService pdfExportService = new PDFExportService();
 
     private static final DateTimeFormatter DT_FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
@@ -346,6 +354,38 @@ public class DossierController {
                 labelErreurCloture.setText("Erreur : " + e.getMessage());
             }
         });
+    }
+
+    // =========================================================================
+    // Export PDF
+    // =========================================================================
+
+    @FXML
+    private void handleExporterPDF() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Enregistrer le dossier en PDF");
+        String nomFichier = "dossier_" + (dossier.getNumeroDossier() != null
+                ? dossier.getNumeroDossier().replace("/", "-") : dossier.getId())
+                + "_" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) + ".pdf";
+        fileChooser.setInitialFileName(nomFichier);
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Fichiers PDF", "*.pdf"));
+        File file = fileChooser.showSaveDialog(btnExporterPDF.getScene().getWindow());
+
+        if (file != null) {
+            try {
+                List<Ordonnance> ordonnances = medicalService.getOrdonnancesByDossierId(dossier.getId());
+                List<Hospitalisation> hosps = medicalService.getHospitalisationsByDossierId(dossier.getId());
+                Hospitalisation hospitalisation = hosps.isEmpty() ? null : hosps.get(0);
+
+                pdfExportService.exportDossierPriseEnCharge(dossier, ordonnances, hospitalisation, file);
+
+                labelMessage.setText("PDF exporte : " + file.getName());
+                labelMessage.setStyle("-fx-text-fill: #388E3C; -fx-font-size: 12;");
+            } catch (Exception e) {
+                labelMessage.setText("Erreur export PDF : " + e.getMessage());
+                labelMessage.setStyle("-fx-text-fill: #F44336; -fx-font-size: 12;");
+            }
+        }
     }
 
     // =========================================================================
