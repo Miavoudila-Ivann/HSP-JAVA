@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="appli.ui.controller.FournisseursController"
+            prefHeight="680.0" prefWidth="1050.0"
+            style="-fx-background-color: #FFF9E7;">
+
+    <stylesheets>
+        <URL value="@cartoon.css"/>
+    </stylesheets>
+
+    <!-- EN-TETE -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="12"
+              style="-fx-background-color: #6C5CE7;
+                     -fx-padding: 12 20 12 20;
+                     -fx-border-color: #1a1a1a;
+                     -fx-border-width: 0 0 4 0;
+                     -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.45), 0, 0, 0, 5);">
+            <Button text="&lt; Retour" onAction="#handleRetour"
+                    style="-fx-background-color: rgba(255,255,255,0.2);
+                           -fx-text-fill: white; -fx-font-weight: bold;
+                           -fx-border-color: rgba(255,255,255,0.5); -fx-border-width: 2;
+                           -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;"/>
+            <Label text="Gestion des Fournisseurs" style="-fx-text-fill: white; -fx-font-weight: bold;">
+                <font><Font size="18.0"/></font>
+            </Label>
+            <HBox HBox.hgrow="ALWAYS"/>
+            <Label fx:id="welcomeLabel" text="Bienvenue"
+                   style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+            <Label text="|" style="-fx-text-fill: rgba(255,255,255,0.4);"/>
+            <Label fx:id="roleLabel" text="Role"
+                   style="-fx-text-fill: #1a1a1a;
+                          -fx-background-color: rgba(255,255,255,0.9);
+                          -fx-padding: 4 10 4 10; -fx-background-radius: 12;
+                          -fx-border-color: #1a1a1a; -fx-border-width: 2;
+                          -fx-border-radius: 12; -fx-font-weight: bold;"/>
+            <Button text="Deconnexion" onAction="#handleLogout"
+                    style="-fx-background-color: #FF7675; -fx-text-fill: white;
+                           -fx-font-weight: bold; -fx-border-color: #1a1a1a; -fx-border-width: 2;
+                           -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;"/>
+        </HBox>
+    </top>
+
+    <!-- CONTENU -->
+    <center>
+        <VBox spacing="14">
+            <padding><Insets top="18" right="24" bottom="18" left="24"/></padding>
+
+            <!-- Barre d'actions -->
+            <HBox alignment="CENTER_LEFT" spacing="12"
+                  style="-fx-background-color: white;
+                         -fx-padding: 12;
+                         -fx-border-color: #1a1a1a; -fx-border-width: 3;
+                         -fx-border-radius: 12; -fx-background-radius: 12;">
+                <Label text="Recherche :" style="-fx-font-weight: bold;"/>
+                <TextField fx:id="tfRecherche" prefWidth="240" promptText="Nom, code, ville..."/>
+                <HBox HBox.hgrow="ALWAYS"/>
+                <Button text="+ Nouveau" onAction="#handleNouveauFournisseur"
+                        style="-fx-background-color: #00B894; -fx-text-fill: white;
+                               -fx-font-weight: bold; -fx-border-color: #1a1a1a; -fx-border-width: 2;
+                               -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;"/>
+                <Button text="Modifier" onAction="#handleModifierFournisseur"
+                        style="-fx-background-color: #FDCB6E; -fx-text-fill: #1a1a1a;
+                               -fx-font-weight: bold; -fx-border-color: #1a1a1a; -fx-border-width: 2;
+                               -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;"/>
+                <Button text="Supprimer" onAction="#handleSupprimerFournisseur"
+                        style="-fx-background-color: #FF7675; -fx-text-fill: white;
+                               -fx-font-weight: bold; -fx-border-color: #1a1a1a; -fx-border-width: 2;
+                               -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;"/>
+            </HBox>
+
+            <!-- Tableau fournisseurs -->
+            <TableView fx:id="tableFournisseurs" VBox.vgrow="ALWAYS"
+                       style="-fx-border-color: #1a1a1a; -fx-border-width: 3; -fx-border-radius: 10;">
+                <columns>
+                    <TableColumn fx:id="colCode" text="Code" prefWidth="100"/>
+                    <TableColumn fx:id="colNom" text="Nom" prefWidth="200"/>
+                    <TableColumn fx:id="colVille" text="Ville" prefWidth="120"/>
+                    <TableColumn fx:id="colTelephone" text="Telephone" prefWidth="130"/>
+                    <TableColumn fx:id="colEmail" text="Email" prefWidth="180"/>
+                    <TableColumn fx:id="colContact" text="Contact" prefWidth="140"/>
+                    <TableColumn fx:id="colDelai" text="Delai" prefWidth="80"/>
+                </columns>
+                <placeholder>
+                    <Label text="Aucun fournisseur enregistre." style="-fx-font-weight: bold;"/>
+                </placeholder>
+            </TableView>
+        </VBox>
+    </center>
+
+    <!-- PIED DE PAGE -->
+    <bottom>
+        <HBox alignment="CENTER"
+              style="-fx-background-color: #FFEAA7; -fx-padding: 8;
+                     -fx-border-color: #1a1a1a; -fx-border-width: 3 0 0 0;">
+            <Label text="HSP - Gestion des Fournisseurs"
+                   style="-fx-text-fill: #636E72; -fx-font-weight: bold;">
+                <font><Font size="11.0"/></font>
+            </Label>
+        </HBox>
+    </bottom>
+
+</BorderPane>

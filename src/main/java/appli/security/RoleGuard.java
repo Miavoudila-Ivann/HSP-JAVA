@@ -22,7 +22,12 @@ public class RoleGuard {
         CONSULTATION_JOURNAL,
         EXPORT_DONNEES,
         CONSULTATION_STATISTIQUES,
-        GESTION_RENDEZ_VOUS
+        GESTION_RENDEZ_VOUS,
+        GESTION_COMMANDES,
+        GESTION_ORDONNANCES,
+        GESTION_FOURNISSEURS,
+        GESTION_CHAMBRES,
+        CONSULTATION_LOGIN_LOG
     }
 
     private static final Map<User.Role, Set<Fonctionnalite>> PERMISSIONS = new HashMap<>();
@@ -46,14 +51,17 @@ public class RoleGuard {
                 Fonctionnalite.DEMANDE_PRODUITS,
                 Fonctionnalite.CONSULTATION_STATISTIQUES,
                 Fonctionnalite.EXPORT_DONNEES,
-                Fonctionnalite.GESTION_RENDEZ_VOUS
+                Fonctionnalite.GESTION_RENDEZ_VOUS,
+                Fonctionnalite.GESTION_ORDONNANCES
         ));
 
         PERMISSIONS.put(User.Role.GESTIONNAIRE, EnumSet.of(
                 Fonctionnalite.GESTION_STOCK,
                 Fonctionnalite.VALIDATION_DEMANDES,
                 Fonctionnalite.CONSULTATION_STATISTIQUES,
-                Fonctionnalite.EXPORT_DONNEES
+                Fonctionnalite.EXPORT_DONNEES,
+                Fonctionnalite.GESTION_COMMANDES,
+                Fonctionnalite.GESTION_FOURNISSEURS
         ));
     }
 
@@ -100,6 +108,11 @@ public class RoleGuard {
                            || hasPermission(Fonctionnalite.GESTION_DOSSIERS);
             case "statistiques" -> hasPermission(Fonctionnalite.CONSULTATION_STATISTIQUES);
             case "rendezvous" -> hasPermission(Fonctionnalite.GESTION_RENDEZ_VOUS);
+            case "commandes" -> hasPermission(Fonctionnalite.GESTION_COMMANDES);
+            case "ordonnances" -> hasPermission(Fonctionnalite.GESTION_ORDONNANCES);
+            case "fournisseurs" -> hasPermission(Fonctionnalite.GESTION_FOURNISSEURS);
+            case "chambres" -> hasPermission(Fonctionnalite.GESTION_CHAMBRES);
+            case "loginlog" -> hasPermission(Fonctionnalite.CONSULTATION_LOGIN_LOG);
             case "totp_verify", "totp_setup" -> true;
             default -> false;
         };

@@ -129,6 +129,13 @@ public class MedicalService {
     }
 
     /**
+     * Recupere les lignes d'une ordonnance.
+     */
+    public List<LigneOrdonnance> getLignesOrdonnance(int ordonnanceId) {
+        return ligneOrdonnanceDAO.findByOrdonnanceId(ordonnanceId);
+    }
+
+    /**
      * Termine une ordonnance.
      */
     public Ordonnance terminerOrdonnance(int ordonnanceId) {
@@ -479,6 +486,97 @@ public class MedicalService {
         hospitalisationDAO.update(hospitalisation);
 
         return hospitalisation;
+    }
+
+    // ==================== ORDONNANCES (CONSULTATION) ====================
+
+    /**
+     * Recupere les ordonnances d'un medecin.
+     */
+    public List<Ordonnance> getOrdonnancesByMedecin(int medecinId) {
+        return ordonnanceDAO.findByMedecinId(medecinId);
+    }
+
+    /**
+     * Recupere toutes les ordonnances.
+     */
+    public List<Ordonnance> getAllOrdonnances() {
+        return ordonnanceDAO.findAll();
+    }
+
+    // ==================== GESTION CHAMBRES (ADMIN) ====================
+
+    /**
+     * Recupere toutes les chambres.
+     */
+    public List<Chambre> getAllChambres() {
+        return chambreDAO.findAll();
+    }
+
+    /**
+     * Cree une nouvelle chambre.
+     */
+    public Chambre creerChambre(Chambre chambre) {
+        User currentUser = SessionManager.getInstance().getCurrentUser();
+        if (currentUser == null) throw new IllegalStateException("Aucun utilisateur connecte");
+        if (!SessionManager.getInstance().isAdmin()) throw new SecurityException("Seul l'admin peut creer une chambre");
+
+        int id = chambreDAO.insert(chambre);
+        if (id < 0) throw new RuntimeException("Erreur lors de la creation de la chambre");
+        chambre.setId(id);
+
+        journalService.logAction(currentUser, JournalAction.TypeAction.CREATION,
+                "Creation chambre: " + chambre.getNumero(), "Chambre", id);
+        return chambre;
+    }
+
+    /**
+     * Modifie une chambre existante.
+     */
+    public Chambre modifierChambre(Chambre chambre) {
+        User currentUser = SessionManager.getInstance().getCurrentUser();
+        if (currentUser == null) throw new IllegalStateException("Aucun utilisateur connecte");
+        if (!SessionManager.getInstance().isAdmin()) throw new SecurityException("Seul l'admin peut modifier une chambre");
+
+        chambreDAO.update(chambre);
+        journalService.logAction(currentUser, JournalAction.TypeAction.MODIFICATION,
+                "Modification chambre: " + chambre.getNumero(), "Chambre", chambre.getId());
+        return chambre;
+    }
+
+    /**
+     * Active ou desactive la maintenance d'une chambre.
+     */
+    public void toggleMaintenanceChambre(int chambreId, boolean enMaintenance) {
+        User currentUser = SessionManager.getInstance().getCurrentUser();
+        if (currentUser == null) throw new IllegalStateException("Aucun utilisateur connecte");
+        if (!SessionManager.getInstance().isAdmin()) throw new SecurityException("Seul l'admin peut modifier une chambre");
+
+        Chambre chambre = chambreDAO.findById(chambreId);
+        if (chambre == null) throw new IllegalArgumentException("Chambre non trouvee");
+        chambre.setEnMaintenance(enMaintenance);
+        chambreDAO.update(chambre);
+
+        journalService.logAction(currentUser, JournalAction.TypeAction.MODIFICATION,
+                "Chambre " + chambre.getNumero() + (enMaintenance ? " mise en maintenance" : " remise en service"),
+                "Chambre", chambreId);
+    }
+
+    /**
+     * Supprime une chambre (uniquement si aucun lit occupe).
+     */
+    public void supprimerChambre(int chambreId) {
+        User currentUser = SessionManager.getInstance().getCurrentUser();
+        if (currentUser == null) throw new IllegalStateException("Aucun utilisateur connecte");
+        if (!SessionManager.getInstance().isAdmin()) throw new SecurityException("Seul l'admin peut supprimer une chambre");
+
+        Chambre chambre = chambreDAO.findById(chambreId);
+        if (chambre == null) throw new IllegalArgumentException("Chambre non trouvee");
+        if (chambre.getNbLitsOccupes() > 0) throw new IllegalStateException("Impossible de supprimer une chambre avec des lits occupes");
+
+        chambreDAO.delete(chambreId);
+        journalService.logAction(currentUser, JournalAction.TypeAction.SUPPRESSION,
+                "Suppression chambre: " + chambre.getNumero(), "Chambre", chambreId);
     }
 
     // ==================== UTILITAIRES ====================

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="appli.ui.controller.CommandesController"
+            prefHeight="700.0" prefWidth="1100.0"
+            style="-fx-background-color: #FFF9E7;">
+
+    <stylesheets>
+        <URL value="@cartoon.css"/>
+    </stylesheets>
+
+    <!-- ===== EN-TETE ===== -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="12"
+              style="-fx-background-color: #6C5CE7;
+                     -fx-padding: 12 20 12 20;
+                     -fx-border-color: #1a1a1a;
+                     -fx-border-width: 0 0 4 0;
+                     -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.45), 0, 0, 0, 5);">
+            <Button text="&lt; Dashboard" onAction="#handleRetour"
+                    style="-fx-background-color: rgba(255,255,255,0.15);
+                           -fx-text-fill: white; -fx-font-weight: bold;
+                           -fx-border-color: rgba(255,255,255,0.5); -fx-border-width: 2;
+                           -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;"/>
+            <Separator orientation="VERTICAL" prefHeight="24" style="-fx-opacity: 0.4;"/>
+            <Label text="Commandes Fournisseurs"
+                   style="-fx-text-fill: white; -fx-font-weight: bold;">
+                <font><Font size="16.0"/></font>
+            </Label>
+            <HBox HBox.hgrow="ALWAYS"/>
+            <Label fx:id="welcomeLabel" text="Bienvenue"
+                   style="-fx-text-fill: white; -fx-font-weight: bold;">
+                <font><Font size="13.0"/></font>
+            </Label>
+            <Label text="|" style="-fx-text-fill: rgba(255,255,255,0.4);"/>
+            <Label fx:id="roleLabel" text="Role"
+                   style="-fx-text-fill: #1a1a1a;
+                          -fx-background-color: rgba(255,255,255,0.9);
+                          -fx-padding: 4 12 4 12;
+                          -fx-background-radius: 14; -fx-border-color: #1a1a1a;
+                          -fx-border-width: 2; -fx-border-radius: 14; -fx-font-weight: bold;">
+                <font><Font size="12.0"/></font>
+            </Label>
+            <Button text="Deconnexion" onAction="#handleLogout"
+                    style="-fx-background-color: #FF7675; -fx-text-fill: white; -fx-font-weight: bold;
+                           -fx-border-color: #1a1a1a; -fx-border-width: 2;
+                           -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;
+                           -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.6), 0, 0, 2, 2);"/>
+        </HBox>
+    </top>
+
+    <!-- ===== CONTENU ===== -->
+    <center>
+        <VBox spacing="14">
+            <padding><Insets top="16" right="20" bottom="16" left="20"/></padding>
+
+            <!-- Barre d'actions -->
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <Button text="+ Nouvelle commande" onAction="#handleNouvelleCommande"
+                        style="-fx-background-color: #6C5CE7; -fx-text-fill: white; -fx-font-weight: bold;
+                               -fx-border-color: #1a1a1a; -fx-border-width: 2; -fx-border-radius: 10;
+                               -fx-background-radius: 10; -fx-cursor: hand; -fx-font-size: 13;
+                               -fx-effect: dropshadow(three_pass_box, #1a1a1a, 0, 0, 3, 3);">
+                    <padding><Insets top="8" right="16" bottom="8" left="16"/></padding>
+                </Button>
+
+                <Separator orientation="VERTICAL" prefHeight="28"/>
+
+                <Label text="Filtrer par statut :"/>
+                <ComboBox fx:id="cbFiltreStatut" prefWidth="160"
+                          style="-fx-border-color: #1a1a1a; -fx-border-width: 2; -fx-border-radius: 8;
+                                 -fx-background-radius: 8;"/>
+
+                <Button text="Rafraichir" onAction="#handleRefresh"
+                        style="-fx-background-color: #FFEAA7; -fx-text-fill: #1a1a1a; -fx-font-weight: bold;
+                               -fx-border-color: #1a1a1a; -fx-border-width: 2; -fx-border-radius: 8;
+                               -fx-background-radius: 8; -fx-cursor: hand;"/>
+
+                <HBox HBox.hgrow="ALWAYS"/>
+                <Label fx:id="labelMessage" text="" wrapText="true" maxWidth="350"/>
+            </HBox>
+
+            <!-- Tableau des commandes -->
+            <VBox spacing="6"
+                  style="-fx-background-color: white; -fx-border-color: #1a1a1a; -fx-border-width: 3;
+                         -fx-border-radius: 14; -fx-background-radius: 14;
+                         -fx-effect: dropshadow(three_pass_box, #1a1a1a, 0, 0, 4, 4);">
+                <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
+                <Label text="Commandes fournisseurs"
+                       style="-fx-font-weight: bold; -fx-font-size: 14;">
+                    <font><Font size="14.0"/></font>
+                </Label>
+                <TableView fx:id="tableCommandes" prefHeight="260"
+                           style="-fx-border-color: #dee2e6; -fx-border-width: 1;">
+                    <columns>
+                        <TableColumn fx:id="colNumero" text="N° Commande" prefWidth="160"/>
+                        <TableColumn fx:id="colFournisseur" text="Fournisseur" prefWidth="180"/>
+                        <TableColumn fx:id="colDate" text="Date" prefWidth="140"/>
+                        <TableColumn fx:id="colStatut" text="Statut" prefWidth="130"/>
+                        <TableColumn fx:id="colMontantHt" text="Montant HT" prefWidth="110"/>
+                        <TableColumn fx:id="colActions" text="Actions" prefWidth="200"/>
+                    </columns>
+                    <placeholder><Label text="Aucune commande"/></placeholder>
+                </TableView>
+            </VBox>
+
+            <!-- Section lignes de la commande selectionnee -->
+            <VBox fx:id="sectionLignes" spacing="6"
+                  style="-fx-background-color: white; -fx-border-color: #6C5CE7; -fx-border-width: 3;
+                         -fx-border-radius: 14; -fx-background-radius: 14;
+                         -fx-effect: dropshadow(three_pass_box, #6C5CE7, 0, 0, 4, 4);">
+                <padding><Insets top="12" right="12" bottom="12" left="12"/></padding>
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="Lignes de la commande : " style="-fx-font-weight: bold; -fx-font-size: 13;"/>
+                    <Label fx:id="labelCommandeSelectionnee" text=""
+                           style="-fx-font-style: italic; -fx-text-fill: #636E72;"/>
+                </HBox>
+                <TableView fx:id="tableLignes" prefHeight="180"
+                           style="-fx-border-color: #dee2e6; -fx-border-width: 1;">
+                    <columns>
+                        <TableColumn fx:id="colLigneProduit" text="Produit" prefWidth="260"/>
+                        <TableColumn fx:id="colLigneQteCmd" text="Qte cmd." prefWidth="90"/>
+                        <TableColumn fx:id="colLigneQteRecue" text="Qte recue" prefWidth="90"/>
+                        <TableColumn fx:id="colLignePrix" text="Prix unit." prefWidth="100"/>
+                        <TableColumn fx:id="colLigneHt" text="Montant HT" prefWidth="110"/>
+                    </columns>
+                    <placeholder><Label text="Aucune ligne"/></placeholder>
+                </TableView>
+            </VBox>
+        </VBox>
+    </center>
+
+    <!-- ===== BAS DE PAGE ===== -->
+    <bottom>
+        <HBox alignment="CENTER"
+              style="-fx-background-color: #FFEAA7; -fx-padding: 8;
+                     -fx-border-color: #1a1a1a; -fx-border-width: 3 0 0 0;">
+            <Label text="HSP - Systeme de Gestion Hospitaliere"
+                   style="-fx-text-fill: #636E72; -fx-font-weight: bold;">
+                <font><Font size="11.0"/></font>
+            </Label>
+        </HBox>
+    </bottom>
+
+</BorderPane>

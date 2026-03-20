@@ -6,10 +6,13 @@ import appli.model.DossierPriseEnCharge.Statut;
 import appli.service.MedicalService;
 import appli.service.PDFExportService;
 import appli.service.PatientService;
+import appli.service.StockService;
 import appli.util.Route;
 import appli.util.Router;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
@@ -73,6 +76,7 @@ public class DossierController {
     private final MedicalService  medicalService  = new MedicalService();
     private final PatientService  patientService  = new PatientService();
     private final PDFExportService pdfExportService = new PDFExportService();
+    private final StockService    stockService    = new StockService();
 
     private static final DateTimeFormatter DT_FMT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
@@ -193,9 +197,14 @@ public class DossierController {
                 for (Ordonnance o : ordonnances) {
                     sb.append("• ").append(o.getNumeroOrdonnance())
                       .append(" — ").append(o.getStatut().getLibelle());
+                    // Afficher le nombre de lignes
+                    try {
+                        int nbLignes = medicalService.getLignesOrdonnance(o.getId()).size();
+                        sb.append(" : ").append(nbLignes).append(" ligne(s)");
+                    } catch (Exception ignored) {}
                     if (o.getNotes() != null && !o.getNotes().isBlank()) {
-                        sb.append(" : ").append(o.getNotes(), 0, Math.min(60, o.getNotes().length()));
-                        if (o.getNotes().length() > 60) sb.append("...");
+                        sb.append(" — ").append(o.getNotes(), 0, Math.min(50, o.getNotes().length()));
+                        if (o.getNotes().length() > 50) sb.append("...");
                     }
                     sb.append("\n");
                 }
@@ -223,7 +232,7 @@ public class DossierController {
 
         User currentUser = Router.getCurrentUser();
         try {
-            medicalService.creerOrdonnance(
+            Ordonnance ordonnance = medicalService.creerOrdonnance(
                     dossier.getId(),
                     currentUser.getId(),
                     taNotesOrdonnance.getText().trim(),
@@ -231,11 +240,153 @@ public class DossierController {
             taNotesOrdonnance.clear();
             dpDateFinOrdonnance.setValue(null);
             chargerOrdonnances();
-            labelMessage.setText("Ordonnance creee.");
+            labelMessage.setText("Ordonnance creee. Ajoutez les medicaments ci-dessous.");
             labelMessage.setStyle("-fx-text-fill: #388E3C; -fx-font-size: 12;");
+            // Step 2 : ouvrir le dialog d'ajout de lignes de prescription
+            ouvrirDialogLignesOrdonnance(ordonnance.getId());
+            chargerOrdonnances();
         } catch (Exception e) {
             labelErreurOrdonnance.setText("Erreur : " + e.getMessage());
         }
+    }
+
+    private void ouvrirDialogLignesOrdonnance(int ordonnanceId) {
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Lignes de prescription");
+        dialog.setHeaderText("Ajouter des medicaments a l'ordonnance");
+        dialog.getDialogPane().setPrefWidth(620);
+
+        ButtonType btnTerminer = new ButtonType("Terminer", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().add(btnTerminer);
+
+        VBox content = new VBox(12);
+        content.setPadding(new Insets(15));
+
+        // Liste des lignes deja ajoutees
+        Label lblLignes = new Label("Medicaments prescrits :");
+        lblLignes.setStyle("-fx-font-weight: bold;");
+        ListView<String> listeLignes = new ListView<>();
+        listeLignes.setPrefHeight(110);
+
+        Runnable rafraichirListe = () -> {
+            try {
+                var lignes = medicalService.getLignesOrdonnance(ordonnanceId);
+                listeLignes.getItems().clear();
+                for (LigneOrdonnance l : lignes) {
+                    String nom = "Produit #" + l.getProduitId();
+                    try {
+                        var opt = stockService.getProduitById(l.getProduitId());
+                        if (opt.isPresent()) nom = opt.get().getNom();
+                    } catch (Exception ignored) {}
+                    String voie = l.getVoieAdministration() != null ? l.getVoieAdministration().name() : "";
+                    int duree = l.getDureeJours() != null ? l.getDureeJours() : 0;
+                    listeLignes.getItems().add(
+                            nom + "  —  " + l.getPosologie()
+                            + "  x" + l.getQuantite()
+                            + "  " + duree + "j"
+                            + "  [" + voie + "]"
+                    );
+                }
+            } catch (Exception ignored) {}
+        };
+        rafraichirListe.run();
+
+        // Formulaire ajout ligne
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(8);
+
+        ComboBox<Produit> cbProduit = new ComboBox<>();
+        cbProduit.setPrefWidth(240);
+        cbProduit.setConverter(new StringConverter<>() {
+            @Override public String toString(Produit p) { return p != null ? "[" + p.getCode() + "] " + p.getNom() : ""; }
+            @Override public Produit fromString(String s) { return null; }
+        });
+        try {
+            cbProduit.getItems().addAll(stockService.getAllProduits());
+            if (!cbProduit.getItems().isEmpty()) cbProduit.getSelectionModel().selectFirst();
+        } catch (Exception e) {
+            content.getChildren().add(new Label("Erreur chargement produits : " + e.getMessage()));
+        }
+
+        TextField tfPosologie = new TextField();
+        tfPosologie.setPromptText("ex: 1 comprime matin et soir");
+
+        Spinner<Integer> spQuantite = new Spinner<>(1, 9999, 1);
+        spQuantite.setEditable(true);
+
+        Spinner<Integer> spDuree = new Spinner<>(1, 365, 7);
+        spDuree.setEditable(true);
+
+        ComboBox<LigneOrdonnance.VoieAdministration> cbVoie = new ComboBox<>();
+        cbVoie.getItems().addAll(LigneOrdonnance.VoieAdministration.values());
+        cbVoie.getSelectionModel().selectFirst();
+
+        TextArea taInstructions = new TextArea();
+        taInstructions.setPrefRowCount(2);
+        taInstructions.setPromptText("Instructions complementaires (optionnel)");
+
+        Label lblErrLigne = new Label();
+        lblErrLigne.setStyle("-fx-text-fill: #D63031; -fx-font-size: 12;");
+
+        Button btnAjouter = new Button("+ Ajouter medicament");
+        btnAjouter.setStyle("-fx-background-color: #6C5CE7; -fx-text-fill: white; -fx-font-weight: bold; " +
+                "-fx-border-color: #1a1a1a; -fx-border-width: 2; -fx-border-radius: 8; " +
+                "-fx-background-radius: 8; -fx-cursor: hand;");
+
+        int row = 0;
+        grid.add(new Label("Medicament *"), 0, row);
+        grid.add(cbProduit, 1, row++);
+        grid.add(new Label("Posologie *"), 0, row);
+        grid.add(tfPosologie, 1, row++);
+        grid.add(new Label("Quantite *"), 0, row);
+        grid.add(spQuantite, 1, row++);
+        grid.add(new Label("Duree (jours) *"), 0, row);
+        grid.add(spDuree, 1, row++);
+        grid.add(new Label("Voie d'administration"), 0, row);
+        grid.add(cbVoie, 1, row++);
+        grid.add(new Label("Instructions"), 0, row);
+        grid.add(taInstructions, 1, row++);
+        grid.add(lblErrLigne, 0, row, 2, 1);
+        row++;
+        grid.add(btnAjouter, 1, row);
+
+        btnAjouter.setOnAction(e -> {
+            lblErrLigne.setText("");
+            if (cbProduit.getValue() == null) { lblErrLigne.setText("Selectionnez un medicament."); return; }
+            if (tfPosologie.getText().trim().isEmpty()) { lblErrLigne.setText("La posologie est obligatoire."); return; }
+            try {
+                medicalService.ajouterLigneOrdonnance(
+                        ordonnanceId,
+                        cbProduit.getValue().getId(),
+                        tfPosologie.getText().trim(),
+                        spQuantite.getValue(),
+                        spDuree.getValue(),
+                        cbVoie.getValue(),
+                        taInstructions.getText().trim().isEmpty() ? null : taInstructions.getText().trim()
+                );
+                rafraichirListe.run();
+                tfPosologie.clear();
+                spQuantite.getValueFactory().setValue(1);
+                spDuree.getValueFactory().setValue(7);
+                taInstructions.clear();
+            } catch (Exception ex) {
+                lblErrLigne.setText("Erreur : " + ex.getMessage());
+            }
+        });
+
+        content.getChildren().addAll(
+                lblLignes, listeLignes,
+                new Separator(),
+                new Label("Ajouter un medicament :"),
+                grid
+        );
+
+        ScrollPane scroll = new ScrollPane(content);
+        scroll.setFitToWidth(true);
+        scroll.setPrefHeight(480);
+        dialog.getDialogPane().setContent(scroll);
+        dialog.showAndWait();
     }
 
     // =========================================================================

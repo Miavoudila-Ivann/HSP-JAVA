@@ -199,7 +199,7 @@
                 </Button>
             </HBox>
 
-            <!-- Ligne 3 : Statistiques | Rendez-vous -->
+            <!-- Ligne 3 : Statistiques | Rendez-vous | Commandes -->
             <HBox alignment="CENTER" spacing="22">
                 <Button fx:id="btnStatistiques" text="Statistiques" onAction="#goToStatistiques"
                         prefWidth="225" prefHeight="105"
@@ -220,6 +220,79 @@
                         style="-fx-background-color: #FD79A8;
                                -fx-text-fill: white;
                                -fx-font-size: 17;
+                               -fx-font-weight: bold;
+                               -fx-background-radius: 16;
+                               -fx-border-color: #1a1a1a;
+                               -fx-border-width: 3;
+                               -fx-border-radius: 16;
+                               -fx-cursor: hand;
+                               -fx-effect: dropshadow(three_pass_box, #1a1a1a, 0, 0, 5, 5);">
+                </Button>
+
+                <Button fx:id="btnCommandes" text="Commandes" onAction="#goToCommandes"
+                        prefWidth="225" prefHeight="105"
+                        style="-fx-background-color: #00CEC9;
+                               -fx-text-fill: white;
+                               -fx-font-size: 17;
+                               -fx-font-weight: bold;
+                               -fx-background-radius: 16;
+                               -fx-border-color: #1a1a1a;
+                               -fx-border-width: 3;
+                               -fx-border-radius: 16;
+                               -fx-cursor: hand;
+                               -fx-effect: dropshadow(three_pass_box, #1a1a1a, 0, 0, 5, 5);">
+                </Button>
+            </HBox>
+
+            <!-- Ligne 4 : Ordonnances | Fournisseurs | Chambres | Journal Connexions -->
+            <HBox alignment="CENTER" spacing="22">
+                <Button fx:id="btnOrdonnances" text="Ordonnances" onAction="#goToOrdonnances"
+                        prefWidth="160" prefHeight="90"
+                        style="-fx-background-color: #2196F3;
+                               -fx-text-fill: white;
+                               -fx-font-size: 14;
+                               -fx-font-weight: bold;
+                               -fx-background-radius: 16;
+                               -fx-border-color: #1a1a1a;
+                               -fx-border-width: 3;
+                               -fx-border-radius: 16;
+                               -fx-cursor: hand;
+                               -fx-effect: dropshadow(three_pass_box, #1a1a1a, 0, 0, 5, 5);">
+                </Button>
+
+                <Button fx:id="btnFournisseurs" text="Fournisseurs" onAction="#goToFournisseurs"
+                        prefWidth="160" prefHeight="90"
+                        style="-fx-background-color: #FF9F43;
+                               -fx-text-fill: white;
+                               -fx-font-size: 14;
+                               -fx-font-weight: bold;
+                               -fx-background-radius: 16;
+                               -fx-border-color: #1a1a1a;
+                               -fx-border-width: 3;
+                               -fx-border-radius: 16;
+                               -fx-cursor: hand;
+                               -fx-effect: dropshadow(three_pass_box, #1a1a1a, 0, 0, 5, 5);">
+                </Button>
+
+                <Button fx:id="btnChambres" text="Chambres" onAction="#goToChambres"
+                        prefWidth="160" prefHeight="90"
+                        style="-fx-background-color: #8E44AD;
+                               -fx-text-fill: white;
+                               -fx-font-size: 14;
+                               -fx-font-weight: bold;
+                               -fx-background-radius: 16;
+                               -fx-border-color: #1a1a1a;
+                               -fx-border-width: 3;
+                               -fx-border-radius: 16;
+                               -fx-cursor: hand;
+                               -fx-effect: dropshadow(three_pass_box, #1a1a1a, 0, 0, 5, 5);">
+                </Button>
+
+                <Button fx:id="btnLoginLog" text="Connexions" onAction="#goToLoginLog"
+                        prefWidth="160" prefHeight="90"
+                        style="-fx-background-color: #636E72;
+                               -fx-text-fill: white;
+                               -fx-font-size: 14;
                                -fx-font-weight: bold;
                                -fx-background-radius: 16;
                                -fx-border-color: #1a1a1a;

@@ -25,6 +25,11 @@ public class DashboardController {
     @FXML private Button btnJournal;
     @FXML private Button btnStatistiques;
     @FXML private Button btnRendezVous;
+    @FXML private Button btnCommandes;
+    @FXML private Button btnOrdonnances;
+    @FXML private Button btnFournisseurs;
+    @FXML private Button btnChambres;
+    @FXML private Button btnLoginLog;
 
     @FXML
     public void initialize() {
@@ -65,6 +70,21 @@ public class DashboardController {
 
         btnRendezVous.setVisible(RoleGuard.hasPermission(Fonctionnalite.GESTION_RENDEZ_VOUS));
         btnRendezVous.setManaged(btnRendezVous.isVisible());
+
+        btnCommandes.setVisible(RoleGuard.hasPermission(Fonctionnalite.GESTION_COMMANDES));
+        btnCommandes.setManaged(btnCommandes.isVisible());
+
+        btnOrdonnances.setVisible(RoleGuard.hasPermission(Fonctionnalite.GESTION_ORDONNANCES));
+        btnOrdonnances.setManaged(btnOrdonnances.isVisible());
+
+        btnFournisseurs.setVisible(RoleGuard.hasPermission(Fonctionnalite.GESTION_FOURNISSEURS));
+        btnFournisseurs.setManaged(btnFournisseurs.isVisible());
+
+        btnChambres.setVisible(RoleGuard.hasPermission(Fonctionnalite.GESTION_CHAMBRES));
+        btnChambres.setManaged(btnChambres.isVisible());
+
+        btnLoginLog.setVisible(RoleGuard.hasPermission(Fonctionnalite.CONSULTATION_LOGIN_LOG));
+        btnLoginLog.setManaged(btnLoginLog.isVisible());
     }
 
     private void chargerBadgeAlertes() {
@@ -124,6 +144,31 @@ public class DashboardController {
     @FXML
     private void goToRendezVous() {
         Router.goTo(Route.RENDEZ_VOUS);
+    }
+
+    @FXML
+    private void goToCommandes() {
+        Router.goTo(Route.COMMANDES);
+    }
+
+    @FXML
+    private void goToOrdonnances() {
+        Router.goTo(Route.ORDONNANCES);
+    }
+
+    @FXML
+    private void goToFournisseurs() {
+        Router.goTo(Route.FOURNISSEURS);
+    }
+
+    @FXML
+    private void goToChambres() {
+        Router.goTo(Route.CHAMBRES);
+    }
+
+    @FXML
+    private void goToLoginLog() {
+        Router.goTo(Route.LOGIN_LOG);
     }
 
     @FXML

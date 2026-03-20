@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -40,6 +41,8 @@ public class StockService {
     private final DemandeProduitDAO demandeProduitDAO = new DemandeProduitDAO();
     private final MouvementStockDAO mouvementStockDAO = new MouvementStockDAO();
     private final JournalService journalService = new JournalService();
+    private final CommandeFournisseurDAO commandeDAO = new CommandeFournisseurDAO();
+    private final LigneCommandeDAO ligneCommandeDAO = new LigneCommandeDAO();
 
     // ==================== CRUD PRODUITS ====================
 
@@ -141,6 +144,10 @@ public class StockService {
         return fournisseurRepository.findAll();
     }
 
+    public List<Fournisseur> rechercherFournisseurs(String terme) {
+        return fournisseurDAO.search(terme);
+    }
+
     /**
      * Cree un nouveau fournisseur.
      */
@@ -166,6 +173,22 @@ public class StockService {
         );
 
         return savedFournisseur;
+    }
+
+    /**
+     * Desactive (supprime logiquement) un fournisseur.
+     */
+    public void supprimerFournisseur(int fournisseurId) {
+        User currentUser = SessionManager.getInstance().getCurrentUser();
+        if (currentUser == null) throw new IllegalStateException("Aucun utilisateur connecte");
+        if (!SessionManager.getInstance().isGestionnaire() && !SessionManager.getInstance().isAdmin()) {
+            throw new SecurityException("Seul le gestionnaire peut supprimer un fournisseur");
+        }
+        Fournisseur f = fournisseurDAO.findById(fournisseurId);
+        if (f == null) throw new IllegalArgumentException("Fournisseur non trouve");
+        fournisseurDAO.delete(fournisseurId);
+        journalService.logAction(currentUser, JournalAction.TypeAction.SUPPRESSION,
+                "Suppression fournisseur: " + f.getNom(), "Fournisseur", fournisseurId);
     }
 
     /**
@@ -725,11 +748,252 @@ public class StockService {
         return emplacements;
     }
 
+    // ==================== COMMANDES FOURNISSEURS ====================
+
+    /**
+     * Cree une commande fournisseur en statut BROUILLON.
+     */
+    public CommandeFournisseur creerCommande(int fournisseurId, LocalDate dateLivraisonPrevue, String notes) {
+        User currentUser = SessionManager.getInstance().getCurrentUser();
+
+        if (currentUser == null) {
+            throw new IllegalStateException("Aucun utilisateur connecte");
+        }
+
+        if (!SessionManager.getInstance().isGestionnaire() && !SessionManager.getInstance().isAdmin()) {
+            throw new SecurityException("Seul le gestionnaire peut creer une commande fournisseur");
+        }
+
+        CommandeFournisseur commande = new CommandeFournisseur();
+        commande.setNumeroCommande(genererNumeroCommande());
+        commande.setFournisseurId(fournisseurId);
+        commande.setDateCommande(LocalDateTime.now());
+        commande.setDateLivraisonPrevue(dateLivraisonPrevue);
+        commande.setStatut(CommandeFournisseur.Statut.BROUILLON);
+        commande.setNotes(notes);
+        commande.setCreateurId(currentUser.getId());
+
+        int id = commandeDAO.insert(commande);
+        commande.setId(id);
+
+        journalService.logAction(
+            currentUser,
+            JournalAction.TypeAction.CREATION,
+            "Creation commande fournisseur: " + commande.getNumeroCommande(),
+            "CommandeFournisseur",
+            id
+        );
+
+        return commande;
+    }
+
+    /**
+     * Ajoute une ligne produit a une commande et recalcule le montant HT.
+     */
+    public LigneCommande ajouterLigneCommande(int commandeId, int produitId, int quantite,
+                                               BigDecimal prixUnitaire, BigDecimal tva) {
+        User currentUser = SessionManager.getInstance().getCurrentUser();
+
+        if (currentUser == null) {
+            throw new IllegalStateException("Aucun utilisateur connecte");
+        }
+
+        if (!SessionManager.getInstance().isGestionnaire() && !SessionManager.getInstance().isAdmin()) {
+            throw new SecurityException("Seul le gestionnaire peut ajouter des lignes de commande");
+        }
+
+        CommandeFournisseur commande = commandeDAO.findById(commandeId);
+        if (commande == null) {
+            throw new IllegalArgumentException("Commande non trouvee");
+        }
+
+        if (commande.getStatut() != CommandeFournisseur.Statut.BROUILLON) {
+            throw new IllegalStateException("Impossible d'ajouter une ligne : la commande n'est pas en brouillon");
+        }
+
+        LigneCommande ligne = new LigneCommande();
+        ligne.setCommandeId(commandeId);
+        ligne.setProduitId(produitId);
+        ligne.setQuantiteCommandee(quantite);
+        ligne.setPrixUnitaire(prixUnitaire);
+        ligne.setTva(tva != null ? tva : BigDecimal.valueOf(20));
+        ligne.setRemisePourcent(BigDecimal.ZERO);
+        ligne.recalculerMontantHt();
+
+        int ligneId = ligneCommandeDAO.insert(ligne);
+        ligne.setId(ligneId);
+
+        // Recalculer le montant total HT de la commande
+        List<LigneCommande> lignes = ligneCommandeDAO.findByCommandeId(commandeId);
+        BigDecimal totalHt = lignes.stream()
+                .map(l -> l.getMontantHt() != null ? l.getMontantHt() : BigDecimal.ZERO)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalTtc = totalHt.multiply(BigDecimal.ONE.add(
+                ligne.getTva().divide(BigDecimal.valueOf(100))));
+        commande.setMontantHt(totalHt);
+        commande.setMontantTtc(totalTtc);
+        commandeDAO.update(commande);
+
+        return ligne;
+    }
+
+    /**
+     * Passe une commande du statut BROUILLON a ENVOYEE.
+     */
+    public CommandeFournisseur envoyerCommande(int commandeId) {
+        User currentUser = SessionManager.getInstance().getCurrentUser();
+
+        if (currentUser == null) {
+            throw new IllegalStateException("Aucun utilisateur connecte");
+        }
+
+        if (!SessionManager.getInstance().isGestionnaire() && !SessionManager.getInstance().isAdmin()) {
+            throw new SecurityException("Seul le gestionnaire peut envoyer une commande");
+        }
+
+        CommandeFournisseur commande = commandeDAO.findById(commandeId);
+        if (commande == null) {
+            throw new IllegalArgumentException("Commande non trouvee");
+        }
+
+        if (commande.getStatut() != CommandeFournisseur.Statut.BROUILLON) {
+            throw new IllegalStateException("Seule une commande en brouillon peut etre envoyee");
+        }
+
+        List<LigneCommande> lignes = ligneCommandeDAO.findByCommandeId(commandeId);
+        if (lignes.isEmpty()) {
+            throw new IllegalStateException("Impossible d'envoyer une commande sans lignes");
+        }
+
+        commande.setStatut(CommandeFournisseur.Statut.ENVOYEE);
+        commande.setValidateurId(currentUser.getId());
+        commandeDAO.update(commande);
+
+        journalService.logAction(
+            currentUser,
+            JournalAction.TypeAction.MODIFICATION,
+            "Envoi commande fournisseur: " + commande.getNumeroCommande(),
+            "CommandeFournisseur",
+            commandeId
+        );
+
+        return commande;
+    }
+
+    /**
+     * Receptionnne une livraison : pour chaque ligne recue, appelle reapprovisionner().
+     * Met a jour le statut de la commande (LIVREE ou LIVREE_PARTIELLE).
+     *
+     * @param commandeId      ID de la commande
+     * @param lignesRecues    Map<ligneId, quantiteRecue>
+     * @param emplacementId   Emplacement de stockage
+     * @param lot             Numero de lot
+     * @param datePeremption  Date de peremption des produits recus
+     */
+    public CommandeFournisseur recevoirLivraison(int commandeId,
+                                                  Map<Integer, Integer> lignesRecues,
+                                                  int emplacementId,
+                                                  String lot,
+                                                  LocalDate datePeremption) {
+        User currentUser = SessionManager.getInstance().getCurrentUser();
+
+        if (currentUser == null) {
+            throw new IllegalStateException("Aucun utilisateur connecte");
+        }
+
+        if (!SessionManager.getInstance().isGestionnaire() && !SessionManager.getInstance().isAdmin()) {
+            throw new SecurityException("Seul le gestionnaire peut receptionner une livraison");
+        }
+
+        CommandeFournisseur commande = commandeDAO.findById(commandeId);
+        if (commande == null) {
+            throw new IllegalArgumentException("Commande non trouvee");
+        }
+
+        if (commande.getStatut() == CommandeFournisseur.Statut.LIVREE
+                || commande.getStatut() == CommandeFournisseur.Statut.ANNULEE) {
+            throw new IllegalStateException("Cette commande ne peut plus etre receptionnee");
+        }
+
+        List<LigneCommande> lignes = ligneCommandeDAO.findByCommandeId(commandeId);
+        boolean toutLivre = true;
+
+        for (LigneCommande ligne : lignes) {
+            Integer qteRecue = lignesRecues.get(ligne.getId());
+            if (qteRecue == null || qteRecue <= 0) {
+                toutLivre = false;
+                continue;
+            }
+
+            // Reapprovisionner le stock
+            reapprovisionner(
+                ligne.getProduitId(),
+                emplacementId,
+                lot,
+                qteRecue,
+                datePeremption,
+                ligne.getPrixUnitaire(),
+                commande.getFournisseurId(),
+                commande.getNumeroCommande()
+            );
+
+            // Mettre a jour quantite recue
+            int totalRecu = ligne.getQuantiteRecue() + qteRecue;
+            ligneCommandeDAO.updateQuantiteRecue(ligne.getId(), totalRecu);
+
+            if (totalRecu < ligne.getQuantiteCommandee()) {
+                toutLivre = false;
+            }
+        }
+
+        commande.setStatut(toutLivre ? CommandeFournisseur.Statut.LIVREE : CommandeFournisseur.Statut.LIVREE_PARTIELLE);
+        commande.setDateLivraisonEffective(LocalDate.now());
+        commandeDAO.update(commande);
+
+        journalService.logAction(
+            currentUser,
+            JournalAction.TypeAction.MODIFICATION,
+            "Reception livraison commande: " + commande.getNumeroCommande()
+                + " - Statut: " + commande.getStatut().getLibelle(),
+            "CommandeFournisseur",
+            commandeId
+        );
+
+        return commande;
+    }
+
+    /**
+     * Recupere toutes les commandes fournisseurs.
+     */
+    public List<CommandeFournisseur> getAllCommandes() {
+        return commandeDAO.findAll();
+    }
+
+    /**
+     * Recupere les commandes par statut.
+     */
+    public List<CommandeFournisseur> getCommandesByStatut(CommandeFournisseur.Statut statut) {
+        return commandeDAO.findByStatut(statut);
+    }
+
+    /**
+     * Recupere les lignes d'une commande.
+     */
+    public List<LigneCommande> getLignesCommande(int commandeId) {
+        return ligneCommandeDAO.findByCommandeId(commandeId);
+    }
+
     // ==================== UTILITAIRES ====================
 
     private String genererNumeroDemande() {
         String datePart = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         String randomPart = String.format("%04d", (int) (Math.random() * 10000));
         return "DEM-" + datePart + "-" + randomPart;
+    }
+
+    private String genererNumeroCommande() {
+        String datePart = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        String randomPart = String.format("%04d", (int) (Math.random() * 10000));
+        return "CMD-" + datePart + "-" + randomPart;
     }
 }

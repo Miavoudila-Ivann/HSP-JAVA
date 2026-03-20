@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="appli.ui.controller.LoginLogController"
+            prefHeight="680.0" prefWidth="1050.0"
+            style="-fx-background-color: #FFF9E7;">
+
+    <stylesheets>
+        <URL value="@cartoon.css"/>
+    </stylesheets>
+
+    <!-- EN-TETE -->
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="12"
+              style="-fx-background-color: #6C5CE7;
+                     -fx-padding: 12 20 12 20;
+                     -fx-border-color: #1a1a1a;
+                     -fx-border-width: 0 0 4 0;
+                     -fx-effect: dropshadow(three_pass_box, rgba(0,0,0,0.45), 0, 0, 0, 5);">
+            <Button text="&lt; Retour" onAction="#handleRetour"
+                    style="-fx-background-color: rgba(255,255,255,0.2);
+                           -fx-text-fill: white; -fx-font-weight: bold;
+                           -fx-border-color: rgba(255,255,255,0.5); -fx-border-width: 2;
+                           -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;"/>
+            <Label text="Journal des Connexions" style="-fx-text-fill: white; -fx-font-weight: bold;">
+                <font><Font size="18.0"/></font>
+            </Label>
+            <HBox HBox.hgrow="ALWAYS"/>
+            <Label fx:id="welcomeLabel" text="Bienvenue"
+                   style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+            <Label text="|" style="-fx-text-fill: rgba(255,255,255,0.4);"/>
+            <Label fx:id="roleLabel" text="Role"
+                   style="-fx-text-fill: #1a1a1a;
+                          -fx-background-color: rgba(255,255,255,0.9);
+                          -fx-padding: 4 10 4 10; -fx-background-radius: 12;
+                          -fx-border-color: #1a1a1a; -fx-border-width: 2;
+                          -fx-border-radius: 12; -fx-font-weight: bold;"/>
+            <Button text="Deconnexion" onAction="#handleLogout"
+                    style="-fx-background-color: #FF7675; -fx-text-fill: white;
+                           -fx-font-weight: bold; -fx-border-color: #1a1a1a; -fx-border-width: 2;
+                           -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;"/>
+        </HBox>
+    </top>
+
+    <!-- CONTENU -->
+    <center>
+        <VBox spacing="14">
+            <padding><Insets top="18" right="24" bottom="18" left="24"/></padding>
+
+            <!-- Barre de filtres -->
+            <HBox alignment="CENTER_LEFT" spacing="12"
+                  style="-fx-background-color: white;
+                         -fx-padding: 12;
+                         -fx-border-color: #1a1a1a; -fx-border-width: 3;
+                         -fx-border-radius: 12; -fx-background-radius: 12;">
+                <Label text="Type :" style="-fx-font-weight: bold;"/>
+                <ComboBox fx:id="cbFiltreType" prefWidth="180"/>
+                <Label text="Du :" style="-fx-font-weight: bold;"/>
+                <DatePicker fx:id="dpDebut" prefWidth="140"/>
+                <Label text="Au :" style="-fx-font-weight: bold;"/>
+                <DatePicker fx:id="dpFin" prefWidth="140"/>
+                <Button text="Appliquer" onAction="#handleAppliquerFiltres"
+                        style="-fx-background-color: #6C5CE7; -fx-text-fill: white;
+                               -fx-font-weight: bold; -fx-border-color: #1a1a1a; -fx-border-width: 2;
+                               -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;"/>
+                <Button text="Reset" onAction="#handleResetFiltres"
+                        style="-fx-background-color: #DFE6E9; -fx-text-fill: #1a1a1a;
+                               -fx-font-weight: bold; -fx-border-color: #1a1a1a; -fx-border-width: 2;
+                               -fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;"/>
+                <HBox HBox.hgrow="ALWAYS"/>
+                <Label fx:id="lblTotal" text="0 entree(s)"
+                       style="-fx-font-weight: bold; -fx-text-fill: #636E72;"/>
+            </HBox>
+
+            <!-- Tableau logs -->
+            <TableView fx:id="tableLogs" VBox.vgrow="ALWAYS"
+                       style="-fx-border-color: #1a1a1a; -fx-border-width: 3; -fx-border-radius: 10;">
+                <columns>
+                    <TableColumn fx:id="colDate" text="Date / Heure" prefWidth="160"/>
+                    <TableColumn fx:id="colType" text="Type" prefWidth="160"/>
+                    <TableColumn fx:id="colUtilisateur" text="Utilisateur" prefWidth="140"/>
+                    <TableColumn fx:id="colDescription" text="Description" prefWidth="300"/>
+                    <TableColumn fx:id="colIP" text="Adresse IP" prefWidth="130"/>
+                </columns>
+                <placeholder>
+                    <Label text="Aucun log de connexion trouve." style="-fx-font-weight: bold;"/>
+                </placeholder>
+            </TableView>
+        </VBox>
+    </center>
+
+    <!-- PIED DE PAGE -->
+    <bottom>
+        <HBox alignment="CENTER"
+              style="-fx-background-color: #FFEAA7; -fx-padding: 8;
+                     -fx-border-color: #1a1a1a; -fx-border-width: 3 0 0 0;">
+            <Label text="HSP - Journal des Connexions"
+                   style="-fx-text-fill: #636E72; -fx-font-weight: bold;">
+                <font><Font size="11.0"/></font>
+            </Label>
+        </HBox>
+    </bottom>
+
+</BorderPane>

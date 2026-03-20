@@ -18,6 +18,11 @@ public enum Route {
     DOSSIER("dossier", "HSP - Detail du Dossier"),
     STATISTIQUES("statistiques", "HSP - Statistiques"),
     RENDEZ_VOUS("rendezvous", "HSP - Rendez-vous"),
+    COMMANDES("commandes", "HSP - Commandes Fournisseurs"),
+    ORDONNANCES("ordonnances", "HSP - Ordonnances"),
+    FOURNISSEURS("fournisseurs", "HSP - Gestion des Fournisseurs"),
+    CHAMBRES("chambres", "HSP - Gestion des Chambres"),
+    LOGIN_LOG("loginlog", "HSP - Journal des Connexions"),
     TOTP_VERIFY("totp_verify", "HSP - Verification 2FA"),
     TOTP_SETUP("totp_setup", "HSP - Configuration 2FA");
 
