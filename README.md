@@ -1,109 +1,67 @@
-# HSP-JAVA - Hospital System Protocol
+# HSP-JAVA - Plateforme de Gestion de Service d'Urgence Hospitalier
 
-> Systeme de gestion hospitaliere complet developpe en **Java 17** avec **JavaFX**.
-> Gestion du triage, des hospitalisations, des ordonnances, des stocks et de la conformite RGPD.
-
----
-
-## Table des matieres
-
-- [Fonctionnalites](#fonctionnalites)
-- [Stack technique](#stack-technique)
-- [Prerequis](#prerequis)
-- [Installation](#installation)
-- [Build et lancement](#build-et-lancement)
-- [Roles et permissions](#roles-et-permissions)
-- [Comptes de test](#comptes-de-test)
-- [Architecture](#architecture)
-- [Tests](#tests)
-- [Scenario demo](#scenario-demo)
+Application de bureau en Java/JavaFX permettant de gerer un service d'urgence hospitalier : prise en charge des patients, gestion des stocks de produits medicaux, et tracabilite des actions conformement au RGPD.
 
 ---
 
-## Fonctionnalites
+## Fonctionnalites principales
 
-### Triage et accueil
+### Gestion des patients
+- Creation et modification de fiches patients (nom, prenom, n° securite sociale, email, telephone, adresse)
+- Enregistrement de dossiers de prise en charge avec niveau de gravite (1 a 5), symptomes, constantes vitales
+- File de triage triee par gravite et priorite
 
-- Creation de dossiers de prise en charge avec **5 niveaux de gravite** (Mineur, Modere, Grave, Severe, Critique)
-- Mode d'arrivee (ambulance, pompiers, personnel, transfert)
-- Saisie des constantes vitales, allergies et antecedents
-- Code couleur par gravite pour un reperage visuel rapide
-- Suivi du statut : EN_ATTENTE, EN_COURS, HOSPITALISE, TERMINE, TRANSFERE, ANNULE
-
-### Hospitalisations
-
-- Attribution de chambre avec **verrouillage transactionnel** (`SELECT FOR UPDATE`) pour eviter les doubles affectations
-- 7 types de chambre : simple, double, soins intensifs, reanimation, urgence, pediatrie, maternite
-- Suivi du sejour : diagnostic d'entree, plan de traitement, observations
-- Sortie patient avec motif : guerison, amelioration, transfert, contre avis medical, deces
-- Liberation automatique du lit a la sortie
-
-### Ordonnances
-
-- Prescription medicamenteuse avec posologie, voie d'administration et duree
-- Voies supportees : orale, IV, IM, sous-cutanee, transdermique, inhalation, rectale, ophtalmique
-- Gestion des **stupefiants** (flag dedie)
-- Statuts : ACTIVE, TERMINEE, ANNULEE, SUSPENDUE
-- Liaison aux hospitalisations ou dossiers de prise en charge
+### Gestion medicale
+- Consultation et prise en charge des dossiers en salle d'attente
+- Hospitalisation des patients avec controle de disponibilite des chambres (transaction securisee)
+- Prescription d'ordonnances avec lignes de medicaments (posologie, voie d'administration, duree)
+- Liberation des chambres a la sortie des patients
+- Gestion des rendez-vous medicaux
 
 ### Gestion des stocks
+- Fiches produits avec niveau de dangerosite (1 a 5) et seuils d'alerte
+- Association produit-fournisseur avec prix d'achat
+- Demandes de produits par les medecins avec workflow de validation/refus
+- Reapprovisionnement via commandes fournisseurs et reception de livraisons
+- Alertes automatiques (stock bas, rupture, peremption)
 
-- Catalogue produits avec categories (medicaments, consommables, dispositifs medicaux)
-- Emplacements multiples avec zones a temperature controlee
-- Suivi des **lots** avec dates de peremption
-- Systeme d'alertes pour les produits proches de la peremption
-- Calcul quantite disponible vs quantite reservee
-- Tarification fournisseur avec marge
+### Securite et RGPD
+- 4 roles : Administrateur, Secretaire, Medecin, Gestionnaire de stock
+- Controle d'acces RBAC avec 18 permissions granulaires
+- Mots de passe securises (BCrypt, cost 12) avec politique de complexite
+- Double authentification TOTP (compatible Google Authenticator, Authy)
+- Verrouillage de compte apres 5 tentatives echouees
+- Journal complet des actions avec snapshots avant/apres
+- Historique des connexions avec adresse IP
+- Creation de comptes reservee a l'administrateur
 
-### Demandes de produits
-
-- Circuit complet : medecin &rarr; gestionnaire avec validation transactionnelle
-- Workflow multi-etapes : EN_ATTENTE &rarr; VALIDEE &rarr; EN_PREPARATION &rarr; PRETE &rarr; LIVREE
-- Support des livraisons partielles
-- Signalement de demandes urgentes avec niveaux de priorite
-
-### Mouvements de stock
-
-- 6 types de mouvement : entree, sortie, transfert, casse, retour, consommation
-- Tracabilite complete avec horodatage
-- Liaison aux demandes ou aux commandes fournisseurs
-
-### Securite et authentification
-
-- Hachage des mots de passe avec **BCrypt** (10 rounds de sel)
-- **Verrouillage de compte** apres 5 tentatives echouees (30 minutes)
-- Gestion de session avec controle d'acces par role (RBAC)
-- Garde de route sur chaque vue selon le role connecte
-
-### Audit et conformite RGPD
-
-- Journalisation de toutes les actions : connexion, deconnexion, CRUD, exports, echecs
-- Snapshots JSON des donnees avant/apres modification
-- Suivi de l'adresse IP et du user agent
-- Horodatage UTC
-- Recherche par utilisateur, plage de dates, type d'entite
+### Statistiques et exports
+- Tableau de bord : patients hospitalises, dossiers en attente, stocks critiques, taux d'occupation
+- Graphiques : hospitalisations par semaine, repartition par gravite, produits les plus demandes
+- Export PDF : fiches patients, dossiers de prise en charge, rapports statistiques
 
 ---
 
-## Stack technique
+## Technologies
 
-| Composant | Technologie |
-|-----------|-------------|
-| Langage | Java 17 |
-| Interface | JavaFX 17.0.6 (FXML) |
-| Base de donnees | MySQL 8.0+ (InnoDB, utf8mb4) |
-| Driver JDBC | MySQL Connector/J 9.5.0 |
-| Securite | jBCrypt 0.4 |
-| Build | Maven 3.8+ |
-| Tests | JUnit 5.10.2, Mockito 5.11.0 |
+| Composant       | Technologie          | Version |
+|-----------------|----------------------|---------|
+| Langage         | Java                 | 17      |
+| Interface       | JavaFX (FXML)        | 17.0.6  |
+| Base de donnees | MySQL                | 8.0+    |
+| Build           | Maven                | 3.8+    |
+| Hachage MDP     | jBCrypt              | 0.4     |
+| Export PDF       | Apache PDFBox        | 3.0.4   |
+| QR Code (2FA)   | Google ZXing         | 3.5.3   |
+| Tests           | JUnit 5 + Mockito 5  |         |
 
 ---
 
 ## Prerequis
 
-- **JDK** 17 ou superieur
-- **Maven** 3.8 ou superieur
-- **MySQL** 8.0 ou superieur
+- **JDK 17** ou superieur
+- **MySQL 8.0+** ou **MariaDB 10.5+**
+- **Maven 3.8+**
 
 ---
 
@@ -112,206 +70,85 @@
 ### 1. Cloner le depot
 
 ```bash
-git clone <url-du-repo>
+git clone <url-du-depot>
 cd HSP-JAVA
 ```
 
 ### 2. Creer la base de donnees
 
-```sql
-CREATE DATABASE hsp_java CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-```
-
-### 3. Executer le schema
-
 ```bash
-mysql -u root -p hsp_java < src/main/resources/sql/schema.sql
-```
-
-### 4. Charger les donnees de test
-
-```bash
+mysql -u root -p < src/main/resources/sql/schema.sql
 mysql -u root -p hsp_java < src/main/resources/sql/seed.sql
 ```
 
-### 5. Configurer la connexion
+### 3. Configurer la connexion
 
-La configuration se trouve dans `src/main/java/appli/util/DBConnection.java` :
+Modifier les parametres dans `src/main/java/appli/util/DBConnection.java` :
 
 ```java
-SERVEUR       = "localhost"
-NOM_BDD       = "hsp_java"
-UTILISATEUR   = "root"
-MOT_DE_PASSE  = ""
+private static final String URL = "jdbc:mysql://localhost:3306/hsp_java";
+private static final String USER = "root";
+private static final String PASSWORD = "votre_mot_de_passe";
 ```
 
-Modifier ces valeurs selon votre environnement.
-
----
-
-## Build et lancement
+### 4. Compiler et lancer
 
 ```bash
-# Compiler le projet
-mvn clean compile
+mvn clean javafx:run
+```
 
-# Lancer l'application
-mvn javafx:run
+### 5. Lancer les tests
 
-# Lancer les tests
+```bash
 mvn test
-
-# Generer le package
-mvn package
 ```
 
 ---
 
-## Roles et permissions
+## Comptes de demonstration
 
-| Role | Acces | Fonctionnalites principales |
-|------|-------|-----------------------------|
-| **ADMIN** | Complet | Gestion des utilisateurs, consultation de toutes les donnees, parametrage |
-| **SECRETAIRE** | Accueil | Creation de fiches patient, ouverture de dossiers de triage |
-| **MEDECIN** | Clinique | Prise en charge des dossiers, hospitalisations, ordonnances, demandes de produits, sortie patient |
-| **GESTIONNAIRE** | Stock | Gestion des produits et fournisseurs, validation/refus des demandes, mouvements de stock, reapprovisionnement |
-
----
-
-## Comptes de test
-
-Mot de passe commun : **`password123`**
-
-| Email | Nom | Role |
-|-------|-----|------|
-| `admin@hsp.fr` | Jean Dupont | Administrateur |
-| `secretaire1@hsp.fr` | Marie Martin | Secretaire |
-| `secretaire2@hsp.fr` | Sophie Bernard | Secretaire |
-| `medecin1@hsp.fr` | Pierre Leroy | Medecin generaliste |
-| `medecin2@hsp.fr` | Claire Moreau | Medecin urgences |
-| `medecin3@hsp.fr` | Francois Petit | Medecin cardiologue |
-| `medecin4@hsp.fr` | Isabelle Roux | Medecin pediatre |
-| `gestionnaire1@hsp.fr` | Michel Fournier | Gestionnaire stock |
-| `gestionnaire2@hsp.fr` | Anne Girard | Gestionnaire stock |
+| Email                 | Mot de passe | Role           |
+|-----------------------|--------------|----------------|
+| admin@hsp.fr          | Admin@123    | Administrateur |
+| secretaire@hsp.fr     | Secret@123   | Secretaire     |
+| medecin@hsp.fr        | Medecin@123  | Medecin        |
+| gestionnaire@hsp.fr   | Gestio@123   | Gestionnaire   |
 
 ---
 
 ## Architecture
 
+Le projet suit une architecture **MVC** avec couche Service et Repository :
+
 ```
 src/main/java/appli/
-├── model/              17 entites (User, Patient, Hospitalisation, Stock, Ordonnance...)
-├── service/            6 services metier (MedicalService, StockService, AuthService...)
-├── repository/         Interfaces + implementations JDBC
-├── dao/                Acces donnees direct (couche legacy)
-├── security/           Authentification, sessions, controle d'acces (RBAC)
-├── ui/
-│   ├── controller/     10 controleurs JavaFX
-│   └── util/           Helpers (AlertHelper)
-└── util/               DBConnection, Router, Route, ValidationUtils
+├── model/          17 entites metier
+├── dao/            20 Data Access Objects (JDBC)
+├── repository/     Interfaces + implementations JDBC
+├── service/        9 services metier (transactions, logique)
+├── security/       Authentification, RBAC, BCrypt, TOTP
+├── ui/controller/  19 controleurs JavaFX
+└── util/           Connexion BDD, routage, validation
 
 src/main/resources/
-├── sql/                schema.sql + seed.sql
-└── appli/view/         11 fichiers FXML + CSS
-
-src/test/java/appli/
-└── service/            Tests unitaires (MedicalServiceTest, StockServiceTest)
-```
-
-### Couches applicatives
-
-```
-┌─────────────────────────────────────────┐
-│          Presentation (JavaFX/FXML)     │
-│         Controllers + Views + CSS       │
-├─────────────────────────────────────────┤
-│           Securite (RBAC)               │
-│   SessionManager, RoleGuard, BCrypt     │
-├─────────────────────────────────────────┤
-│          Services (Logique metier)      │
-│  MedicalService, StockService, etc.     │
-├─────────────────────────────────────────┤
-│        Repository (Acces donnees)       │
-│     Interfaces + Implementations JDBC   │
-├─────────────────────────────────────────┤
-│             MySQL (InnoDB)              │
-│   21 tables, FK, index, contraintes    │
-└─────────────────────────────────────────┘
-```
-
-### Patterns utilises
-
-- **MVC** : Model-View-Controller via JavaFX
-- **Repository** : Interfaces d'acces aux donnees avec implementations JDBC
-- **Singleton** : DBConnection, SessionManager
-- **RBAC** : Controle d'acces par role sur chaque route
-- **Transactions** : Verrouillage pessimiste pour l'attribution de chambres
-
----
-
-## Tests
-
-Les tests unitaires couvrent les regles metier critiques :
-
-- **MedicalServiceTest** : hospitalisation (controles de securite, verification des etats, capacite des chambres), sortie patient
-- **StockServiceTest** : validation de demandes (securite, etats, livraison partielle), refus de demandes
-
-```bash
-mvn test
+├── appli/view/     19 fichiers FXML + CSS
+└── sql/            Schema, seed, migrations
 ```
 
 ---
 
-## Scenario demo
+## Documentation
 
-Le fichier `seed.sql` injecte un scenario complet sur plusieurs jours.
+La documentation complete est disponible dans le dossier `docs/` :
 
-### Jour 1 — 15 janvier
-
-1. **Secretaire** Marie Martin accueille 4 patients avec des gravites differentes
-2. **Dr Leroy** prend en charge Dubois (douleur thoracique, gravite 4) :
-   - Hospitalisation en soins intensifs — chambre 301
-   - Ordonnance : aspirine + adrenaline si besoin
-   - Demande de seringues &rarr; **validee** par le gestionnaire
-3. Demande de gants latex &rarr; **refusee** (rupture de stock)
-
-### Jour 2 — 16 janvier
-
-4. **Dr Petit** (cardiologue) prend en charge Moreau en urgence critique (IDM) :
-   - Hospitalisation en reanimation — chambre 303
-   - Ordonnance avec **morphine** (stupefiant) + aspirine + adrenaline
-   - Demande urgente de morphine &rarr; **validee** depuis le coffre
-5. **Dr Moreau** hospitalise Durand (fracture ouverte) — chambre 104
-6. **Dr Roux** hospitalise Faure (menace accouchement premature) en maternite — chambre 403
-7. **Dr Leroy** hospitalise Bernard (BPCO decompensee) — chambre 201
-8. Reapprovisionnement compresses + transfert adrenaline frigo &rarr; urgences
-
-### Jour 5 — 21 janvier
-
-9. **Sortie de Bernard** avec amelioration : ordonnance de relais PO, cloture du dossier
-
-### Etat final du scenario
-
-| Donnee | Valeur |
-|--------|--------|
-| Patients hospitalises | 4 (Dubois en SI, Moreau en Rea, Durand en Chir, Faure en Mat) |
-| Patients sortis | 1 (Bernard, amelioration) |
-| Dossiers en attente | 2 (Petit — asthme, Garcia — entorse) |
-| Demandes en attente | 2 (a traiter par le gestionnaire) |
-| Mouvements de stock | 6 (sorties, entree, transfert, casse) |
+- **[Documentation fonctionnelle](docs/DOCUMENTATION_FONCTIONNELLE.md)** : guide utilisateur, profils et permissions, workflows metier, securite, RGPD
+- **[Documentation technique](docs/DOCUMENTATION_TECHNIQUE.md)** : architecture, modele de donnees, couche securite, services, transactions, deploiement
 
 ---
 
 ## Structure de la base de donnees
 
-21 tables principales :
-
-| Domaine | Tables |
-|---------|--------|
-| Utilisateurs | `users`, `login_logs`, `journal_actions` |
-| Patients | `patients`, `dossiers_prise_en_charge` |
-| Hospitalisations | `chambres`, `hospitalisations` |
-| Prescriptions | `ordonnances`, `lignes_ordonnances` |
-| Produits | `produits`, `categories_produits`, `produits_fournisseurs`, `fournisseurs` |
-| Stocks | `stock`, `emplacements_stock`, `mouvements_stock`, `demandes_produits` |
-| Systeme | `alertes` |
+- **21 tables** : users, patients, dossiers_prise_en_charge, chambres, hospitalisations, ordonnances, lignes_ordonnance, produits, stocks, mouvements_stock, demandes_produits, fournisseurs, produits_fournisseurs, commandes_fournisseurs, lignes_commande, emplacements_stock, categories_produits, alertes, journal_actions, rendezvous
+- **4 vues** : v_stocks_details, v_dossiers_triage, v_occupation_chambres, v_rendezvous_a_venir
+- **Moteur** : InnoDB (transactions ACID)
+- **Charset** : utf8mb4
