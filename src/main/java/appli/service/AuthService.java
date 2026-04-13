@@ -10,6 +10,12 @@ import appli.security.TotpService;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+/**
+ * Service d'authentification et de gestion des comptes.
+ * Gere la connexion (avec verification bcrypt, verrouillage apres echecs et 2FA TOTP),
+ * la deconnexion, le changement de mot de passe et l'activation/desactivation du 2FA.
+ * Utilise {@link appli.security.SessionManager} pour maintenir la session active.
+ */
 public class AuthService {
 
     private static final int MAX_TENTATIVES = 5;
@@ -18,6 +24,7 @@ public class AuthService {
     private final UserRepository userRepository = new UserRepository();
     private final JournalService journalService = new JournalService();
 
+    /** Statuts possibles retournes apres une tentative de connexion. */
     public enum LoginStatus {
         SUCCESS,
         IDENTIFIANTS_INVALIDES,
@@ -27,6 +34,7 @@ public class AuthService {
         TOTP_INVALIDE
     }
 
+    /** Resultat de la tentative de connexion : statut + utilisateur (si authentifie). */
     public record LoginResult(LoginStatus status, User user) {
         public boolean isSuccess() {
             return status == LoginStatus.SUCCESS;
@@ -105,6 +113,10 @@ public class AuthService {
         return SessionManager.getInstance().getCurrentUser();
     }
 
+    /**
+     * Change le mot de passe apres verification de l'ancien.
+     * @return {@code true} si le changement a reussi
+     */
     public boolean changePassword(User user, String oldPassword, String newPassword) {
         if (!PasswordHasher.verify(oldPassword, user.getPasswordHash())) {
             return false;
@@ -119,6 +131,9 @@ public class AuthService {
         return true;
     }
 
+    /**
+     * Cree un nouvel utilisateur avec un mot de passe hache et journalise la creation.
+     */
     public User createUser(String email, String password, String nom, String prenom, User.Role role) {
         String hashedPassword = PasswordHasher.hash(password);
         User newUser = new User(email, hashedPassword, nom, prenom, role);

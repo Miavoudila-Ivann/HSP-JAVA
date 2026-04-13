@@ -15,6 +15,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+/**
+ * Controleur de la vue du journal des connexions (loginlog.fxml).
+ * Affiche l'historique des tentatives de connexion (reussies et echouees)
+ * avec filtres par type et par plage de dates. Accessible a l'admin.
+ */
 public class LoginLogController {
 
     @FXML private Label welcomeLabel;

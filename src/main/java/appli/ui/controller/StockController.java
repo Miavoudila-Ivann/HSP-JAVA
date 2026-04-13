@@ -25,6 +25,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Controleur de la vue de gestion du stock (stock.fxml).
+ * Interface gestionnaire : TabPane avec 5 onglets (Produits, Fournisseurs,
+ * Demandes en attente, Reapprovisionnement, Alertes stock).
+ */
 public class StockController {
 
     @FXML private Label welcomeLabel;

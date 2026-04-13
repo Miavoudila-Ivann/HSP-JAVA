@@ -11,10 +11,17 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
+/**
+ * Controleur du tableau de bord principal (dashboard.fxml).
+ * A l'initialisation, affiche le nom de l'utilisateur connecte et masque
+ * les boutons de navigation auxquels son role ne donne pas acces.
+ * Affiche aussi un badge si des alertes de stock non resolues existent.
+ */
 public class DashboardController {
 
     @FXML private Label welcomeLabel;
     @FXML private Label roleLabel;
+    /** Badge affiche uniquement si des alertes de stock sont en attente. */
     @FXML private Label lblAlerteBadge;
 
     @FXML private Button btnPatients;
@@ -31,6 +38,10 @@ public class DashboardController {
     @FXML private Button btnChambres;
     @FXML private Button btnLoginLog;
 
+    /**
+     * Initialise le tableau de bord : affiche le message de bienvenue,
+     * configure la visibilite des boutons selon le role et charge le badge alertes.
+     */
     @FXML
     public void initialize() {
         User user = Router.getCurrentUser();
@@ -44,6 +55,10 @@ public class DashboardController {
         chargerBadgeAlertes();
     }
 
+    /**
+     * Affiche ou masque chaque bouton en fonction des permissions du role courant.
+     * Utilise setManaged(false) pour eviter que les boutons invisibles occupent de l'espace.
+     */
     private void configurerBoutonsParRole() {
         btnPatients.setVisible(RoleGuard.hasPermission(Fonctionnalite.CONSULTATION_PATIENTS)
                 || RoleGuard.hasPermission(Fonctionnalite.GESTION_PATIENTS));
@@ -87,6 +102,10 @@ public class DashboardController {
         btnLoginLog.setManaged(btnLoginLog.isVisible());
     }
 
+    /**
+     * Charge et affiche le badge du nombre d'alertes de stock non resolues.
+     * Visible uniquement pour le gestionnaire et l'admin.
+     */
     private void chargerBadgeAlertes() {
         SessionManager session = SessionManager.getInstance();
         if (session.isGestionnaire() || session.isAdmin()) {

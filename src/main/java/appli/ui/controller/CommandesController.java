@@ -26,6 +26,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Controleur de la vue de gestion des commandes fournisseurs (commandes.fxml).
+ * Permet au gestionnaire de creer des commandes, d'y ajouter des lignes de produits,
+ * de les envoyer au fournisseur et de saisir les receptions partielles ou totales.
+ */
 public class CommandesController {
 
     @FXML private Label welcomeLabel;

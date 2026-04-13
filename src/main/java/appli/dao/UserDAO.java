@@ -12,6 +12,7 @@ public class UserDAO {
 
     public User findById(int id) {
         String sql = "SELECT * FROM users WHERE id = ?";
+        // try-with-resources : connexion et statement fermés automatiquement
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -88,6 +89,7 @@ public class UserDAO {
 
     public int insert(User user) {
         String sql = "INSERT INTO users (email, password_hash, nom, prenom, role, specialite, telephone, actif, date_creation, tentatives_connexion, compte_verrouille, totp_secret, totp_enabled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        // RETURN_GENERATED_KEYS : permet de récupérer l'ID généré après INSERT
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, user.getEmail());
@@ -140,6 +142,7 @@ public class UserDAO {
         return false;
     }
 
+    // Met à jour l'horodatage de dernière connexion après un login réussi
     public boolean updateDerniereConnexion(int userId) {
         String sql = "UPDATE users SET derniere_connexion = ? WHERE id = ?";
         try (Connection conn = DBConnection.getInstance().getConnection();
@@ -153,6 +156,7 @@ public class UserDAO {
         return false;
     }
 
+    // Incrémente les tentatives échouées et verrouille le compte si le seuil est atteint
     public boolean updateTentativesConnexion(int userId, int tentatives, boolean verrouille, LocalDateTime dateVerrouillage) {
         String sql = "UPDATE users SET tentatives_connexion = ?, compte_verrouille = ?, date_verrouillage = ? WHERE id = ?";
         try (Connection conn = DBConnection.getInstance().getConnection();
@@ -180,6 +184,7 @@ public class UserDAO {
         return false;
     }
 
+    // Convertit une ligne du ResultSet SQL en objet User Java
     private User mapResultSetToUser(ResultSet rs) throws SQLException {
         User user = new User();
         user.setId(rs.getInt("id"));

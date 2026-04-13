@@ -2,6 +2,11 @@ package appli.model;
 
 import java.math.BigDecimal;
 
+/**
+ * Modele representant l'association entre un produit et un fournisseur.
+ * Contient les conditions commerciales specifiques (prix d'achat, delai, quantite minimale).
+ * Un seul fournisseur peut etre marque comme principal ({@code estPrincipal = true}).
+ */
 public class ProduitFournisseur {
 
     private int id;
@@ -13,6 +18,7 @@ public class ProduitFournisseur {
     private BigDecimal prixAchat;
     private Integer delaiLivraisonJours;
     private Integer quantiteMinimumCommande;
+    /** Indique si ce fournisseur est le fournisseur preferentiel pour ce produit. */
     private boolean estPrincipal;
     private boolean actif;
 

@@ -5,8 +5,15 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Modele representant une ordonnance medicale.
+ * Prescrite par un medecin dans le cadre d'un dossier de prise en charge,
+ * elle contient une liste de lignes (medicaments + posologie).
+ * Le statut evolue de ACTIVE a TERMINEE ou ANNULEE.
+ */
 public class Ordonnance {
 
+    /** Etat courant de l'ordonnance. */
     public enum Statut {
         ACTIVE("Active"),
         TERMINEE("Terminee"),
@@ -25,6 +32,7 @@ public class Ordonnance {
     }
 
     private int id;
+    /** Numero unique au format ORD-YYYYMMDD-XXXX. */
     private String numeroOrdonnance;
     private int dossierId;
     private DossierPriseEnCharge dossier;
@@ -158,6 +166,9 @@ public class Ordonnance {
         this.lignes = lignes;
     }
 
+    /**
+     * Ajoute une ligne a l'ordonnance et rattache la reference retour.
+     */
     public void addLigne(LigneOrdonnance ligne) {
         this.lignes.add(ligne);
         ligne.setOrdonnanceId(this.id);

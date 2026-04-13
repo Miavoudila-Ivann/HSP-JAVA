@@ -20,6 +20,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Controleur de la vue du journal des actions (journal.fxml).
+ * Affiche le journal d'audit RGPD avec filtres par utilisateur, type d'action et periode.
+ * Accessible a l'admin uniquement.
+ */
 public class JournalController {
 
     @FXML private Label welcomeLabel;

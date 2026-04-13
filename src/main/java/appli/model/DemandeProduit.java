@@ -3,8 +3,14 @@ package appli.model;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * Modele representant une demande de produit formulee par un medecin.
+ * Le gestionnaire de stock la valide ou la refuse via {@link appli.service.StockService}.
+ * Peut etre liee a un dossier, une hospitalisation ou une ordonnance.
+ */
 public class DemandeProduit {
 
+    /** Cycle de vie de la demande. */
     public enum Statut {
         EN_ATTENTE("En attente"),
         VALIDEE("Validee"),
@@ -26,6 +32,7 @@ public class DemandeProduit {
     }
 
     private int id;
+    /** Numero unique de la demande. */
     private String numeroDemande;
     private int produitId;
     private Produit produit;
@@ -43,7 +50,9 @@ public class DemandeProduit {
     private EmplacementStock emplacementDestination;
     private LocalDateTime dateDemande;
     private LocalDate dateBesoin;
+    /** Indique si la demande est urgente (remonte en tete de liste). */
     private boolean urgence;
+    /** Priorite numerique (0 = normale ; plus haut = plus prioritaire). */
     private int priorite;
     private String motif;
     private Statut statut;
@@ -302,6 +311,7 @@ public class DemandeProduit {
         this.livreur = livreur;
     }
 
+    /** Retourne {@code true} si la quantite livree couvre la quantite demandee. */
     public boolean isLivraisonComplete() {
         return quantiteLivree != null && quantiteLivree >= quantiteDemandee;
     }

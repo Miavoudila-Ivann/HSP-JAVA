@@ -2,8 +2,14 @@ package appli.model;
 
 import java.time.LocalDate;
 
+/**
+ * Modele representant une ligne d'une ordonnance (un medicament prescrit).
+ * Contient la posologie, la quantite, la duree et la voie d'administration.
+ * Rattachee a une {@link Ordonnance} et a un {@link Produit}.
+ */
 public class LigneOrdonnance {
 
+    /** Voie par laquelle le medicament est administre. */
     public enum VoieAdministration {
         ORALE("Orale"),
         IV("Intraveineuse"),

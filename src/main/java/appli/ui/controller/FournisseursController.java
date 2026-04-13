@@ -15,6 +15,11 @@ import javafx.scene.layout.GridPane;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Controleur de la vue de gestion des fournisseurs (fournisseurs.fxml).
+ * Accessible au gestionnaire et a l'admin.
+ * Permet le CRUD complet des fournisseurs et la recherche par nom/code.
+ */
 public class FournisseursController {
 
     @FXML private Label welcomeLabel;

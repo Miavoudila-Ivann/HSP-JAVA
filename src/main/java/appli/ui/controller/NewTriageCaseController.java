@@ -17,6 +17,11 @@ import javafx.util.StringConverter;
 
 import java.util.List;
 
+/**
+ * Controleur de la vue de creation d'un nouveau dossier de triage (triage.fxml).
+ * La secretaire selectionne un patient, saisit le motif, les symptomes,
+ * le niveau de gravite et le mode d'arrivee pour creer le dossier.
+ */
 public class NewTriageCaseController {
 
     // --- Navigation bar ---

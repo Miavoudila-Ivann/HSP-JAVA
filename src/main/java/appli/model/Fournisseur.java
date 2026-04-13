@@ -3,12 +3,20 @@ package appli.model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * Modele representant un fournisseur de produits pharmaceutiques ou consommables.
+ * Contient les coordonnees legales (SIRET, raison sociale), les informations
+ * de contact, les conditions commerciales et une note d'evaluation.
+ */
 public class Fournisseur {
 
     private int id;
+    /** Code interne unique du fournisseur (ex: "FOUR001"). */
     private String code;
     private String nom;
+    /** Denomination legale de l'entreprise. */
     private String raisonSociale;
+    /** Numero SIRET a 14 chiffres. */
     private String siret;
     private String adresse;
     private String codePostal;
@@ -23,6 +31,7 @@ public class Fournisseur {
     private String contactEmail;
     private String conditionsPaiement;
     private Integer delaiLivraisonJours;
+    /** Note d'evaluation du fournisseur de 0 a 5 (qualite, delais, etc.). */
     private BigDecimal noteEvaluation;
     private boolean actif;
     private LocalDateTime dateCreation;

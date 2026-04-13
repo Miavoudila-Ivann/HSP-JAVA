@@ -12,12 +12,13 @@ public class PatientDAO {
 
     public Patient findById(int id) {
         String sql = "SELECT * FROM patients WHERE id = ?";
-        try (Connection conn = DBConnection.getInstance().getConnection();
+        // try-with-resources : connexion et statement fermés automatiquement après le bloc
+        try (Connection conn = DBConnection.getInstance().getConnection(); // connexion obtenue depuis le singleton DBConnection
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return mapResultSetToPatient(rs);
+                return mapResultSetToPatient(rs); // convertit la ligne SQL en objet Patient
             }
         } catch (SQLException e) {
             System.err.println("Erreur lors de la recherche du patient : " + e.getMessage());
@@ -76,13 +77,14 @@ public class PatientDAO {
 
     public int insert(Patient patient) {
         String sql = "INSERT INTO patients (numero_securite_sociale, nom, prenom, date_naissance, sexe, groupe_sanguin, adresse, code_postal, ville, telephone, telephone_mobile, email, personne_contact_nom, personne_contact_telephone, personne_contact_lien, medecin_traitant, notes_medicales, allergies_connues, antecedents_medicaux, date_creation, cree_par) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        // RETURN_GENERATED_KEYS : demande à JDBC de retourner l'ID auto-incrémenté après l'INSERT
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, patient.getNumeroSecuriteSociale());
             stmt.setString(2, patient.getNom());
             stmt.setString(3, patient.getPrenom());
-            stmt.setDate(4, patient.getDateNaissance() != null ? Date.valueOf(patient.getDateNaissance()) : null);
-            stmt.setString(5, patient.getSexe() != null ? patient.getSexe().name() : null);
+            stmt.setDate(4, patient.getDateNaissance() != null ? Date.valueOf(patient.getDateNaissance()) : null); // LocalDate → java.sql.Date
+            stmt.setString(5, patient.getSexe() != null ? patient.getSexe().name() : null); // enum stocké comme String en base
             stmt.setString(6, patient.getGroupeSanguin() != null ? patient.getGroupeSanguin().getDbValue() : null);
             stmt.setString(7, patient.getAdresse());
             stmt.setString(8, patient.getCodePostal());
@@ -97,14 +99,15 @@ public class PatientDAO {
             stmt.setString(17, patient.getNotesMedicales());
             stmt.setString(18, patient.getAllergiesConnues());
             stmt.setString(19, patient.getAntecedentsMedicaux());
-            stmt.setTimestamp(20, Timestamp.valueOf(LocalDateTime.now()));
+            stmt.setTimestamp(20, Timestamp.valueOf(LocalDateTime.now())); // horodatage de création automatique
             if (patient.getCreePar() != null) {
                 stmt.setInt(21, patient.getCreePar());
             } else {
-                stmt.setNull(21, Types.INTEGER);
+                stmt.setNull(21, Types.INTEGER); // champ nullable : passer NULL explicitement en SQL
             }
             stmt.executeUpdate();
 
+            // lecture de la clé primaire générée par la base
             ResultSet generatedKeys = stmt.getGeneratedKeys();
             if (generatedKeys.next()) {
                 return generatedKeys.getInt(1);
@@ -112,7 +115,7 @@ public class PatientDAO {
         } catch (SQLException e) {
             System.err.println("Erreur lors de l'insertion du patient : " + e.getMessage());
         }
-        return -1;
+        return -1; // -1 signale un échec d'insertion
     }
 
     public boolean update(Patient patient) {
@@ -145,7 +148,7 @@ public class PatientDAO {
                 stmt.setNull(21, Types.INTEGER);
             }
             stmt.setInt(22, patient.getId());
-            return stmt.executeUpdate() > 0;
+            return stmt.executeUpdate() > 0; // true si au moins une ligne modifiée
         } catch (SQLException e) {
             System.err.println("Erreur lors de la mise a jour du patient : " + e.getMessage());
         }
@@ -164,6 +167,7 @@ public class PatientDAO {
         return false;
     }
 
+    // Convertit une ligne du ResultSet SQL en objet Patient Java
     private Patient mapResultSetToPatient(ResultSet rs) throws SQLException {
         Patient patient = new Patient();
         patient.setId(rs.getInt("id"));
@@ -172,11 +176,11 @@ public class PatientDAO {
         patient.setPrenom(rs.getString("prenom"));
         Date dateNaissance = rs.getDate("date_naissance");
         if (dateNaissance != null) {
-            patient.setDateNaissance(dateNaissance.toLocalDate());
+            patient.setDateNaissance(dateNaissance.toLocalDate()); // java.sql.Date → LocalDate
         }
         String sexe = rs.getString("sexe");
         if (sexe != null) {
-            patient.setSexe(Patient.Sexe.valueOf(sexe));
+            patient.setSexe(Patient.Sexe.valueOf(sexe)); // String DB → enum Java
         }
         String groupeSanguin = rs.getString("groupe_sanguin");
         if (groupeSanguin != null) {
@@ -204,7 +208,7 @@ public class PatientDAO {
             patient.setDateModification(dateModification.toLocalDateTime());
         }
         int creePar = rs.getInt("cree_par");
-        if (!rs.wasNull()) {
+        if (!rs.wasNull()) { // getInt() retourne 0 pour NULL SQL ; wasNull() distingue 0 réel d'un NULL
             patient.setCreePar(creePar);
         }
         int modifiePar = rs.getInt("modifie_par");

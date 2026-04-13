@@ -2,8 +2,17 @@ package appli.model;
 
 import java.time.LocalDateTime;
 
+/**
+ * Modele representant un utilisateur du systeme hospitalier.
+ * Un utilisateur dispose d'un role qui determine ses permissions via {@link appli.security.RoleGuard}.
+ * La securite inclut le hachage du mot de passe, le verrouillage apres echecs et le 2FA (TOTP).
+ */
 public class User {
 
+    /**
+     * Les quatre roles possibles dans l'application.
+     * Chaque role donne acces a un sous-ensemble de fonctionnalites.
+     */
     public enum Role {
         ADMIN("Administrateur"),
         SECRETAIRE("Secretaire"),
@@ -16,6 +25,7 @@ public class User {
             this.libelle = libelle;
         }
 
+        /** Retourne le libelle lisible du role (affiche dans l'interface). */
         public String getLibelle() {
             return libelle;
         }
@@ -23,19 +33,27 @@ public class User {
 
     private int id;
     private String email;
+    /** Mot de passe stocke sous forme de hash bcrypt. */
     private String passwordHash;
     private String nom;
     private String prenom;
     private Role role;
+    /** Specialite medicale (utilisee uniquement pour le role MEDECIN). */
     private String specialite;
     private String telephone;
+    /** Indique si le compte est actif. Un compte inactif ne peut pas se connecter. */
     private boolean actif;
     private LocalDateTime dateCreation;
     private LocalDateTime derniereConnexion;
+    /** Nombre de tentatives de connexion echouees consecutives. */
     private int tentativesConnexion;
+    /** {@code true} si le compte a ete verrouille suite a trop d'echecs. */
     private boolean compteVerrouille;
+    /** Date/heure du verrouillage, utilisee pour le deverrouillage automatique apres 30 min. */
     private LocalDateTime dateVerrouillage;
+    /** Cle secrete TOTP (Base32) pour l'authentification a deux facteurs. */
     private String totpSecret;
+    /** {@code true} si le 2FA TOTP est active pour ce compte. */
     private boolean totpEnabled;
 
     public User() {}
@@ -177,6 +195,7 @@ public class User {
         this.totpEnabled = totpEnabled;
     }
 
+    /** Retourne le nom complet au format "Prenom Nom". */
     public String getNomComplet() {
         return prenom + " " + nom;
     }

@@ -28,6 +28,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * Controleur de la vue de gestion des hospitalisations (hospitalisations.fxml).
+ * Affiche les dossiers en attente et en cours pour le medecin.
+ * Permet de prendre en charge un dossier, d'hospitaliser un patient dans une chambre
+ * et de consulter le detail d'un dossier.
+ */
 public class HospitalisationsController {
 
     @FXML private Label welcomeLabel;

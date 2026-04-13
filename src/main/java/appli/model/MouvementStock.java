@@ -2,8 +2,14 @@ package appli.model;
 
 import java.time.LocalDateTime;
 
+/**
+ * Modele representant un mouvement de stock (entree, sortie, transfert...).
+ * Chaque operation sur le stock est tracee avec les quantites avant/apres
+ * pour garantir l'auditabilite reglementaire.
+ */
 public class MouvementStock {
 
+    /** Sens et nature du mouvement de stock. */
     public enum TypeMouvement {
         ENTREE("Entree"),
         SORTIE("Sortie"),
@@ -31,7 +37,9 @@ public class MouvementStock {
     private Produit produit;
     private TypeMouvement typeMouvement;
     private int quantite;
+    /** Quantite en stock avant ce mouvement (snapshot pour audit). */
     private int quantiteAvant;
+    /** Quantite en stock apres ce mouvement (snapshot pour audit). */
     private int quantiteApres;
     private String motif;
     private String referenceDocument;
@@ -46,6 +54,7 @@ public class MouvementStock {
     private int userId;
     private User user;
     private LocalDateTime dateMouvement;
+    /** Indique si le mouvement a ete valide (false = annule / en attente). */
     private boolean valide;
     private LocalDateTime dateValidation;
     private Integer validateurId;

@@ -3,8 +3,15 @@ package appli.model;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * Modele representant un sejour hospitalier.
+ * Cree lors de l'hospitalisation d'un dossier de prise en charge,
+ * il lie le dossier a une chambre precise et suit l'evolution du patient
+ * jusqu'a sa sortie (TERMINEE, TRANSFEREE, DECES).
+ */
 public class Hospitalisation {
 
+    /** Etat courant du sejour hospitalier. */
     public enum Statut {
         EN_COURS("En cours"),
         TERMINEE("Terminee"),
@@ -22,6 +29,7 @@ public class Hospitalisation {
         }
     }
 
+    /** Motif de la sortie du patient. */
     public enum TypeSortie {
         GUERISON("Guerison"),
         AMELIORATION("Amelioration"),
@@ -42,14 +50,18 @@ public class Hospitalisation {
     }
 
     private int id;
+    /** Numero unique de sejour au format SEJ-YYYYMMDD-XXXX. */
     private String numeroSejour;
     private int dossierId;
     private DossierPriseEnCharge dossier;
     private int chambreId;
     private Chambre chambre;
+    /** Numero du lit dans la chambre (attribue automatiquement). */
     private Integer litNumero;
     private LocalDateTime dateEntree;
+    /** Date de sortie estimee par le medecin a l'admission. */
     private LocalDate dateSortiePrevue;
+    /** Date et heure effectives de la sortie. */
     private LocalDateTime dateSortieEffective;
     private String motifHospitalisation;
     private String diagnosticEntree;

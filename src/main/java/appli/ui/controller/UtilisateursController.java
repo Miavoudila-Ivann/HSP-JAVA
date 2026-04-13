@@ -19,6 +19,11 @@ import javafx.scene.layout.GridPane;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+/**
+ * Controleur de la vue de gestion des utilisateurs (utilisateurs.fxml).
+ * Accessible a l'admin uniquement.
+ * Permet de creer, modifier, activer/desactiver et supprimer les comptes utilisateurs.
+ */
 public class UtilisateursController {
 
     @FXML private Label welcomeLabel;

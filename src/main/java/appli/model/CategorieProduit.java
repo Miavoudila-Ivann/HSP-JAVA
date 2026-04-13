@@ -1,11 +1,17 @@
 package appli.model;
 
+/**
+ * Modele representant une categorie de produits pharmaceutiques.
+ * Les categories peuvent etre hierarchiques (parent/enfant).
+ * Exemples : "Medicaments", "Dispositifs medicaux", "Consommables".
+ */
 public class CategorieProduit {
 
     private int id;
     private String code;
     private String nom;
     private String description;
+    /** Identifiant de la categorie parente (null si categorie racine). */
     private Integer categorieParentId;
     private CategorieProduit categorieParent;
     private boolean actif;

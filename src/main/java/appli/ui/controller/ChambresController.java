@@ -16,6 +16,12 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Controleur de la vue de gestion des chambres (chambres.fxml).
+ * Accessible a l'admin uniquement.
+ * Affiche la liste des chambres avec leur occupation et permet le CRUD
+ * ainsi que la mise en/hors maintenance.
+ */
 public class ChambresController {
 
     @FXML private Label welcomeLabel;

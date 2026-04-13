@@ -18,6 +18,11 @@ import javafx.scene.layout.VBox;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+/**
+ * Controleur de la vue de consultation des ordonnances (ordonnances.fxml).
+ * Permet au medecin de consulter et filtrer l'ensemble des ordonnances,
+ * de voir le detail des lignes et d'exporter une ordonnance en PDF.
+ */
 public class OrdonnancesController {
 
     @FXML private Label welcomeLabel;

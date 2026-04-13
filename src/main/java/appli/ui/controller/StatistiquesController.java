@@ -23,6 +23,12 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
+/**
+ * Controleur de la vue des statistiques (statistiques.fxml).
+ * Affiche des indicateurs cles (patients, hospitalisations, stocks...)
+ * sous forme de labels et de graphiques JavaFX (BarChart, PieChart).
+ * Permet l'export PDF du rapport de statistiques.
+ */
 public class StatistiquesController {
 
     @FXML private Label welcomeLabel;

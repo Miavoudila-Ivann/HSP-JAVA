@@ -4,8 +4,14 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
 
+/**
+ * Modele representant un patient de l'hopital.
+ * Contient les informations administratives, medicales et de contact.
+ * Identifie de maniere unique par le numero de securite sociale.
+ */
 public class Patient {
 
+    /** Sexe du patient. */
     public enum Sexe {
         M("Masculin"),
         F("Feminin");
@@ -21,6 +27,10 @@ public class Patient {
         }
     }
 
+    /**
+     * Groupe sanguin du patient.
+     * Le libelle (ex: "A+") est la valeur stockee en base de donnees.
+     */
     public enum GroupeSanguin {
         A_POSITIF("A+"),
         A_NEGATIF("A-"),
@@ -41,10 +51,17 @@ public class Patient {
             return libelle;
         }
 
+        /** Retourne la valeur telle qu'elle est stockee en base (identique au libelle). */
         public String getDbValue() {
             return libelle;
         }
 
+        /**
+         * Reconstruit un GroupeSanguin a partir de sa valeur en base de donnees.
+         *
+         * @param value la valeur stockee (ex: "AB+")
+         * @return l'enum correspondant, ou {@code null} si non trouve
+         */
         public static GroupeSanguin fromDbValue(String value) {
             for (GroupeSanguin gs : values()) {
                 if (gs.libelle.equals(value)) {
@@ -283,10 +300,16 @@ public class Patient {
         this.modifiePar = modifiePar;
     }
 
+    /** Retourne le nom complet au format "Prenom Nom". */
     public String getNomComplet() {
         return prenom + " " + nom;
     }
 
+    /**
+     * Calcule l'age du patient a la date d'aujourd'hui.
+     *
+     * @return l'age en annees, ou 0 si la date de naissance est inconnue
+     */
     public int getAge() {
         if (dateNaissance == null) {
             return 0;

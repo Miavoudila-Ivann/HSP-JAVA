@@ -25,6 +25,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Controleur de la vue de gestion des rendez-vous (rendezvous.fxml).
+ * Permet a la secretaire et au medecin de planifier, confirmer,
+ * realiser ou annuler des rendez-vous entre patients et medecins.
+ */
 public class RendezVousController {
 
     @FXML private Label welcomeLabel;

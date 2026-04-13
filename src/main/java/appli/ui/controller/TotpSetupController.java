@@ -21,6 +21,11 @@ import javafx.scene.image.ImageView;
 
 import java.awt.image.BufferedImage;
 
+/**
+ * Controleur de la vue de configuration du 2FA (totp_setup.fxml).
+ * Genere une cle TOTP secrete, affiche le QR code a scanner avec Google Authenticator
+ * et active le 2FA apres confirmation du premier code OTP.
+ */
 public class TotpSetupController {
 
     @FXML private ImageView qrCodeView;

@@ -23,6 +23,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Controleur de la vue de detail d'un dossier de prise en charge (dossier.fxml).
+ * Accessible par le medecin, affiche les informations du patient, permet de
+ * creer une ordonnance, d'hospitaliser le patient ou de cloturer le dossier.
+ */
 public class DossierController {
 
     // Navigation

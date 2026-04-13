@@ -25,6 +25,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Controleur de la vue des demandes de produits (demandes.fxml).
+ * Le medecin peut creer des demandes ; le gestionnaire les valide ou les refuse.
+ * L'affichage s'adapte au role de l'utilisateur courant.
+ */
 public class DemandesController {
 
     @FXML private Label welcomeLabel;

@@ -15,14 +15,25 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+/**
+ * Service metier pour la gestion des alertes de stock.
+ * Analyse periodiquement les niveaux de stock et les dates de peremption
+ * afin de creer automatiquement des alertes dans la base de donnees.
+ * Expose aussi les methodes de consultation, de lecture et de resolution.
+ */
 public class AlerteService {
 
     private final AlerteDAO alerteDAO = new AlerteDAO();
     private final StockService stockService = new StockService();
     private final JournalService journalService = new JournalService();
 
+    /** DTO resumant le nombre d'alertes par niveau de severite. */
     public record CompteursAlertes(int critiques, int warnings, int infos, int total) {}
 
+    /**
+     * Analyse les stocks et genere les alertes manquantes (ruptures, stock bas, peremptions).
+     * Evite les doublons : ne cree une alerte que si aucune alerte non resolue du meme type n'existe.
+     */
     public void verifierEtGenererAlertes() {
         // 1. Verifier les produits en stock bas / rupture
         List<Produit> produitsStockBas = stockService.getProduitsStockBas();
@@ -96,6 +107,7 @@ public class AlerteService {
         }
     }
 
+    /** Retourne la liste de toutes les alertes non encore resolues. */
     public List<Alerte> getAlertesActives() {
         return alerteDAO.findNonResolues();
     }
@@ -108,6 +120,7 @@ public class AlerteService {
         return new CompteursAlertes(critiques, warnings, infos, total);
     }
 
+    /** Marque une alerte comme lue par l'utilisateur courant. */
     public void marquerCommeLue(int alerteId) {
         User currentUser = SessionManager.getInstance().getCurrentUser();
         if (currentUser != null) {
@@ -115,6 +128,9 @@ public class AlerteService {
         }
     }
 
+    /**
+     * Marque une alerte comme resolue avec des notes optionnelles et journalise l'action.
+     */
     public void resoudreAlerte(int alerteId, String notes) {
         User currentUser = SessionManager.getInstance().getCurrentUser();
         if (currentUser != null) {
@@ -129,6 +145,9 @@ public class AlerteService {
         }
     }
 
+    /**
+     * Resout en bloc toutes les alertes non resolues d'un type donne.
+     */
     public void resoudreToutesParType(TypeAlerte type) {
         User currentUser = SessionManager.getInstance().getCurrentUser();
         if (currentUser == null) return;
@@ -149,6 +168,7 @@ public class AlerteService {
         );
     }
 
+    /** Retourne le nombre total d'alertes non resolues (utilise pour le badge du dashboard). */
     public int countNonResolues() {
         return alerteDAO.countNonResolues();
     }

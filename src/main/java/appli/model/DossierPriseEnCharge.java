@@ -2,8 +2,18 @@ package appli.model;
 
 import java.time.LocalDateTime;
 
+/**
+ * Modele representant un dossier de prise en charge aux urgences.
+ * Ouvert lors de l'admission d'un patient, il suit son parcours depuis le triage
+ * (EN_ATTENTE) jusqu'a la cloture (TERMINE ou TRANSFERE).
+ * Relie au patient, au medecin responsable et aux hospitalisations / ordonnances.
+ */
 public class DossierPriseEnCharge {
 
+    /**
+     * Echelle de gravite de triage (inspiree de l'ESI - Emergency Severity Index).
+     * Niveau 1 = mineur, Niveau 5 = critique.
+     */
     public enum NiveauGravite {
         NIVEAU_1("1", "Mineur", "#4CAF50"),
         NIVEAU_2("2", "Modere", "#8BC34A"),
@@ -43,6 +53,7 @@ public class DossierPriseEnCharge {
         }
     }
 
+    /** Mode d'arrivee du patient aux urgences. */
     public enum ModeArrivee {
         AMBULANCE("Ambulance"),
         POMPIERS("Pompiers"),
@@ -61,6 +72,7 @@ public class DossierPriseEnCharge {
         }
     }
 
+    /** Cycle de vie du dossier de prise en charge. */
     public enum Statut {
         EN_ATTENTE("En attente"),
         EN_COURS("En cours"),
@@ -81,6 +93,7 @@ public class DossierPriseEnCharge {
         }
     }
 
+    /** Destination du patient a la sortie du dossier. */
     public enum DestinationSortie {
         DOMICILE("Domicile"),
         HOSPITALISATION("Hospitalisation"),
@@ -100,6 +113,7 @@ public class DossierPriseEnCharge {
     }
 
     private int id;
+    /** Numero unique au format URG-YYYYMMDD-XXXX. */
     private String numeroDossier;
     private int patientId;
     private Patient patient;
@@ -114,11 +128,14 @@ public class DossierPriseEnCharge {
     private String allergies;
     private String traitementEnCours;
     private Statut statut;
+    /** Priorite de triage calculee depuis le niveau de gravite (1 = priorite max). */
     private int prioriteTriage;
     private Integer medecinResponsableId;
     private User medecinResponsable;
     private Integer creePar;
+    /** Horodatage de la prise en charge par le medecin. */
     private LocalDateTime datePriseEnCharge;
+    /** Horodatage de la cloture du dossier. */
     private LocalDateTime dateCloture;
     private String notesCloture;
     private DestinationSortie destinationSortie;

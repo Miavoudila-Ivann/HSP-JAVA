@@ -2,8 +2,15 @@ package appli.model;
 
 import java.time.LocalDateTime;
 
+/**
+ * Modele representant un rendez-vous entre un patient et un medecin.
+ * Cree par la secretaire ou le medecin, il evolue de PLANIFIE a REALISE ou ANNULE.
+ * Les champs joins {@code patientNom/Prenom} et {@code medecinNom/Prenom} sont
+ * alimentes lors des lectures en base pour eviter des jointures supplementaires.
+ */
 public class Rendezvous {
 
+    /** Type de rendez-vous. */
     public enum TypeRdv {
         CONSULTATION("Consultation"),
         SUIVI("Suivi"),
@@ -17,6 +24,7 @@ public class Rendezvous {
         @Override public String toString() { return libelle; }
     }
 
+    /** Etat courant du rendez-vous. */
     public enum Statut {
         PLANIFIE("Planifie"),
         CONFIRME("Confirme"),
@@ -44,7 +52,7 @@ public class Rendezvous {
     private LocalDateTime dateCreation;
     private Integer creePar;
 
-    // Champs joins pour affichage
+    // Champs joints pour affichage (remplis par les requetes SQL avec jointure)
     private String patientNom;
     private String patientPrenom;
     private String medecinNom;
@@ -56,11 +64,13 @@ public class Rendezvous {
         this.statut = Statut.PLANIFIE;
     }
 
+    /** Retourne le nom complet du patient (depuis les champs joints), ou "Patient #id" en fallback. */
     public String getPatientNomComplet() {
         if (patientPrenom != null && patientNom != null) return patientPrenom + " " + patientNom;
         return "Patient #" + patientId;
     }
 
+    /** Retourne "Dr. Prenom Nom" du medecin (depuis les champs joints), ou "Medecin #id" en fallback. */
     public String getMedecinNomComplet() {
         if (medecinPrenom != null && medecinNom != null) return "Dr. " + medecinPrenom + " " + medecinNom;
         return "Medecin #" + medecinId;

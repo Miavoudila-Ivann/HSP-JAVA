@@ -2,8 +2,15 @@ package appli.model;
 
 import java.time.LocalDateTime;
 
+/**
+ * Modele representant une alerte de stock ou de peremption.
+ * Generee automatiquement par {@link appli.service.AlerteService} lors de la detection
+ * d'un stock bas, d'une rupture ou d'une peremption imminente.
+ * Peut etre marquee comme lue ou resolue par le gestionnaire.
+ */
 public class Alerte {
 
+    /** Categorie de l'alerte. */
     public enum TypeAlerte {
         STOCK_BAS("Stock bas"),
         PEREMPTION("Peremption proche"),
@@ -24,6 +31,7 @@ public class Alerte {
         }
     }
 
+    /** Severite de l'alerte (determine la couleur dans l'interface). */
     public enum Niveau {
         INFO("Information"),
         WARNING("Avertissement"),
@@ -181,10 +189,12 @@ public class Alerte {
         this.notesResolution = notesResolution;
     }
 
+    /** Retourne {@code true} si l'alerte a ete consultee par un utilisateur. */
     public boolean isLue() {
         return dateLecture != null;
     }
 
+    /** Retourne {@code true} si l'alerte a ete resolue par un gestionnaire. */
     public boolean isResolue() {
         return dateResolution != null;
     }

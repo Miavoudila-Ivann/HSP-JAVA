@@ -2,6 +2,11 @@ package appli.model;
 
 import java.math.BigDecimal;
 
+/**
+ * Modele representant une ligne d'une commande fournisseur.
+ * Associe un produit a une quantite commandee, un prix unitaire et une remise.
+ * Le montant HT est recalcule via {@link #recalculerMontantHt()}.
+ */
 public class LigneCommande {
 
     private int id;
@@ -21,8 +26,6 @@ public class LigneCommande {
         this.remisePourcent = BigDecimal.ZERO;
         this.montantHt = BigDecimal.ZERO;
     }
-
-    // ==================== Getters / Setters ====================
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }

@@ -13,6 +13,7 @@ public class ProduitDAO {
 
     public Produit findById(int id) {
         String sql = "SELECT * FROM produits WHERE id = ?";
+        // try-with-resources : connexion et statement fermés automatiquement
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -244,8 +245,10 @@ public class ProduitDAO {
         return false;
     }
 
+    // Retourne uniquement les produits ayant au moins un lot en stock (quantite > 0)
     public List<Produit> findAllWithStock() {
         List<Produit> produits = new ArrayList<>();
+        // DISTINCT : évite les doublons si un produit est présent dans plusieurs emplacements
         String sql = "SELECT DISTINCT p.* FROM produits p " +
                 "INNER JOIN stocks s ON p.id = s.produit_id " +
                 "WHERE p.actif = true AND s.quantite > 0 ORDER BY p.nom";
@@ -261,8 +264,10 @@ public class ProduitDAO {
         return produits;
     }
 
+    // Retourne les produits dont le stock réel est en dessous du seuil d'alerte
     public List<Produit> findLowStock() {
         List<Produit> produits = new ArrayList<>();
+        // Sous-requête corrélée : compare le seuil du produit à la somme de ses stocks sur tous les emplacements
         String sql = "SELECT p.* FROM produits p " +
                 "WHERE p.actif = true AND p.seuil_alerte_stock > " +
                 "(SELECT COALESCE(SUM(s.quantite), 0) FROM stocks s WHERE s.produit_id = p.id) " +
@@ -279,6 +284,7 @@ public class ProduitDAO {
         return produits;
     }
 
+    // Suppression logique (soft delete) : désactive le produit sans le supprimer physiquement
     public boolean delete(int id) {
         String sql = "UPDATE produits SET actif = false WHERE id = ?";
         try (Connection conn = DBConnection.getInstance().getConnection();
@@ -291,6 +297,7 @@ public class ProduitDAO {
         return false;
     }
 
+    // Convertit une ligne du ResultSet SQL en objet Produit Java
     private Produit mapResultSetToProduit(ResultSet rs) throws SQLException {
         Produit produit = new Produit();
         produit.setId(rs.getInt("id"));

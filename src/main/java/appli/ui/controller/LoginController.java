@@ -12,6 +12,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
+/**
+ * Controleur de la vue de connexion (login.fxml).
+ * Valide les champs, appelle {@link AuthService#login} et redirige selon le statut :
+ * tableau de bord, verification 2FA, ou affichage d'un message d'erreur.
+ */
 public class LoginController {
 
     @FXML
@@ -25,11 +30,16 @@ public class LoginController {
 
     private final AuthService authService = new AuthService();
 
+    /** Cache le label d'erreur a l'ouverture de la vue. */
     @FXML
     public void initialize() {
         errorLabel.setVisible(false);
     }
 
+    /**
+     * Declenche la tentative de connexion apres validation locale des champs.
+     * Redirige vers TOTP_VERIFY si le 2FA est active, vers DASHBOARD sinon.
+     */
     @FXML
     private void handleLogin() {
         String email = emailField.getText().trim();
@@ -55,10 +65,10 @@ public class LoginController {
         LoginResult result = authService.login(email, password);
 
         switch (result.status()) {
-            case SUCCESS -> Router.goTo(Route.DASHBOARD);
-            case TOTP_REQUIRED -> Router.goTo(Route.TOTP_VERIFY, result.user());
-            case COMPTE_VERROUILLE -> showError("Compte verrouille - Reessayez dans 30 minutes");
-            case COMPTE_DESACTIVE -> showError("Compte desactive - Contactez l'administrateur");
+            case SUCCESS             -> Router.goTo(Route.DASHBOARD);
+            case TOTP_REQUIRED       -> Router.goTo(Route.TOTP_VERIFY, result.user());
+            case COMPTE_VERROUILLE   -> showError("Compte verrouille - Reessayez dans 30 minutes");
+            case COMPTE_DESACTIVE    -> showError("Compte desactive - Contactez l'administrateur");
             case IDENTIFIANTS_INVALIDES -> {
                 showError("Email ou mot de passe incorrect");
                 passwordField.clear();
@@ -67,11 +77,13 @@ public class LoginController {
         }
     }
 
+    /** Affiche un message d'erreur dans le label prevu a cet effet. */
     private void showError(String message) {
         errorLabel.setText(message);
         errorLabel.setVisible(true);
     }
 
+    /** Permet de valider le formulaire avec la touche Entree. */
     @FXML
     private void handleKeyPressed(KeyEvent event) {
         if (event.getCode() == KeyCode.ENTER) {

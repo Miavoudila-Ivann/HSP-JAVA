@@ -2,8 +2,14 @@ package appli.model;
 
 import java.math.BigDecimal;
 
+/**
+ * Modele representant un emplacement physique de stockage dans l'hopital.
+ * Identifie par un code unique, il peut etre temperature controlee (refrigerateur, coffre).
+ * Les stocks ({@link Stock}) sont associes a un emplacement.
+ */
 public class EmplacementStock {
 
+    /** Type d'emplacement physique. */
     public enum TypeEmplacement {
         PHARMACIE("Pharmacie"),
         RESERVE("Reserve"),
@@ -29,7 +35,9 @@ public class EmplacementStock {
     private String nom;
     private String description;
     private TypeEmplacement typeEmplacement;
+    /** Indique si la temperature de cet emplacement est surveillee. */
     private boolean temperatureControlee;
+    /** Temperature cible en degres Celsius (pertinent si temperatureControlee). */
     private BigDecimal temperatureCible;
     private Integer responsableId;
     private User responsable;

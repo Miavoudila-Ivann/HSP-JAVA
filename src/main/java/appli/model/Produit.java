@@ -3,8 +3,15 @@ package appli.model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * Modele representant un produit pharmaceutique ou consommable medical en stock.
+ * Contient les informations de nomenclature, de stockage, de danger et de seuils d'alerte.
+ */
 public class Produit {
 
+    /**
+     * Niveau de dangerosite du produit (couleur utilisee pour l'affichage).
+     */
     public enum NiveauDangerosite {
         FAIBLE("Faible", "#4CAF50"),
         MOYEN("Moyen", "#FFC107"),
@@ -29,6 +36,7 @@ public class Produit {
         }
     }
 
+    /** Forme galenique du produit. */
     public enum Forme {
         COMPRIME("Comprime"),
         GELULE("Gelule"),
@@ -53,9 +61,12 @@ public class Produit {
     }
 
     private int id;
+    /** Code interne unique du produit (ex: "PARA500"). */
     private String code;
+    /** Code CIP (Codes Identifiants de Presentation) pour les medicaments. */
     private String codeCip;
     private String nom;
+    /** Nom de marque commercial, affiche en complement du nom generique. */
     private String nomCommercial;
     private String description;
     private Integer categorieId;
@@ -64,15 +75,23 @@ public class Produit {
     private String dosage;
     private String uniteMesure;
     private BigDecimal prixUnitaire;
+    /** Taux de TVA en pourcentage (ex: 20.00 pour 20%). */
     private BigDecimal tva;
     private NiveauDangerosite niveauDangerosite;
     private String conditionsStockage;
+    /** Temperature minimale de stockage en degres Celsius. */
     private BigDecimal temperatureMin;
+    /** Temperature maximale de stockage en degres Celsius. */
     private BigDecimal temperatureMax;
+    /** Indique si une ordonnance est requise pour dispenser ce produit. */
     private boolean necessiteOrdonnance;
+    /** Indique si le produit est un stupefiant (sujet a une tracabilite renforcee). */
     private boolean stupefiant;
+    /** Nombre de jours avant la date de peremption a partir duquel une alerte est generee. */
     private int datePeremptionAlerteJours;
+    /** Quantite minimale en dessous de laquelle une alerte de stock bas est declenchee. */
     private int seuilAlerteStock;
+    /** Quantite declenchant une commande automatique (null si inactif). */
     private Integer seuilCommandeAuto;
     private Integer fournisseurPrincipalId;
     private Fournisseur fournisseurPrincipal;
@@ -304,6 +323,7 @@ public class Produit {
         this.dateCreation = dateCreation;
     }
 
+    /** Retourne le nom complet "Nom generique (Nom commercial)" si disponible, sinon juste le nom. */
     public String getNomComplet() {
         if (nomCommercial != null && !nomCommercial.isEmpty()) {
             return nom + " (" + nomCommercial + ")";

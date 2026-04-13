@@ -2,6 +2,12 @@ package appli.util;
 
 import java.util.regex.Pattern;
 
+/**
+ * Utilitaires de validation de donnees en entree.
+ * Fournit des methodes statiques pour valider les emails, telephones,
+ * numeros de securite sociale, mots de passe, et pour nettoyer les chaines
+ * (echappement HTML basique contre les injections XSS).
+ */
 public class ValidationUtils {
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
@@ -18,6 +24,7 @@ public class ValidationUtils {
 
     private ValidationUtils() {}
 
+    /** Retourne {@code true} si l'email est non vide et correspond au format standard. */
     public static boolean isValidEmail(String email) {
         if (email == null || email.trim().isEmpty()) {
             return false;
@@ -25,6 +32,7 @@ public class ValidationUtils {
         return EMAIL_PATTERN.matcher(email.trim()).matches();
     }
 
+    /** Retourne {@code true} si le numero de telephone est un numero francais valide (fixe ou mobile). */
     public static boolean isValidTelephone(String telephone) {
         if (telephone == null || telephone.trim().isEmpty()) {
             return false;
@@ -32,6 +40,7 @@ public class ValidationUtils {
         return TELEPHONE_PATTERN.matcher(telephone.trim()).matches();
     }
 
+    /** Retourne {@code true} si le numero de securite sociale est valide (format NIR francais 15 chiffres). */
     public static boolean isValidNumeroSecuriteSociale(String numero) {
         if (numero == null || numero.trim().isEmpty()) {
             return false;
@@ -79,6 +88,10 @@ public class ValidationUtils {
         return null;
     }
 
+    /**
+     * Echappe les caracteres HTML dangereux pour prevenir les injections XSS.
+     * Remplace {@code < > " '} par leurs entites HTML.
+     */
     public static String sanitize(String input) {
         if (input == null) {
             return null;

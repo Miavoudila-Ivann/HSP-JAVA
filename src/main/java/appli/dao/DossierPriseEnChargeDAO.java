@@ -17,12 +17,12 @@ public class DossierPriseEnChargeDAO {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return mapResultSetToDossier(rs);
+                return mapResultSetToDossier(rs); // convertit la ligne SQL en objet Java
             }
         } catch (SQLException e) {
             System.err.println("Erreur lors de la recherche du dossier : " + e.getMessage());
         }
-        return null;
+        return null; // dossier introuvable
     }
 
     public DossierPriseEnCharge findByNumeroDossier(String numeroDossier) {
@@ -42,6 +42,7 @@ public class DossierPriseEnChargeDAO {
 
     public List<DossierPriseEnCharge> findByPatientId(int patientId) {
         List<DossierPriseEnCharge> dossiers = new ArrayList<>();
+        // du plus récent au plus ancien pour l'historique patient
         String sql = "SELECT * FROM dossiers_prise_en_charge WHERE patient_id = ? ORDER BY date_creation DESC";
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -60,7 +61,7 @@ public class DossierPriseEnChargeDAO {
         List<DossierPriseEnCharge> dossiers = new ArrayList<>();
         String sql = "SELECT * FROM dossiers_prise_en_charge ORDER BY date_creation DESC";
         try (Connection conn = DBConnection.getInstance().getConnection();
-             Statement stmt = conn.createStatement();
+             Statement stmt = conn.createStatement(); // pas de paramètre → Statement simple suffit
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 dossiers.add(mapResultSetToDossier(rs));
@@ -71,12 +72,13 @@ public class DossierPriseEnChargeDAO {
         return dossiers;
     }
 
+    // Tri par niveau_gravite DESC : les cas les plus graves remontent en premier
     public List<DossierPriseEnCharge> findByStatut(DossierPriseEnCharge.Statut statut) {
         List<DossierPriseEnCharge> dossiers = new ArrayList<>();
         String sql = "SELECT * FROM dossiers_prise_en_charge WHERE statut = ? ORDER BY niveau_gravite DESC, date_creation";
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, statut.name());
+            stmt.setString(1, statut.name()); // .name() pour stocker l'enum en texte côté SQL
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 dossiers.add(mapResultSetToDossier(rs));
@@ -89,6 +91,7 @@ public class DossierPriseEnChargeDAO {
 
     public List<DossierPriseEnCharge> findEnAttenteTriage() {
         List<DossierPriseEnCharge> dossiers = new ArrayList<>();
+        // statut hardcodé car cette méthode est dédiée à la salle d'attente du triage
         String sql = "SELECT * FROM dossiers_prise_en_charge WHERE statut = 'EN_ATTENTE' ORDER BY niveau_gravite DESC, date_creation";
         try (Connection conn = DBConnection.getInstance().getConnection();
              Statement stmt = conn.createStatement();
@@ -121,10 +124,11 @@ public class DossierPriseEnChargeDAO {
     public int insert(DossierPriseEnCharge dossier) {
         String sql = "INSERT INTO dossiers_prise_en_charge (numero_dossier, patient_id, date_creation, date_admission, motif_admission, niveau_gravite, mode_arrivee, symptomes, constantes_vitales, antecedents, allergies, traitement_en_cours, statut, priorite_triage, medecin_responsable_id, cree_par, date_prise_en_charge, destination_sortie) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getInstance().getConnection();
+             // RETURN_GENERATED_KEYS : récupérer l'id auto-incrémenté après l'insert
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, dossier.getNumeroDossier());
             stmt.setInt(2, dossier.getPatientId());
-            stmt.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
+            stmt.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now())); // date_creation = maintenant
             stmt.setTimestamp(4, dossier.getDateAdmission() != null ? Timestamp.valueOf(dossier.getDateAdmission()) : null);
             stmt.setString(5, dossier.getMotifAdmission());
             stmt.setString(6, dossier.getNiveauGravite().name());
@@ -136,6 +140,7 @@ public class DossierPriseEnChargeDAO {
             stmt.setString(12, dossier.getTraitementEnCours());
             stmt.setString(13, dossier.getStatut().name());
             stmt.setInt(14, dossier.getPrioriteTriage());
+            // champs FK nullables : setNull() obligatoire si absent, sinon JDBC envoie 0
             if (dossier.getMedecinResponsableId() != null) {
                 stmt.setInt(15, dossier.getMedecinResponsableId());
             } else {
@@ -150,16 +155,18 @@ public class DossierPriseEnChargeDAO {
             stmt.setString(18, dossier.getDestinationSortie() != null ? dossier.getDestinationSortie().name() : null);
             stmt.executeUpdate();
 
+            // lecture de la clé générée par la base
             ResultSet generatedKeys = stmt.getGeneratedKeys();
             if (generatedKeys.next()) {
-                return generatedKeys.getInt(1);
+                return generatedKeys.getInt(1); // retourne le nouvel id
             }
         } catch (SQLException e) {
             System.err.println("Erreur lors de l'insertion du dossier : " + e.getMessage());
         }
-        return -1;
+        return -1; // -1 signale un échec d'insertion
     }
 
+    // Version autonome : ouvre sa propre connexion
     public boolean update(DossierPriseEnCharge dossier) {
         String sql = "UPDATE dossiers_prise_en_charge SET numero_dossier = ?, patient_id = ?, date_admission = ?, motif_admission = ?, niveau_gravite = ?, mode_arrivee = ?, symptomes = ?, constantes_vitales = ?, antecedents = ?, allergies = ?, traitement_en_cours = ?, statut = ?, priorite_triage = ?, medecin_responsable_id = ?, cree_par = ?, date_prise_en_charge = ?, date_cloture = ?, notes_cloture = ?, destination_sortie = ? WHERE id = ?";
         try (Connection conn = DBConnection.getInstance().getConnection();
@@ -171,13 +178,16 @@ public class DossierPriseEnChargeDAO {
         return false;
     }
 
+    // Version transactionnelle : réutilise une connexion externe (ex. service qui gère la transaction)
     public boolean update(DossierPriseEnCharge dossier, Connection conn) throws SQLException {
         String sql = "UPDATE dossiers_prise_en_charge SET numero_dossier = ?, patient_id = ?, date_admission = ?, motif_admission = ?, niveau_gravite = ?, mode_arrivee = ?, symptomes = ?, constantes_vitales = ?, antecedents = ?, allergies = ?, traitement_en_cours = ?, statut = ?, priorite_triage = ?, medecin_responsable_id = ?, cree_par = ?, date_prise_en_charge = ?, date_cloture = ?, notes_cloture = ?, destination_sortie = ? WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             return executeUpdate(dossier, stmt);
         }
+        // pas de catch : on laisse remonter l'exception pour que le service gère le rollback
     }
 
+    // Factorise la logique commune aux deux surcharges update()
     private boolean executeUpdate(DossierPriseEnCharge dossier, PreparedStatement stmt) throws SQLException {
         stmt.setString(1, dossier.getNumeroDossier());
         stmt.setInt(2, dossier.getPatientId());
@@ -206,15 +216,17 @@ public class DossierPriseEnChargeDAO {
         stmt.setTimestamp(17, dossier.getDateCloture() != null ? Timestamp.valueOf(dossier.getDateCloture()) : null);
         stmt.setString(18, dossier.getNotesCloture());
         stmt.setString(19, dossier.getDestinationSortie() != null ? dossier.getDestinationSortie().name() : null);
-        stmt.setInt(20, dossier.getId());
-        return stmt.executeUpdate() > 0;
+        stmt.setInt(20, dossier.getId()); // WHERE id = ? → toujours en dernier
+        return stmt.executeUpdate() > 0; // true si au moins une ligne modifiée
     }
 
+    // Wrapper public utilisé par les services qui construisent eux-mêmes leur ResultSet (ex. JOIN)
     public DossierPriseEnCharge mapFromResultSet(ResultSet rs) throws SQLException {
         return mapResultSetToDossier(rs);
     }
 
     public boolean updateStatut(int id, DossierPriseEnCharge.Statut statut) {
+        // UPDATE ciblé sur le seul champ statut, évite de recharger tout l'objet
         String sql = "UPDATE dossiers_prise_en_charge SET statut = ? WHERE id = ?";
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -229,6 +241,7 @@ public class DossierPriseEnChargeDAO {
 
     public List<DossierPriseEnCharge> findOpenCasesSorted() {
         List<DossierPriseEnCharge> dossiers = new ArrayList<>();
+        // dossiers actifs triés : gravité décroissante → priorité croissante → plus ancien d'abord
         String sql = "SELECT * FROM dossiers_prise_en_charge " +
                 "WHERE statut IN ('EN_ATTENTE', 'EN_COURS', 'EN_OBSERVATION') " +
                 "ORDER BY niveau_gravite DESC, priorite_triage ASC, date_creation ASC";
@@ -261,6 +274,7 @@ public class DossierPriseEnChargeDAO {
         dossier.setId(rs.getInt("id"));
         dossier.setNumeroDossier(rs.getString("numero_dossier"));
         dossier.setPatientId(rs.getInt("patient_id"));
+        // Timestamp → LocalDateTime : nécessaire car JDBC retourne Timestamp, pas LocalDateTime
         Timestamp dateCreation = rs.getTimestamp("date_creation");
         if (dateCreation != null) {
             dossier.setDateCreation(dateCreation.toLocalDateTime());
@@ -270,6 +284,7 @@ public class DossierPriseEnChargeDAO {
             dossier.setDateAdmission(dateAdmission.toLocalDateTime());
         }
         dossier.setMotifAdmission(rs.getString("motif_admission"));
+        // valueOf() : reconstitue l'enum Java depuis la chaîne stockée en base
         String niveau = rs.getString("niveau_gravite");
         if (niveau != null) {
             dossier.setNiveauGravite(DossierPriseEnCharge.NiveauGravite.valueOf(niveau));
@@ -285,6 +300,7 @@ public class DossierPriseEnChargeDAO {
         dossier.setTraitementEnCours(rs.getString("traitement_en_cours"));
         dossier.setStatut(DossierPriseEnCharge.Statut.valueOf(rs.getString("statut")));
         dossier.setPrioriteTriage(rs.getInt("priorite_triage"));
+        // wasNull() : seul moyen fiable de détecter un INTEGER NULL après getInt()
         int medecinId = rs.getInt("medecin_responsable_id");
         if (!rs.wasNull()) {
             dossier.setMedecinResponsableId(medecinId);

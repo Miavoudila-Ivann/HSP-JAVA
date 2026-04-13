@@ -2,8 +2,15 @@ package appli.model;
 
 import java.time.LocalDateTime;
 
+/**
+ * Modele representant une entree dans le journal d'audit (traçabilite RGPD).
+ * Enregistre chaque action significative : connexions, creation, modification,
+ * suppression, consultation, export.
+ * Stocke optionnellement les snapshots avant/apres pour les modifications.
+ */
 public class JournalAction {
 
+    /** Types d'actions traquees dans le journal. */
     public enum TypeAction {
         CONNEXION("Connexion"),
         DECONNEXION("Deconnexion"),
@@ -31,11 +38,17 @@ public class JournalAction {
     private TypeAction typeAction;
     private String description;
     private LocalDateTime dateAction;
+    /** Adresse IP de la machine depuis laquelle l'action a ete effectuee. */
     private String adresseIP;
+    /** Identifiant du client (ex: "HSP-JavaFX/1.0"). */
     private String userAgent;
+    /** Nom de la table ou entite concernee (ex: "Patient", "Ordonnance"). */
     private String entite;
+    /** Identifiant de l'entite concernee. */
     private Integer entiteId;
+    /** Snapshot JSON de l'entite avant modification (RGPD). */
     private String donneesAvant;
+    /** Snapshot JSON de l'entite apres modification (RGPD). */
     private String donneesApres;
 
     public JournalAction() {

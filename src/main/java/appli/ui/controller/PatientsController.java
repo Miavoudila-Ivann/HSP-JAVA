@@ -29,6 +29,12 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+/**
+ * Controleur de la vue de gestion des patients (patients.fxml).
+ * Permet la recherche, la creation, la modification et la suppression de patients.
+ * Accessible a la secretaire (creation/modification) et a l'admin (suppression).
+ * Offre aussi l'export PDF de la fiche patient et la creation d'un dossier de triage.
+ */
 public class PatientsController {
 
     @FXML private Label welcomeLabel;
@@ -83,6 +89,7 @@ public class PatientsController {
         loadPatients();
     }
 
+    /** Configure les colonnes de la table avec les proprietes correspondantes du modele Patient. */
     private void setupTableColumns() {
         colNom.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getNom()));
         colPrenom.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().getPrenom()));
@@ -95,6 +102,7 @@ public class PatientsController {
         });
     }
 
+    /** Masque les boutons inaccessibles selon le role de l'utilisateur courant. */
     private void configurerBoutonsParRole() {
         boolean canManage = RoleGuard.hasPermission(Fonctionnalite.GESTION_PATIENTS);
         btnAjouter.setVisible(canManage);
@@ -113,6 +121,7 @@ public class PatientsController {
         btnExportPDF.setManaged(canExport);
     }
 
+    /** Charge tous les patients depuis le service et rafraichit la table. */
     private void loadPatients() {
         try {
             List<Patient> patients = patientService.getAll();
@@ -124,6 +133,7 @@ public class PatientsController {
         }
     }
 
+    /** Filtre la table selon le terme saisi ; recharge tout si le champ est vide. */
     @FXML
     private void handleSearch() {
         String term = searchField.getText().trim();
@@ -177,6 +187,7 @@ public class PatientsController {
         }
     }
 
+    /** Exporte la fiche du patient selectionne en PDF via un selecteur de fichier. */
     @FXML
     private void handleExportPatient() {
         Patient selected = patientTable.getSelectionModel().getSelectedItem();
@@ -212,6 +223,11 @@ public class PatientsController {
         showDossierDialog(selected);
     }
 
+    /**
+     * Affiche le formulaire de creation ou d'edition d'un patient dans une boite de dialogue.
+     *
+     * @param existing le patient a modifier, ou {@code null} pour une creation
+     */
     private void showPatientDialog(Patient existing) {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle(existing == null ? "Nouveau patient" : "Modifier patient");

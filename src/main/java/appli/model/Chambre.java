@@ -2,8 +2,16 @@ package appli.model;
 
 import java.math.BigDecimal;
 
+/**
+ * Modele representant une chambre dans l'hopital.
+ * Identifie par son numero et son etage, elle a une capacite en lits.
+ * Peut etre mise en maintenance ou desactivee.
+ * Le nombre de lits occupes est mis a jour de maniere transactionnelle lors
+ * des hospitalisations et sorties via {@link appli.service.MedicalService}.
+ */
 public class Chambre {
 
+    /** Type de chambre determinant son usage medical. */
     public enum TypeChambre {
         SIMPLE("Chambre simple"),
         DOUBLE("Chambre double"),
@@ -29,7 +37,9 @@ public class Chambre {
     private int etage;
     private String batiment;
     private TypeChambre typeChambre;
+    /** Nombre total de lits dans la chambre. */
     private int capacite;
+    /** Nombre de lits actuellement occupes (mis a jour transactionnellement). */
     private int nbLitsOccupes;
     private String equipements;
     private BigDecimal tarifJournalier;
@@ -149,14 +159,17 @@ public class Chambre {
         this.notes = notes;
     }
 
+    /** Retourne le nombre de lits non occupes dans la chambre. */
     public int getLitsDisponibles() {
         return capacite - nbLitsOccupes;
     }
 
+    /** Retourne {@code true} si la chambre est active, non en maintenance et a au moins un lit libre. */
     public boolean hasLitDisponible() {
         return nbLitsOccupes < capacite && actif && !enMaintenance;
     }
 
+    /** Retourne une description courte lisible, ex: "101 - Chambre simple (Etage 1)". */
     public String getDescription() {
         return numero + " - " + typeChambre.getLibelle() + " (Etage " + etage + ")";
     }

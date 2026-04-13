@@ -4,8 +4,14 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * Modele representant une commande passee aupres d'un fournisseur.
+ * Creee en BROUILLON, elle evolue jusqu'a LIVREE apres reception.
+ * Le montant HT et TTC est calcule depuis les {@link LigneCommande}.
+ */
 public class CommandeFournisseur {
 
+    /** Cycle de vie de la commande fournisseur. */
     public enum Statut {
         BROUILLON("Brouillon"),
         ENVOYEE("Envoyee"),
@@ -44,8 +50,6 @@ public class CommandeFournisseur {
         this.montantHt = BigDecimal.ZERO;
         this.montantTtc = BigDecimal.ZERO;
     }
-
-    // ==================== Getters / Setters ====================
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }

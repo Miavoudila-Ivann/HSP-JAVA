@@ -11,6 +11,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
+/**
+ * Controleur de la vue de verification 2FA (totp_verify.fxml).
+ * Affiche a l'utilisateur qui a active le 2FA un champ de saisie du code OTP.
+ * Appele apres la verification du mot de passe, avant l'acces au dashboard.
+ */
 public class TotpVerifyController {
 
     @FXML private TextField codeField;

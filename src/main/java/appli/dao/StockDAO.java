@@ -73,8 +73,10 @@ public class StockDAO {
         return stocks;
     }
 
+    // Retourne les lots dont la date de péremption est dans les prochains `days` jours
     public List<Stock> findExpiringBefore(int days) {
         List<Stock> stocks = new ArrayList<>();
+        // DATE_ADD(CURDATE(), INTERVAL ? DAY) : calcule la borne de date côté MySQL
         String sql = "SELECT * FROM stocks WHERE date_peremption <= DATE_ADD(CURDATE(), INTERVAL ? DAY) AND date_peremption IS NOT NULL ORDER BY date_peremption";
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -89,6 +91,7 @@ public class StockDAO {
         return stocks;
     }
 
+    // Version autonome : ouvre sa propre connexion
     public int insert(Stock stock) {
         String sql = "INSERT INTO stocks (produit_id, emplacement_id, lot, quantite, quantite_reservee, date_peremption, " +
                 "date_reception, prix_unitaire_achat, fournisseur_id, numero_commande, date_derniere_maj) " +
@@ -102,6 +105,7 @@ public class StockDAO {
         return -1;
     }
 
+    // Version transactionnelle : réutilise une connexion externe pour participer à une transaction
     public int insert(Stock stock, Connection conn) throws SQLException {
         String sql = "INSERT INTO stocks (produit_id, emplacement_id, lot, quantite, quantite_reservee, date_peremption, " +
                 "date_reception, prix_unitaire_achat, fournisseur_id, numero_commande, date_derniere_maj) " +
@@ -111,6 +115,7 @@ public class StockDAO {
         }
     }
 
+    // Factorise la logique commune aux deux surcharges insert()
     private int executeInsert(Stock stock, PreparedStatement stmt) throws SQLException {
         stmt.setInt(1, stock.getProduitId());
         stmt.setInt(2, stock.getEmplacementId());
@@ -189,6 +194,7 @@ public class StockDAO {
         return false;
     }
 
+    // Mise à jour ciblée : modifie uniquement la quantité sans toucher aux autres champs
     public boolean updateQuantite(int stockId, int quantite) {
         String sql = "UPDATE stocks SET quantite = ?, date_derniere_maj = ? WHERE id = ?";
         try (Connection conn = DBConnection.getInstance().getConnection();
@@ -215,7 +221,9 @@ public class StockDAO {
         return false;
     }
 
+    // Calcule la quantité totale en stock sur tous les emplacements pour un produit donné
     public int getTotalQuantiteByProduit(int produitId) {
+        // COALESCE(SUM(...), 0) : retourne 0 si aucun lot en stock (évite NULL)
         String sql = "SELECT COALESCE(SUM(quantite), 0) AS total FROM stocks WHERE produit_id = ?";
         try (Connection conn = DBConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -230,6 +238,7 @@ public class StockDAO {
         return 0;
     }
 
+    // Convertit une ligne du ResultSet SQL en objet Stock Java
     private Stock mapResultSetToStock(ResultSet rs) throws SQLException {
         Stock stock = new Stock();
         stock.setId(rs.getInt("id"));

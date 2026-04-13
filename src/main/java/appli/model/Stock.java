@@ -4,6 +4,11 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * Modele representant une entree de stock : un lot d'un produit dans un emplacement donne.
+ * La quantite disponible est calculee comme {@code quantite - quantiteReservee}.
+ * La date de peremption permet de declencher des alertes anticipees.
+ */
 public class Stock {
 
     private int id;
@@ -12,7 +17,9 @@ public class Stock {
     private int emplacementId;
     private EmplacementStock emplacement;
     private String lot;
+    /** Quantite totale en stock (avant reservation). */
     private int quantite;
+    /** Quantite reservee pour des demandes en cours de livraison. */
     private int quantiteReservee;
     private LocalDate datePeremption;
     private LocalDateTime dateReception;
@@ -100,6 +107,7 @@ public class Stock {
         this.quantiteReservee = quantiteReservee;
     }
 
+    /** Retourne la quantite reellement disponible (total - reserves). */
     public int getQuantiteDisponible() {
         return quantite - quantiteReservee;
     }
@@ -160,10 +168,14 @@ public class Stock {
         this.dateDerniereMaj = dateDerniereMaj;
     }
 
+    /** Retourne {@code true} si la date de peremption est passee. */
     public boolean isPerime() {
         return datePeremption != null && datePeremption.isBefore(LocalDate.now());
     }
 
+    /**
+     * Retourne {@code true} si la date de peremption est dans moins de {@code joursAlerte} jours.
+     */
     public boolean isProcheDuPeremption(int joursAlerte) {
         if (datePeremption == null) {
             return false;
@@ -171,6 +183,10 @@ public class Stock {
         return datePeremption.isBefore(LocalDate.now().plusDays(joursAlerte));
     }
 
+    /**
+     * Retourne le nombre de jours avant la date de peremption.
+     * Retourne {@link Long#MAX_VALUE} si aucune date n'est definie.
+     */
     public long getJoursAvantPeremption() {
         if (datePeremption == null) {
             return Long.MAX_VALUE;
